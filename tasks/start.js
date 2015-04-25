@@ -4,7 +4,9 @@ var Q = require('q');
 var electron = require('electron-prebuilt');
 var pathUtil = require('path');
 var childProcess = require('child_process');
+var kill = require('tree-kill');
 var utils = require('./utils');
+var watch;
 
 var gulpPath = pathUtil.resolve('./node_modules/.bin/gulp');
 if (process.platform === 'win32') {
@@ -16,12 +18,11 @@ var runBuild = function () {
 
     var build = childProcess.spawn(gulpPath, [
         'build',
-        '--target=' + utils.getBuildTarget(),
+        '--env=' + utils.getEnvName(),
         '--color'
-    ]);
-
-    build.stdout.pipe(process.stdout);
-    build.stderr.pipe(process.stderr);
+    ], {
+        stdio: 'inherit'
+    });
 
     build.on('close', function (code) {
         deferred.resolve();
@@ -31,14 +32,13 @@ var runBuild = function () {
 };
 
 var runGulpWatch = function () {
-    var watch = childProcess.spawn(gulpPath, [
+    watch = childProcess.spawn(gulpPath, [
         'watch',
-        '--target=' + utils.getBuildTarget(),
+        '--env=' + utils.getEnvName(),
         '--color'
-    ]);
-
-    watch.stdout.pipe(process.stdout);
-    watch.stderr.pipe(process.stderr);
+    ], {
+        stdio: 'inherit'
+    });
 
     watch.on('close', function (code) {
         // Gulp watch exits when error occured during build.
@@ -48,14 +48,15 @@ var runGulpWatch = function () {
 };
 
 var runApp = function () {
-    var app = childProcess.spawn(electron, ['./build']);
-
-    app.stdout.pipe(process.stdout);
-    app.stderr.pipe(process.stderr);
+    var app = childProcess.spawn(electron, ['./build'], {
+        stdio: 'inherit'
+    });
 
     app.on('close', function (code) {
         // User closed the app. Kill the host process.
-        process.exit();
+        kill(watch.pid, 'SIGKILL', function () {
+            process.exit();
+        });
     });
 };
 

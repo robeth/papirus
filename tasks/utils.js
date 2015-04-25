@@ -2,6 +2,7 @@
 
 var argv = require('yargs').argv;
 var os = require('os');
+var jetpack = require('fs-jetpack');
 
 module.exports.os = function () {
     switch (os.platform()) {
@@ -23,6 +24,15 @@ module.exports.replace = function (str, patterns) {
     return str;
 };
 
-module.exports.getBuildTarget = function () {
-    return argv.target || 'development';
+module.exports.getEnvName = function () {
+    return argv.env || 'development';
+};
+
+module.exports.getSigningId = function () {
+    return argv.sign;
+};
+
+module.exports.getElectronVersion = function () {
+    var manifest = jetpack.read(__dirname + '/../package.json', 'json');
+    return manifest.devDependencies['electron-prebuilt'].substring(1);
 };
