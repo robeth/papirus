@@ -14,7 +14,7 @@ var projectDir = jetpack;
 var srcDir = projectDir.cwd('./app');
 var destDir = projectDir.cwd('./build');
 var bowerSrcDir = projectDir.cwd('./bower_components');
-var bowerDestDir = projectDir.cwd('./build/vendor/bower');
+var bowerDestDir = projectDir.cwd('./build/vendor/');
 
 var paths = {
     copyFromAppDir: [
@@ -24,17 +24,63 @@ var paths = {
     ],
 }
 
+var bowerPaths = {
+  plugins: {
+    src: './bower_components/admin-lte/plugins',
+    dest: './build/plugins'
+  },
+  js: {
+    src: './bower_components/admin-lte/dist/js',
+    dest: './build/js'
+  },
+  css: {
+    src: './bower_components/admin-lte/dist/css',
+    dest: './build/css'
+  },
+  img: {
+    src: './bower_components/admin-lte/dist/img',
+    dest: './build/img'
+  },
+  bootstrap: {
+    src: './bower_components/admin-lte/bootstrap',
+    dest: './build/plugins/bootstrap'
+  },
+  fa: {
+    src: './vendor/font-awesome/',
+    dest: './build/plugins/font-awesome'
+  }
+}
+
 // -------------------------------------
 // Tasks
 // -------------------------------------
 
 gulp.task('clean', function(callback) {
-  console.log("lets clean up!");
     return destDir.dirAsync('.', { empty: true });
 });
 
-var copyBowerTask = function(){
-  return bowerSrcDir.copyAsync('.', bowerDestDir.path(), { overwrite: true } );
+var copyAdminPluginTask = function(){
+  return projectDir.cwd(bowerPaths.plugins.src).copyAsync('.',projectDir.cwd(bowerPaths.plugins.dest).path(), {overwrite: true});
+};
+
+var copyAdminJsTask = function(){
+  return projectDir.cwd(bowerPaths.js.src).copyAsync('.',projectDir.cwd(bowerPaths.js.dest).path(), {overwrite: true});
+};
+
+var copyAdminCssTask = function(){
+  return projectDir.cwd(bowerPaths.css.src).copyAsync('.',projectDir.cwd(bowerPaths.css.dest).path(), {overwrite: true});
+};
+
+var copyAdminImgTask = function(){
+  return projectDir.cwd(bowerPaths.img.src).copyAsync('.',projectDir.cwd(bowerPaths.img.dest).path(), {overwrite: true});
+};
+
+var copyAdminBootstrapTask = function(){
+  return projectDir.cwd(bowerPaths.bootstrap.src).copyAsync('.',projectDir.cwd(bowerPaths.bootstrap.dest).path(), {overwrite: true});
+};
+
+var copyAdminFaTask = function(){
+  return projectDir.cwd(bowerPaths.fa.src).copyAsync('.',projectDir.cwd(bowerPaths.fa.dest).path(), {overwrite: true});
 };
 
 var copyTask = function () {
@@ -44,8 +90,15 @@ var copyTask = function () {
     });
 };
 
-gulp.task('copy-bower', copyBowerTask);
-gulp.task('copy', ['clean'], copyTask);
+gulp.task('copy-admin-plugin', ['clean'], copyAdminPluginTask);
+gulp.task('copy-admin-bootstrap', ['copy-admin-plugin'],copyAdminBootstrapTask);
+gulp.task('copy-admin-fa', ['copy-admin-bootstrap'],copyAdminFaTask);
+gulp.task('copy-admin-js', ['copy-admin-fa'],copyAdminJsTask);
+gulp.task('copy-admin-css', ['copy-admin-js'], copyAdminCssTask);
+gulp.task('copy-admin-img', ['copy-admin-css'], copyAdminImgTask);
+gulp.task('copy-admin', ['copy-admin-img']);
+
+gulp.task('copy', ['copy-admin'], copyTask);
 gulp.task('copy-watch', copyTask);
 
 var bundle = function (src, dest) {
@@ -136,4 +189,4 @@ gulp.task('watch', function () {
 });
 
 
-gulp.task('build', ['bundle', 'less', 'copy', 'copy-bower', 'finalize']);
+gulp.task('build', ['bundle', 'less', 'copy','finalize']);
