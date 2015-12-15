@@ -13,6 +13,8 @@ var generateSpecsImportFile = require('./generate_specs_import');
 var projectDir = jetpack;
 var srcDir = projectDir.cwd('./app');
 var destDir = projectDir.cwd('./build');
+var bowerSrcDir = projectDir.cwd('./bower_components');
+var bowerDestDir = projectDir.cwd('./build/vendor/bower');
 
 var paths = {
     copyFromAppDir: [
@@ -27,9 +29,13 @@ var paths = {
 // -------------------------------------
 
 gulp.task('clean', function(callback) {
+  console.log("lets clean up!");
     return destDir.dirAsync('.', { empty: true });
 });
 
+var copyBowerTask = function(){
+  return bowerSrcDir.copyAsync('.', bowerDestDir.path(), { overwrite: true } );
+};
 
 var copyTask = function () {
     return projectDir.copyAsync('app', destDir.path(), {
@@ -37,9 +43,10 @@ var copyTask = function () {
         matching: paths.copyFromAppDir
     });
 };
+
+gulp.task('copy-bower', copyBowerTask);
 gulp.task('copy', ['clean'], copyTask);
 gulp.task('copy-watch', copyTask);
-
 
 var bundle = function (src, dest) {
     var deferred = Q.defer();
@@ -129,4 +136,4 @@ gulp.task('watch', function () {
 });
 
 
-gulp.task('build', ['bundle', 'less', 'copy', 'finalize']);
+gulp.task('build', ['bundle', 'less', 'copy', 'copy-bower', 'finalize']);

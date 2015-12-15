@@ -1,0 +1,19 @@
+{
+  "name": "electron-boilerplate",
+  "version": "0.0.0",
+  "homepage": "https://github.com/szwacz/electron-boilerplate",
+  "authors": [
+    "robeth <robethrahmatullah@gmail.com>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "admin-lte": "~2.2.0"
+  }
+}
