@@ -10,6 +10,8 @@
     "target": "development"
   },
   "dependencies": {
-    "fs-jetpack": "^0.7.0"
+    "fs-jetpack": "^0.7.0",
+    "react": "^0.14.3",
+    "react-dom": "^0.14.3"
   }
 }

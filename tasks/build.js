@@ -7,6 +7,12 @@ var rollup = require('rollup');
 var less = require('gulp-less');
 var jetpack = require('fs-jetpack');
 
+// For react build purpose
+var browserify = require('browserify');
+var reactify = require('reactify');
+var uglify = require('gulp-uglify');
+var source = require('vinyl-source-stream');
+
 var utils = require('./utils');
 var generateSpecsImportFile = require('./generate_specs_import');
 
@@ -22,6 +28,11 @@ var paths = {
         './vendor/**',
         './**/*.html'
     ],
+    react: {
+      entry: './app/components/bina-mandiri.jsx',
+      destFilename: 'bina-mandiri.js',
+      destDir: './build/'
+    }
 }
 
 var bowerPaths = {
@@ -181,12 +192,28 @@ gulp.task('finalize', ['clean'], function () {
     destDir.copy(configFilePath, 'env_config.json');
 });
 
+var bundleReact = function(){
+  return browserify({
+      debug: true,
+      entries: paths.react.entry,
+      extensions: ['.js', '.jsx'],
+      transform: [reactify]
+    })
+    .bundle()
+    .pipe(source(paths.react.destFilename))
+    .pipe(gulp.dest(paths.react.destDir));
+};
+
+// Bundle react components
+gulp.task('bundle-react', ['clean'], bundleReact);
+gulp.task('bundle-react-watch', bundleReact);
 
 gulp.task('watch', function () {
     gulp.watch('app/**/*.js', ['bundle-watch']);
+    gulp.watch('app/**/*.jsx', ['bundle-react-watch']);
     gulp.watch(paths.copyFromAppDir, { cwd: 'app' }, ['copy-watch']);
     gulp.watch('app/**/*.less', ['less-watch']);
 });
 
 
-gulp.task('build', ['bundle', 'less', 'copy','finalize']);
+gulp.task('build', ['bundle', 'bundle-react' ,'less', 'copy','finalize']);

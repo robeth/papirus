@@ -5,10 +5,13 @@
     "fs-jetpack": "^0.7.0",
     "gulp": "^3.9.0",
     "gulp-less": "^3.0.3",
+    "gulp-uglify": "^1.5.1",
     "gulp-util": "^3.0.6",
     "q": "^1.4.1",
+    "reactify": "^1.1.1",
     "rollup": "^0.16.1",
     "tree-kill": "^0.1.1",
+    "vinyl-source-stream": "^1.1.0",
     "yargs": "^3.15.0"
   },
   "optionalDependencies": {

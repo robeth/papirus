@@ -33,7 +33,7 @@ app.on('ready', function () {
     if (env.name === 'test') {
         mainWindow.loadUrl('file://' + __dirname + '/spec.html');
     } else {
-        mainWindow.loadUrl('file://' + __dirname + '/index.html');
+        mainWindow.loadUrl('file://' + __dirname + '/bina-mandiri.html');
     }
 
     if (env.name !== 'production') {
