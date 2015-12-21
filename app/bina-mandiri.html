@@ -34,6 +34,9 @@
   <body>
     <div id="container">
     </div>
+    <script type="text/javascript">
+    window.Models = require('./models');
+    </script>
     <script src="bina-mandiri.js"></script>
     <!-- jQuery 2.1.4 -->
     <script>window.$ = window.jQuery = require('./plugins/jQuery/jQuery-2.1.4.min.js');</script>
@@ -281,8 +284,8 @@
       responsive: true
     };
 
-    var transactionVolumeCanvas = $('#transaction-volume-chart').get(0).getContext('2d');
-    var transactionVolumeChart = new Chart(transactionVolumeCanvas).Line(transactionVolumeChartData, transactionVolumeChartOptions);
+    // var transactionVolumeCanvas = $('#transaction-volume-chart').get(0).getContext('2d');
+    // var transactionVolumeChart = new Chart(transactionVolumeCanvas).Line(transactionVolumeChartData, transactionVolumeChartOptions);
     </script>
   </body>
 </html>

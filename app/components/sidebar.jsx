@@ -66,7 +66,7 @@ var Sidebar = React.createClass({
                 <li><a href="#" data-link="form-konversi"><i className="fa fa-recycle"></i> Konversi</a></li>
                 <li><a href="#" data-link="form-penarikan"><i className="fa fa-hand-lizard-o"></i> Penarikan</a></li>
                 <li><a href="#" data-link="form-transaksi"><i className="fa fa-file"></i> Transaksi</a></li>
-                <li><a href="#" data-link="form-nasabah"><i className="fa fa-users"></i> Nasabah</a></li>
+                <li><a href="#" data-link="form-nasabah" onClick={this._generateOnItemClick('form-nasabah')}><i className="fa fa-users"></i> Nasabah</a></li>
                 <li><a href="#" data-link="form-vendor"><i className="fa fa-truck"></i> Vendor</a></li>
                 <li><a href="#" data-link="form-kategori-transaksi"><i className="fa fa-list-ol"></i> Kategori Transaksi</a></li>
               </ul>

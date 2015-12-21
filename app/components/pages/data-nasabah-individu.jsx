@@ -1,7 +1,38 @@
 var React = require('react');
+var Nasabah = window.Models.Nasabah;
 
 var DataNasabahIndividu = React.createClass({
+  getInitialState: function(){
+    return {accounts: []};
+  },
+  componentDidMount: function(){
+    var instance = this;
+    Nasabah
+      .findAll()
+      .then(function onAccountRetrieveSuccess(accounts){
+        console.log('Retrieve all accounts data success!');
+        console.log(accounts);
+        instance.setState({accounts: accounts});
+      })
+      .catch(function onAccountRetrieveFailed(error){
+        console.log('Retrieving accounts failed...');
+        console.log(error);
+      });
+  },
   render: function(){
+    var rows = this.state.accounts.map(function(account, index){
+      return (
+        <tr>
+          <td className="text-center">{index}</td>
+          <td className="text-center"><a href="#"><span className="label label-info">{account.id}</span></a></td>
+          <td className="text-center">I01234</td>
+          <td>{account.nama} </td>
+          <td>{account.alamat}</td>
+          <td>-</td>
+          <td className="text-right">-</td>
+        </tr>
+      );
+    });
     return (
       <section className="content">
         <div className="row">
@@ -38,33 +69,7 @@ var DataNasabahIndividu = React.createClass({
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td className="text-center">1</td>
-                      <td className="text-center"><a href="#"><span className="label label-info">N107</span></a></td>
-                      <td className="text-center">I01234</td>
-                      <td>Iin </td>
-                      <td>Bratang Lapangan</td>
-                      <td>031-5400123</td>
-                      <td className="text-right">90.000,00</td>
-                    </tr>
-                    <tr>
-                      <td className="text-center">2</td>
-                      <td className="text-center"><a href="#"><span className="label label-info">N88</span></a></td>
-                      <td className="text-center">I01235</td>
-                      <td>Cinta </td>
-                      <td>Mulyorejo I</td>
-                      <td>088877001122</td>
-                      <td className="text-right">200.000,00</td>
-                    </tr>
-                    <tr>
-                      <td className="text-center">3</td>
-                      <td className="text-center"><a href="#"><span className="label label-info">N34</span></a></td>
-                      <td className="text-center">I03034</td>
-                      <td>Dudu </td>
-                      <td>Ahmad Yani 10-1</td>
-                      <td>031-52007575</td>
-                      <td className="text-right">20.000,00</td>
-                    </tr>
+                    {rows}
                   </tbody>
                 </table>
               </div>

@@ -26,7 +26,8 @@ var paths = {
     copyFromAppDir: [
         './node_modules/**',
         './vendor/**',
-        './**/*.html'
+        './**/*.html',
+        './models/**'
     ],
     react: {
       entry: './app/components/bina-mandiri.jsx',
