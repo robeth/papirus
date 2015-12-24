@@ -60,6 +60,10 @@ var bowerPaths = {
   fa: {
     src: './vendor/font-awesome/',
     dest: './build/plugins/font-awesome'
+  },
+  daterangepicker: {
+    src: './bower_components/bootstrap-daterangepicker',
+    dest: './build/plugins/bootstrap-daterangepicker'
   }
 }
 
@@ -95,6 +99,10 @@ var copyAdminFaTask = function(){
   return projectDir.cwd(bowerPaths.fa.src).copyAsync('.',projectDir.cwd(bowerPaths.fa.dest).path(), {overwrite: true});
 };
 
+var copyDaterangepickerTask = function(){
+  return projectDir.cwd(bowerPaths.daterangepicker.src).copyAsync('.',projectDir.cwd(bowerPaths.daterangepicker.dest).path(), {overwrite: true});
+};
+
 var copyTask = function () {
     return projectDir.copyAsync('app', destDir.path(), {
         overwrite: true,
@@ -108,7 +116,8 @@ gulp.task('copy-admin-fa', ['copy-admin-bootstrap'],copyAdminFaTask);
 gulp.task('copy-admin-js', ['copy-admin-fa'],copyAdminJsTask);
 gulp.task('copy-admin-css', ['copy-admin-js'], copyAdminCssTask);
 gulp.task('copy-admin-img', ['copy-admin-css'], copyAdminImgTask);
-gulp.task('copy-admin', ['copy-admin-img']);
+gulp.task('copy-daterangepicker', ['copy-admin-img'], copyDaterangepickerTask);
+gulp.task('copy-admin', ['copy-daterangepicker']);
 
 gulp.task('copy', ['copy-admin'], copyTask);
 gulp.task('copy-watch', copyTask);
