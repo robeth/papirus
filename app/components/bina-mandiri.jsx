@@ -9,7 +9,7 @@ var PAGE_DICTIONARY = require('./constants/page-dictionary');
 
 var BinaMandiri = React.createClass({
   getInitialState: function(){
-    return { currentPage: PAGE_DICTIONARY['data-nasabah-individu'] };
+    return { currentPage: PAGE_DICTIONARY['form-nasabah'] };
   },
 
   render: function(){
