@@ -16,14 +16,15 @@ var DateField = React.createClass({
 
   getInitialState: function(){
     return {
-      value: this.props.initialValue,
       status: 'neutral',
       errors: []
     };
   },
 
   componentWillReceiveProps: function(nextProps){
-    this.setState({value: nextProps.initialValue});
+    if(this.props.initialValue !== nextProps.initialValue){
+      this.refs['input'].value = nextProps.initialValue;
+    }
   },
 
   componentDidMount: function(){
@@ -35,23 +36,17 @@ var DateField = React.createClass({
       },
       startDate: '1980-01-01'
     });
-    this.refs['input'].value='';
+    this.refs['input'].value = this.props.initialValue;
   },
 
   value: function(){
-    var value = this.state.value;
+    var value = this.refs['input'].value;
 
     // Never return blank string
     if(value){
       value = value.trim();
     }
     return  value || null;
-  },
-
-  handleValueChange: function(event){
-    this.setState({
-      value: event.target.value
-    });
   },
 
   validate: function(){
@@ -65,6 +60,15 @@ var DateField = React.createClass({
     });
 
     return errors;
+  },
+
+  reset: function(){
+    this.setState({
+      status: 'neutral',
+      errors: []
+    });
+
+    this.refs['input'].value=this.props.initialValue;
   },
 
   render: function(){
@@ -95,10 +99,8 @@ var DateField = React.createClass({
             ref='input'
             type="text"
             className='form-control'
-            onChange={this.handleValueChange}
             placeholder={this.props.placeholder}
-            value={this.state.value}
-            readOnly={this.props.readOnly}/>
+            disabled={this.props.readOnly}/>
           {
             this.state.status === 'invalid'
             ? <span className="help-block">{this.state.errors[0]}</span>

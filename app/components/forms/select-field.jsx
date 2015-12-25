@@ -22,10 +22,11 @@ var SelectField = React.createClass({
   },
 
   componentWillReceiveProps: function(nextProps){
-    console.log('select new props: ' + nextProps.initialValue);
-    this.setState({
-      value: nextProps.initialValue
-    });
+    if(this.props.initialValue !== nextProps.initialValue){
+      this.setState({
+        value: nextProps.initialValue
+      });
+    }
   },
 
   value: function(){
@@ -49,6 +50,14 @@ var SelectField = React.createClass({
     });
 
     return errors;
+  },
+
+  reset: function(){
+    this.setState({
+      value: this.props.initialValue,
+      status: 'neutral',
+      errors: []
+    });
   },
 
   render: function(){

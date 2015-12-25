@@ -2,6 +2,8 @@ var React = require('react');
 var Field = require('../forms/field');
 var DateField = require('../forms/date-field');
 var SelectField = require('../forms/select-field');
+var Alert = require('../alert');
+
 var Nasabah = window.Models.Nasabah;
 
 var FormNasabah = React.createClass({
@@ -48,15 +50,7 @@ var FormNasabah = React.createClass({
     });
   },
 
-  onNewFormSubmit: function(event){
-    event.preventDefault();
-    var formErrors = this.validate();
-
-    if(formErrors.length > 0){
-      console.log('Form is invalid');
-      return;
-    }
-
+  collectPayload: function(){
     var type = this.refs['nasabah-type'].value();
     var nama = this.refs['nasabah-nama'].value();
     var ktp = this.refs['nasabah-ktp'].value();
@@ -67,22 +61,40 @@ var FormNasabah = React.createClass({
     var tanggalLahir = this.refs['nasabah-tanggal-lahir'].value();
     var email = this.refs['nasabah-email'].value();
 
+    return {
+      jenis: type,
+      nama: nama,
+      ktp: ktp,
+      alamat: alamat,
+      nama_pj: pj,
+      no_induk: noInduk,
+      telepon: telepon,
+      tanggal_lahir: tanggalLahir,
+      email: email,
+      tanggal_daftar: new Date(),
+    };
+  },
+
+  onNewFormSubmit: function(event){
+    event.preventDefault();
+    this.resetAlert();
+    var component = this;
+    var formErrors = this.validate();
+
+    if(formErrors.length > 0){
+      console.log('Form is invalid');
+      return;
+    }
+
+    var nasabahPayload = this.collectPayload();
+
     Nasabah
-      .create({
-        jenis: type,
-        nama: nama,
-        ktp: ktp,
-        alamat: alamat,
-        nama_pj: pj,
-        no_induk: noInduk,
-        telepon: telepon,
-        tanggal_lahir: tanggalLahir,
-        email: email,
-        tanggal_daftar: new Date(),
-      })
+      .create(nasabahPayload)
       .then(function onNasabahCreationSuccess(nasabah){
         console.log("success creating new nasabah!");
         console.log(nasabah);
+        component.refs['add-success-alert'].show();
+        component.resetFields();
       })
       .catch(function onNasabahCreationError(error){
         console.log("Failed creating new nasabah...");
@@ -91,33 +103,89 @@ var FormNasabah = React.createClass({
   },
 
   validate: function(){
-    var fields = [];
-    var formErrors = [];
-
-    for(var key in this.refs){
-      fields.push({component: this.refs[key], key: key});
+    function validateInput(input){
+      var fieldErrors = input.component.validate();
+      return fieldErrors.length > 0
+        ? {ref: input.key, errors: fieldErrors}
+        : null;
     }
 
-    for(var i = 0; i < fields.length; i++){
-      var fieldErrors = fields[i].component.validate();
-      if(fieldErrors.length > 0){
-        formErrors.push({ref: fields[i].key, errors: fieldErrors});
-      }
-    }
-
-    return formErrors;
+    return this.mapInputRefs(validateInput);
   },
 
   onCancel: function(event){
     event.preventDefault();
+    this.resetFields();
+    this.resetAlert();
     this.setState({isReadOnly: true});
   },
 
   onEdit: function(event){
-    console.log("onEdit");
-    console.log(this.state);
     event.preventDefault();
+    this.resetAlert();
     this.setState({isReadOnly: false});
+  },
+
+  onEditFormSubmit: function(event){
+    event.preventDefault();
+    this.resetAlert();
+    var component = this;
+    var formErrors = this.validate();
+
+    if(formErrors.length > 0){
+      console.log('Form is invalid');
+      return;
+    }
+
+    var nasabahPayload = this.collectPayload();
+
+    this.state.nasabahInstance
+      .update(nasabahPayload)
+      .then(function onNasabahCreationSuccess(nasabah){
+        console.log("success update nasabah!");
+        console.log(nasabah);
+        component.refs['edit-success-alert'].show();
+        component.setState({isReadOnly: true, nasabahInstance: nasabah});
+        component.resetFields();
+      })
+      .catch(function onNasabahCreationError(error){
+        console.log("Failed updating nasabah...");
+        console.log(error);
+      });
+
+  },
+
+  mapInputRefs: function(callback){
+    var fields = [];
+    var results = [];
+
+    for(var key in this.refs){
+      if(this.refs[key].validate){
+        fields.push({component: this.refs[key], key: key});
+      }
+    }
+
+    for(var i = 0; i < fields.length; i++){
+      if(fields[i].component.validate){
+        var result = callback(fields[i]);
+        if(result){
+          results.push(result);
+        }
+      }
+    }
+
+    return results;
+  },
+
+  resetAlert: function(){
+    this.refs['add-success-alert'].hide();
+    this.refs['edit-success-alert'].hide();
+  },
+
+  resetFields: function(){
+    this.mapInputRefs(function resetField(input){
+      input.component.reset();
+    });
   },
 
   render: function(){
@@ -127,7 +195,7 @@ var FormNasabah = React.createClass({
 
     var buttons = null;
     if(this.props.mode === 'add'){
-      buttons = <button className="btn btn-info pull-right" ><i className="fa fa-save"></i> Simpan</button>
+      buttons = <button className="btn btn-success pull-right" ><i className="fa fa-save"></i> Simpan</button>
     }
     else {
       if(this.state.isReadOnly){
@@ -135,8 +203,8 @@ var FormNasabah = React.createClass({
       } else {
         buttons = (
           <div>
-            <button className="btn btn-info pull-right" onClick={this.onCancel} ><i className="fa fa-save"></i> Cancel</button>
-            <button className="btn btn-info pull-right" ><i className="fa fa-save"></i> Simpan</button>
+            <button className="btn btn-danger pull-right" onClick={this.onCancel} ><i className="fa fa-undo"></i> Batal</button>
+            <button className="btn btn-success pull-right" onClick={this.onEditFormSubmit}><i className="fa fa-pencil"></i> Simpan</button>
           </div>
         );
       }
@@ -148,6 +216,22 @@ var FormNasabah = React.createClass({
 
     return (
       <form role="form" className="form-horizontal" onSubmit={formHandler}>
+        <div className="row">
+          <div className="col-xs-12">
+            <Alert
+              ref='add-success-alert'
+              type='success' show={false}
+              title={<div><i className='icon fa fa-check'/> Success!</div>}>
+              Nasabah successfully added
+            </Alert>
+            <Alert
+              ref='edit-success-alert'
+              type='info' show={false}
+              title={<div><i className='icon fa fa-check'/> Success!</div>}>
+              Nasabah successfully updated
+            </Alert>
+          </div>
+        </div>
         <div className="row">
           <div className="col-xs-6">
             <SelectField

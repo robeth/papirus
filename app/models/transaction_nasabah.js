@@ -1,5 +1,5 @@
 /* jshint indent: 2 */
-
+var Moment = window.moment;
 module.exports = function(sequelize, DataTypes) {
   console.log(sequelize);
   return sequelize.define('transaction_nasabah', {
@@ -31,7 +31,11 @@ module.exports = function(sequelize, DataTypes) {
     },
     tanggal_lahir: {
       type: DataTypes.DATE,
-      allowNull: true
+      allowNull: true,
+      get: function(){
+        var bornDate = this.getDataValue('tanggal_lahir');
+        return Moment(bornDate).format('YYYY-MM-DD');
+      }
     },
     tanggal_daftar: {
       type: DataTypes.DATE,

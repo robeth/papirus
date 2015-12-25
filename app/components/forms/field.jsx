@@ -22,9 +22,11 @@ var Field = React.createClass({
   },
 
   componentWillReceiveProps: function(nextProps){
-    this.setState({
-      value: nextProps.initialValue
-    });
+    if(this.props.initialValue !== nextProps.initialValue){
+      this.setState({
+        value: nextProps.initialValue
+      });
+    }
   },
 
   handleValueChange: function(event){
