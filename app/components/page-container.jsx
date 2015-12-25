@@ -8,11 +8,11 @@ var PageContainer = React.createClass({
       <div className="content-wrapper">
         <section className="content-header">
           <h1>
-            {this.props.page.title}
+            {this.props.title}
           </h1>
-          <Breadcrumbs path={this.props.page.path}/>
+          <Breadcrumbs path={this.props.path}/>
         </section>
-        {this.props.page.element}
+        {this.props.children}
       </div>
     );
   }

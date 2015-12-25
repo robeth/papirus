@@ -1,15 +1,17 @@
 var React = require('react');
-var Box = require('../box.jsx');
 var NasabahForm = require('../forms/nasabah');
+var Box = require('../box.jsx');
+var Nasabah = window.Models.Nasabah;
 
-var NasabahFormPage = React.createClass({
+var DetailNasabah = React.createClass({
+
   render: function(){
     return (
       <section className="content">
         <Box.Container className="box-info">
           <Box.Header showBorder={true} title='Nasabah Baru'/>
           <Box.Body>
-            <NasabahForm mode='add'/>
+            <NasabahForm mode='edit' nasabahId={this.props.nasabahId}/>
           </Box.Body>
         </Box.Container>
       </section>
@@ -17,4 +19,4 @@ var NasabahFormPage = React.createClass({
   }
 });
 
-module.exports = NasabahFormPage;
+module.exports = DetailNasabah;

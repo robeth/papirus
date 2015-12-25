@@ -8,18 +8,34 @@ var SelectField = React.createClass({
     htmlId: React.PropTypes.string,
     label: React.PropTypes.string,
     onSelectChange: React.PropTypes.func,
-    validation: React.PropTypes.arrayOf(React.PropTypes.string)
+    validation: React.PropTypes.arrayOf(React.PropTypes.string),
+    readOnly: React.PropTypes.bool,
+    initialValue: React.PropTypes.string
   },
 
   getInitialState: function(){
     return {
+      value: this.props.initialValue,
       status: 'neutral',
       errors: []
     };
   },
 
+  componentWillReceiveProps: function(nextProps){
+    console.log('select new props: ' + nextProps.initialValue);
+    this.setState({
+      value: nextProps.initialValue
+    });
+  },
+
   value: function(){
-    return this.refs['input'].value;
+    return this.state.value;
+  },
+
+  handleValueChange: function(event){
+    this.setState({
+      value: event.target.value
+    });
   },
 
   validate: function(){
@@ -62,7 +78,9 @@ var SelectField = React.createClass({
           <select
             ref='input'
             className='form-control'
-            onChange={this.props.onSelectChange}>
+            disabled={this.props.readOnly}
+            onChange={this.handleValueChange}
+            value={this.state.value}>
             {this.props.children}
           </select>
           {

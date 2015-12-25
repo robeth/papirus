@@ -2,6 +2,7 @@ var React = require('react');
 
 var Dashboard = React.createClass({
   render: function(){
+    console.log('hahahahaha');
     return (
       <section className="content">
         <div className="row">

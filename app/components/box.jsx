@@ -44,8 +44,22 @@ var BoxBody = React.createClass({
   }
 });
 
+var BoxFooter = React.createClass({
+  propTypes: {
+    className: React.PropTypes.string
+  },
+  render: function(){
+    return (
+      <div className={classNames('box-footer', this.props.className)}>
+        {this.props.children}
+      </div>
+    );
+  }
+});
+
 module.exports = {
   Container: BoxContainer,
   Header: BoxHeader,
-  Body: BoxBody
+  Body: BoxBody,
+  Footer: BoxFooter
 };

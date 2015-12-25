@@ -8,24 +8,29 @@ var Field = React.createClass({
     htmlId: React.PropTypes.string,
     label: React.PropTypes.string,
     placeholder: React.PropTypes.string,
-    validation: React.PropTypes.arrayOf(React.PropTypes.string)
+    validation: React.PropTypes.arrayOf(React.PropTypes.string),
+    readOnly: React.PropTypes.bool,
+    initialValue: React.PropTypes.string
   },
 
   getInitialState: function(){
     return {
+      value: this.props.initialValue,
       status: 'neutral',
       errors: []
     };
   },
 
-  value: function(){
-    var value = this.refs['input'].value;
+  componentWillReceiveProps: function(nextProps){
+    this.setState({
+      value: nextProps.initialValue
+    });
+  },
 
-    // Never return blank string
-    if(value){
-      value = value.trim();
-    }
-    return  value || null;
+  handleValueChange: function(event){
+    this.setState({
+      value: event.target.value
+    });
   },
 
   validate: function(){
@@ -39,6 +44,25 @@ var Field = React.createClass({
     });
 
     return errors;
+  },
+
+  value: function(){
+    var currentValue = this.state.value;
+
+    // Never return blank/whitespace string
+    // If blank/whitespace, return null instead
+    if(currentValue){
+      currentValue = currentValue.trim();
+    }
+    return  currentValue || null;
+  },
+
+  reset: function(){
+    this.setState({
+      value: this.props.initialValue,
+      status: 'neutral',
+      errors: []
+    });
   },
 
   render: function(){
@@ -69,7 +93,10 @@ var Field = React.createClass({
             ref='input'
             type="text"
             className='form-control'
-            placeholder={this.props.placeholder}/>
+            onChange={this.handleValueChange}
+            placeholder={this.props.placeholder}
+            readOnly={this.props.readOnly}
+            value={this.state.value}/>
           {
             this.state.status === 'invalid'
             ? <span className="help-block">{this.state.errors[0]}</span>

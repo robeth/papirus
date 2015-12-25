@@ -9,14 +9,21 @@ var DateField = React.createClass({
     label: React.PropTypes.string,
     placeholder: React.PropTypes.string,
     type: React.PropTypes.oneOf(['single', 'range']),
-    validation: React.PropTypes.arrayOf(React.PropTypes.string)
+    validation: React.PropTypes.arrayOf(React.PropTypes.string),
+    readOnly: React.PropTypes.bool,
+    initialValue: React.PropTypes.string
   },
 
   getInitialState: function(){
     return {
+      value: this.props.initialValue,
       status: 'neutral',
       errors: []
     };
+  },
+
+  componentWillReceiveProps: function(nextProps){
+    this.setState({value: nextProps.initialValue});
   },
 
   componentDidMount: function(){
@@ -32,13 +39,19 @@ var DateField = React.createClass({
   },
 
   value: function(){
-    var value = this.refs['input'].value;
+    var value = this.state.value;
 
     // Never return blank string
     if(value){
       value = value.trim();
     }
     return  value || null;
+  },
+
+  handleValueChange: function(event){
+    this.setState({
+      value: event.target.value
+    });
   },
 
   validate: function(){
@@ -82,7 +95,10 @@ var DateField = React.createClass({
             ref='input'
             type="text"
             className='form-control'
-            placeholder={this.props.placeholder}/>
+            onChange={this.handleValueChange}
+            placeholder={this.props.placeholder}
+            value={this.state.value}
+            readOnly={this.props.readOnly}/>
           {
             this.state.status === 'invalid'
             ? <span className="help-block">{this.state.errors[0]}</span>

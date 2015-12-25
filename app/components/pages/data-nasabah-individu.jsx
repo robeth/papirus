@@ -19,12 +19,18 @@ var DataNasabahIndividu = React.createClass({
         console.log(error);
       });
   },
+
+  _generateOnItemClick: function(argument, nasabahId){
+    return function(){return this.props.changePage(argument, {nasabahId: nasabahId})};
+  },
+
   render: function(){
+    var component = this;
     var rows = this.state.accounts.map(function(account, index){
       return (
         <tr>
           <td className="text-center">{index}</td>
-          <td className="text-center"><a href="#"><span className="label label-info">{account.id}</span></a></td>
+          <td className="text-center"><a onClick={this._generateOnItemClick('detail-nasabah', account.id).bind(component)}><span className="label label-info">{account.id}</span></a></td>
           <td className="text-center">I01234</td>
           <td>{account.nama} </td>
           <td>{account.alamat}</td>
@@ -32,7 +38,7 @@ var DataNasabahIndividu = React.createClass({
           <td className="text-right">-</td>
         </tr>
       );
-    });
+    }.bind(component));
     return (
       <section className="content">
         <div className="row">
@@ -45,7 +51,7 @@ var DataNasabahIndividu = React.createClass({
                 <div className="form-group">
                   <div className="input-group">
                     <div className="input-group-addon"><i className="fa fa-calendar"></i></div>
-                    <input data-widget="calendar-range" className="form-control pull-right" value="11/01/2015 - 11/30/2015"></input>
+                    <input data-widget="calendar-range" className="form-control pull-right"></input>
                   </div>
                 </div>
               </div>
