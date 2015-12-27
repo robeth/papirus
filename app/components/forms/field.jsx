@@ -10,7 +10,9 @@ var Field = React.createClass({
     placeholder: React.PropTypes.string,
     validation: React.PropTypes.arrayOf(React.PropTypes.string),
     readOnly: React.PropTypes.bool,
-    initialValue: React.PropTypes.string
+    initialValue: React.PropTypes.string,
+    prefixAddon: React.PropTypes.string,
+    suffixAddon: React.PropTypes.string
   },
 
   getInitialState: function(){
@@ -83,30 +85,64 @@ var Field = React.createClass({
         break;
     }
 
-    return (
-      <div className={classNames('form-group', cssStatus)}>
-        <label
-          htmlFor={this.props.htmlId}
-          className={classNames('control-label', 'col-sm-'+labelColumn)}>
-          {this.props.label}
-        </label>
-        <div className={'col-sm-' + this.props.inputColumn}>
-          <input
-            ref='input'
-            type="text"
-            className='form-control'
-            onChange={this.handleValueChange}
-            placeholder={this.props.placeholder}
-            readOnly={this.props.readOnly}
-            value={this.state.value}/>
-          {
-            this.state.status === 'invalid'
-            ? <span className="help-block">{this.state.errors[0]}</span>
-            : ''
-          }
-        </div>
+    var prefix
+    var inputFieldWithAddon = (
+      <div className='input-group'>
+        {this.props.prefixAddon && (
+          <span className="input-group-addon">{this.props.prefixAddon}</span>
+        )}
+        <input
+          ref='input'
+          type="text"
+          className='form-control'
+          onChange={this.handleValueChange}
+          placeholder={this.props.placeholder}
+          readOnly={this.props.readOnly}
+          value={this.state.value}/>
+        {this.props.suffixAddon && (
+          <span className="input-group-addon">{this.props.suffixAddon}</span>
+        )}
       </div>
     );
+
+    var inputFieldWithoutAddon = (
+      <input
+        ref='input'
+        type="text"
+        className='form-control'
+        onChange={this.handleValueChange}
+        placeholder={this.props.placeholder}
+        readOnly={this.props.readOnly}
+        value={this.state.value}/>
+    );
+
+    var inputField = this.props.suffixAddon || this.props.prefixAddon
+      ? inputFieldWithAddon
+      : inputFieldWithoutAddon;
+
+    var inputContainer = (
+      <div className={'col-xs-' + this.props.inputColumn}>
+        {inputField}
+        {
+          this.state.status === 'invalid'
+          ? <span className="help-block">{this.state.errors[0]}</span>
+          : ''
+        }
+      </div>
+    );
+
+    return this.props.label
+      ? (
+          <div className={classNames('form-group', cssStatus)}>
+            <label
+              htmlFor={this.props.htmlId}
+              className={classNames('control-label', 'col-xs-'+labelColumn)}>
+              {this.props.label}
+            </label>
+            {inputContainer}
+          </div>
+        )
+      : inputContainer;
   }
 });
 

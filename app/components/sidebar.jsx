@@ -61,7 +61,7 @@ var Sidebar = React.createClass({
                 <i className="fa fa-angle-left pull-right"></i>
               </a>
               <ul className="treeview-menu">
-                <li><a href="#" data-link="form-pembelian"><i className="fa fa-arrow-right"></i> Pembelian</a></li>
+                <li><a href="#" data-link="form-pembelian" onClick={this._generateOnItemClick('form-pembelian')}><i className="fa fa-arrow-right"></i> Pembelian</a></li>
                 <li><a href="#" data-link="form-penjualan"><i className="fa fa-arrow-left"></i> Penjualan</a></li>
                 <li><a href="#" data-link="form-konversi"><i className="fa fa-recycle"></i> Konversi</a></li>
                 <li><a href="#" data-link="form-penarikan"><i className="fa fa-hand-lizard-o"></i> Penarikan</a></li>
