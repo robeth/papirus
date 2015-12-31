@@ -1,8 +1,8 @@
-var tableName = 'transaction_detailpenarikan';
+var tableName = 'transaction_detailpenjualan';
 
 module.exports = {
   up: function(queryInterface, DataTypes){
-    console.log('Migration 009');
+    console.log('Migration 011');
     queryInterface.createTable(tableName, {
       id: {
         type: DataTypes.INTEGER(11),
@@ -10,29 +10,34 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true
       },
-      penarikan_id: {
+      penjualan_id: {
         type: DataTypes.INTEGER(11),
         allowNull: false,
         references: {
-          model: 'transaction_penarikan',
+          model: 'transaction_penjualan',
           key: 'id'
         }
       },
-      pembelian_id: {
+      stok_id: {
         type: DataTypes.INTEGER(11),
         allowNull: false,
         references: {
-          model: 'transaction_pembelian',
+          model: 'transaction_stok',
           key: 'id'
         }
       },
       jumlah: {
         type: DataTypes.DECIMAL,
         allowNull: false
+      },
+      harga: {
+        type: DataTypes.DECIMAL,
+        allowNull: false
       }
     });
   },
   down: function(queryInterface, DataTypes){
+    console.log("Down 011");
     queryInterface.dropTable(tableName);
   }
 };

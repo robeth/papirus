@@ -1,8 +1,8 @@
-var tableName = 'transaction_kategori';
+var tableName = 'transaction_nasabah';
 
 module.exports = {
   up: function(queryInterface, DataTypes){
-    console.log('Migration 004');
+    console.log('Migration 001');
     queryInterface.createTable(tableName, {
       id: {
         type: DataTypes.INTEGER(11),
@@ -10,47 +10,55 @@ module.exports = {
         primaryKey: true,
         autoIncrement: true
       },
-      kode: {
+      ktp: {
         type: DataTypes.STRING,
-        allowNull: false
+        allowNull: true
       },
       nama: {
         type: DataTypes.STRING,
         allowNull: false
       },
-      deskripsi: {
+      alamat: {
         type: DataTypes.TEXT,
         allowNull: false
       },
-      satuan: {
+      telepon: {
         type: DataTypes.STRING,
+        allowNull: true
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: true
+      },
+      tanggal_lahir: {
+        type: DataTypes.DATE,
+        allowNull: true
+      },
+      tanggal_daftar: {
+        type: DataTypes.DATE,
         allowNull: false
       },
       foto: {
         type: DataTypes.STRING,
         allowNull: true
       },
-      stabil: {
-        type: DataTypes.DECIMAL,
+      jenis: {
+        type: DataTypes.STRING,
         allowNull: false,
-        defaultValue: '0.00'
+        defaultValue: 'individu'
       },
-      fluktuatif: {
-        type: DataTypes.DECIMAL,
-        allowNull: false,
-        defaultValue: '0.00'
+      nama_pj: {
+        type: DataTypes.STRING,
+        allowNull: true
       },
-      report_kategori_id: {
-        type: DataTypes.INTEGER(11),
-        allowNull: false,
-        references: {
-          model: 'transaction_reportkategori',
-          key: 'id'
-        }
+      no_induk: {
+        type: DataTypes.STRING,
+        allowNull: true
       }
     });
   },
   down: function(queryInterface, DataTypes){
+    console.log("Down 001");
     queryInterface.dropTable(tableName);
   }
 };

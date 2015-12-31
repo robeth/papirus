@@ -6,7 +6,7 @@ var DATA = [
   {id: 3, nama: 'Kaca', satuan: 'kg'},
   {id: 4, nama: 'Plastik', satuan: 'kg'},
   {id: 5, nama: 'Plastik non lembar', satuan: 'kg'},
-  {id: 6, nama: 'Kertas', satuan: 'kg'},
+  {id: 6, nama: 'Kertas', satuan: 'kg'}
 ];
 
 function getSqlValueString(){
@@ -44,6 +44,7 @@ module.exports = {
     });
   },
   down: function(queryInterface, DataTypes){
+    console.log("Down 003");
     queryInterface.dropTable(tableName);
   }
 };

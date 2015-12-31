@@ -1,12 +1,4 @@
 var Sequelize = require('sequelize');
-var nasabahDescription = require('./transaction_nasabah');
-var sequelizeMetaDescription = require('./sequelize-meta');
-var Umzug = require('umzug');
-
-var jetpack = require('fs-jetpack');
-var modelsDir = jetpack.cwd(__dirname);
-var migrationFiles = modelsDir.list('migrations/');
-console.log('migrations files: ' + migrationFiles.sort() );
 
 var sequelize = new Sequelize(
   'papirus',
@@ -21,49 +13,32 @@ var sequelize = new Sequelize(
   }
 );
 
-var Nasabah = sequelize.import('transaction_nasabah', nasabahDescription);
-var SequelizeMeta = sequelize.import('SequelizeMeta', sequelizeMetaDescription);
+// Model name & import path/table name pair
+var MODEL_DICTIONARY = {
+  'Sequelize': 'sequelize-meta',
+  'Nasabah': 'transaction_nasabah',
+  'Vendor': 'transaction_vendor',
+  'ReportKategori': 'transaction_reportkategori',
+  'Kategori': 'transaction_kategori',
+  'Stok': 'transaction_stok',
+  'Penarikan': 'transaction_penarikan',
+  'Pembelian': 'transaction_pembelian',
+  'StokPembelian': 'transaction_pembelian_stocks',
+  'DetailPenarikan': 'transaction_detailpenarikan',
+  'Penjualan': 'transaction_penjualan',
+  'DetailPenjualan': 'transaction_detailpenjualan',
+  'Konversi': 'transaction_konversi',
+  'DetailIn': 'transaction_detailin',
+  'KonversiOut': 'transaction_konversi_outs'
+}
 
+module.exports = {}
 
-
-Nasabah
-  .drop()
-  .then(function(result){
-    console.log('Nasabah drop result: ' + result);
-  });
-
-SequelizeMeta
-  .drop()
-  .then(function(result){
-    console.log('SequelizeMeta drop result:' + result);
-  });
-
-var umzug = new Umzug({
-  storage: 'sequelize',
-  storageOptions: {
-    sequelize: sequelize,
-  },
-  migrations: {
-    params: [sequelize.getQueryInterface(), Sequelize],
-    path: __dirname + '/migrations'
+// Register All Models
+for(var modelName in MODEL_DICTIONARY){
+  // Make sure prototype/built-in attribute doesn't pass
+  if(MODEL_DICTIONARY.hasOwnProperty(modelName)){
+    var tableName = MODEL_DICTIONARY[modelName];
+    module.exports[modelName] = sequelize.import(tableName, require('./' + tableName));
   }
-});
-
-console.log('Execute migrations');
-
-umzug.execute({
-  migrations: migrationFiles,
-  method: 'up'
-}).then(function(migrations){
-  console.log("migrations finished");
-  console.log(migrations);
-}).catch(function(error){
-  console.log(error);
-});
-
-
-
-
-module.exports = {
-  Nasabah: Nasabah
 }

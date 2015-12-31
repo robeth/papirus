@@ -21,6 +21,7 @@ module.exports = {
     });
   },
   down: function(queryInterface, DataTypes){
+    console.log("Down 012");
     queryInterface.dropTable(tableName);
   }
 };

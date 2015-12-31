@@ -27,7 +27,8 @@ var paths = {
         './node_modules/**',
         './vendor/**',
         './**/*.html',
-        './models/**'
+        './models/**',
+        './migrations/**'
     ],
     react: {
       entry: './app/components/bina-mandiri.jsx',
@@ -151,6 +152,7 @@ var bundleApplication = function () {
     return Q.all([
         bundle(srcDir.path('background.js'), destDir.path('background.js')),
         bundle(srcDir.path('app.js'), destDir.path('app.js')),
+        bundle(srcDir.path('migration.js'), destDir.path('migration.js')),
     ]);
 };
 
