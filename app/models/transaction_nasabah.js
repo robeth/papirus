@@ -1,7 +1,6 @@
 /* jshint indent: 2 */
 var Moment = require('moment');
 module.exports = function(sequelize, DataTypes) {
-  console.log(sequelize);
   return sequelize.define('transaction_nasabah', {
     id: {
       type: DataTypes.INTEGER(11),
