@@ -58,7 +58,7 @@ module.exports = {
         "(9, 'AL2', 'Siku', 'Tirai, Kusen, Rak, Jemuran,dll', 'Kg', '', 14500.00, 13000.00, 2)," +
         "(10, 'BT6', 'Beling', 'Pecahan Botol, Lampu,', 'Kg', '', 50.00, 50.00, 3)," +
         "(11, 'KN', 'Kuningan ', 'Kran warna kuning, barang antik dari kuningan ', 'Kg', '', 32000.00, 20500.00, 1)," +
-        "(12, 'AL4', 'Panci dan Wajan ', 'Panci dan Wajan bekas ', 'Kg', '', 10500.00, 9800.00, 2," +
+        "(12, 'AL4', 'Panci dan Wajan ', 'Panci dan Wajan bekas ', 'Kg', '', 10500.00, 9800.00, 2)," +
         "(13, 'AL5', 'Kaleng Aluminium', 'Kalengpocari,coca cola,yg tidak tertarik dgn magnet', 'Kg', '', 10000.00, 9500.00, 2)," +
         "(14, 'AL6', 'Parfum', 'Tempat parfum, Semprotan Serangga, tidak tertarik dgn magnet', 'Kg', '', 5000.00, 3600.00, 2)," +
         "(15, 'B2', 'Grabang/greed', 'Pipa, kompor,besi tipis ', 'Kg', '', 1700.00, 1700.00, 1)," +

@@ -66,7 +66,7 @@ var dummyUmzug = new Umzug({
 });
 
 function upDummy(){
-  console.log('Dummy Migrations started');
+  console.log('UP Dummy Migrations started');
   console.log(dummyMigrationFiles);
   return dummyUmzug.execute({
     migrations: dummyMigrationFiles,
@@ -74,8 +74,18 @@ function upDummy(){
   });
 }
 
+function downDummy(){
+  console.log('DOWN Dummy Migrations started');
+  console.log(dummyMigrationFiles);
+  return dummyUmzug.execute({
+    migrations: dummyMigrationFiles.sort().reverse(),
+    method: 'down'
+  });
+}
+
 module.exports = {
   up: up,
   down: down,
   upDummy: upDummy,
+  downDummy: downDummy
 }
