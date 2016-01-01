@@ -7,6 +7,7 @@ var PembelianDetails = require('./pembelian-details');
 var DynamicForm = require('./dynamic-form');
 var Alert = require('../alert');
 var Nasabah = window.Models.Nasabah;
+var Pembelian = window.Models.Pembelian;
 
 var PembelianForm = React.createClass({
   getPropTypes: {
@@ -20,7 +21,7 @@ var PembelianForm = React.createClass({
       nasabahInstances: [],
       pembelianInstance: {
         tanggal: '',
-        nasabah_id: '',
+        nasabah_id: undefined,
         nota: ''
       }
     };
@@ -28,13 +29,14 @@ var PembelianForm = React.createClass({
 
   componentDidMount: function(){
     var component = this;
+
+    // Initialize nasabah selection
     Nasabah
     .findAll()
     .then(function onFound(nasabahInstances){
       console.log('All nasabah found');
       console.log(nasabahInstances);
       component.setState({nasabahInstances: nasabahInstances});
-      component.formatNasabahSelection();
     })
     .catch(function onError(error){
       console.log('error fetching all nasabah');
@@ -42,22 +44,112 @@ var PembelianForm = React.createClass({
     });
   },
 
-  formatNasabahOption: function (state){
-    return $('<div><span class="label label-info">N' + state.id + '</span> ' + state.text + '</div>');
+  validate: function(){
+    function validateInput(input){
+      var fieldErrors = input.component.validate();
+      return fieldErrors.length > 0
+        ? {ref: input.key, errors: fieldErrors}
+        : null;
+    }
+
+    return this.mapInputRefs(validateInput);
   },
 
-  formatNasabahSelection: function(){
+  onNewFormSubmit: function(event){
+    event.preventDefault();
+    this.resetAlert();
+    var formErrors = this.validate();
+
+    if(formErrors.length > 0){
+      console.log('Pembelian form is invalid');
+      console.log('Invalid: ');
+      console.log(formErrors);
+      return;
+    }
+    var pembelianPayload = this.collectPayload();
     var component = this;
-    $(component.refs['nasabah_id'].refs['input']).select2({
-      templateResult: component.formatNasabahOption,
-      templateSelection: component.formatNasabahOption
+    Pembelian
+      .create(pembelianPayload)
+      .then(function onPembelianCreationSuccess(pembelian){
+        console.log("success creating new pembelian!");
+        console.log(pembelian);
+
+        // Instruct child forms to save
+        component.getChildrenForms().map(function(childForm, index, arr){
+          childForm.save(pembelian);
+        });
+        component.refs['add-success-alert'].show();
+        component.resetFields();
+      })
+      .catch(function onPembelianCreationError(error){
+        console.log("Failed creating new pembelian...");
+        console.log(error);
+      });
+
+  },
+
+  resetAlert: function(){
+    this.refs['add-success-alert'].hide();
+    this.refs['edit-success-alert'].hide();
+  },
+
+  resetFields: function(){
+    this.mapInputRefs(function resetField(input){
+      input.component.reset();
     });
   },
 
-  render: function(){
-    var formHandler = function(event){
-      event.preventDefault();
+  collectPayload: function(){
+    var tanggal = this.refs['tanggal'].value();
+    var nasabah_id = this.refs['nasabah_id'].value();
+    var nota = this.refs['nota'].value();
+
+    return {
+      tanggal: tanggal,
+      nasabah_id: nasabah_id,
+      nota: nota
     };
+  },
+
+  mapInputRefs: function(callback){
+    var fields = [];
+    var results = [];
+
+    for(var key in this.refs){
+      if(this.refs[key].validate){
+        fields.push({component: this.refs[key], key: key});
+      }
+    }
+
+    for(var i = 0; i < fields.length; i++){
+      if(fields[i].component.validate){
+        var result = callback(fields[i]);
+        if(result){
+          results.push(result);
+        }
+      }
+    }
+
+    return results;
+  },
+
+  getChildrenForms: function(){
+    var childrenForms = [];
+
+    for(var key in this.refs){
+      if(this.refs[key].save){
+        childrenForms.push(this.refs[key]);
+      }
+    }
+
+    return childrenForms;
+  },
+
+  formatOption: function (state){
+    return $('<div><span class="label label-info">N' + state.id + '</span> ' + state.text + '</div>');
+  },
+
+  render: function(){
     var nasabahOptions = this.state.nasabahInstances.map(
       function(nasabahInstance, index, arr){
         return (
@@ -71,7 +163,7 @@ var PembelianForm = React.createClass({
     );
 
     return (
-      <form role="form" className="form-horizontal" onSubmit={formHandler}>
+      <form role="form" className="form-horizontal" onSubmit={this.onNewFormSubmit}>
         <Box.Container className="box-info">
           <Box.Header showBorder={true} title='Pembelian Baru'/>
           <Box.Body>
@@ -112,7 +204,9 @@ var PembelianForm = React.createClass({
                   ref='nasabah_id'
                   inputColumn={10}
                   htmlId='nasabah-type'
-                  label='Jenis'
+                  label='Nasabah'
+                  select2={true}
+                  formatOption={this.formatOption}
                   validation={['required']}
                   readOnly={this.state.isReadOnly}
                   initialValue={this.state.pembelianInstance.nasabah_id}>
@@ -129,23 +223,8 @@ var PembelianForm = React.createClass({
             <DynamicForm
               header={React.createFactory(PembelianDetails.Header)}
               element={React.createFactory(PembelianDetails.Element)}
+              ref='pembelian_stocks'
               />
-            <div className="row">
-              <div className="col-xs-12">
-                <Alert
-                  ref='add-success-alert'
-                  type='success' show={false}
-                  title={<div><i className='icon fa fa-check'/> Success!</div>}>
-                  Pembelian successfully added
-                </Alert>
-                <Alert
-                  ref='edit-success-alert'
-                  type='info' show={false}
-                  title={<div><i className='icon fa fa-check'/> Success!</div>}>
-                  Pembelian successfully updated
-                </Alert>
-              </div>
-            </div>
           </Box.Body>
         </Box.Container>
         <div className="row">

@@ -121,7 +121,7 @@ var Field = React.createClass({
       : inputFieldWithoutAddon;
 
     var inputContainer = (
-      <div className={'col-xs-' + this.props.inputColumn}>
+      <div className={classNames('col-xs-' + this.props.inputColumn, cssStatus)}>
         {inputField}
         {
           this.state.status === 'invalid'

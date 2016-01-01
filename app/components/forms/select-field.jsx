@@ -10,7 +10,10 @@ var SelectField = React.createClass({
     onSelectChange: React.PropTypes.func,
     validation: React.PropTypes.arrayOf(React.PropTypes.string),
     readOnly: React.PropTypes.bool,
-    initialValue: React.PropTypes.string
+    initialValue: React.PropTypes.string,
+    select2: React.PropTypes.bool,
+    formatSelection: React.PropTypes.func,
+    formatOption: React.PropTypes.func
   },
 
   getInitialState: function(){
@@ -21,11 +24,26 @@ var SelectField = React.createClass({
     };
   },
 
+  componentDidMount: function(){
+    console.log('mount');
+    if(this.props.select2){
+      this.formatSelection();
+    }
+  },
+
   componentWillReceiveProps: function(nextProps){
     if(this.props.initialValue !== nextProps.initialValue){
       this.setState({
         value: nextProps.initialValue
       });
+    }
+    if(this.props.select2){
+      console.log('select2 new props: ');
+      console.log(nextProps.children.length > 0 ? nextProps.children[0].props.value : null);
+      this.setState({
+        value: nextProps.children.length > 0 ? nextProps.children[0].props.value : null
+      });
+      $(this.refs['input']).trigger('change');
     }
   },
 
@@ -34,6 +52,7 @@ var SelectField = React.createClass({
   },
 
   handleValueChange: function(event){
+    console.log('Change value: ' + event.target.value);
     this.setState({
       value: event.target.value
     });
@@ -60,10 +79,22 @@ var SelectField = React.createClass({
     });
   },
 
+  formatSelection: function(){
+    var component = this;
+    $(component.refs['input']).select2({
+      templateResult: component.props.formatOption,
+      templateSelection: component.props.formatOption
+    });
+
+    $(component.refs['input']).on('change', function(event){
+      component.setState({value: event.target.value});
+    });
+  },
+
   render: function(){
     var labelColumn = 12 - this.props.inputColumn;
     var cssStatus = null;
-
+    console.log('select options: ' + this.props.children.length +'--- select value: ' + this.state.value);
     switch(this.state.status) {
       case 'valid':
         cssStatus = 'has-success';
@@ -76,30 +107,37 @@ var SelectField = React.createClass({
         break;
     }
 
-    return (
-      <div className={classNames('form-group', cssStatus)}>
-        <label
-          htmlFor={this.props.htmlId}
-          className={classNames('control-label', 'col-sm-'+labelColumn)}>
-          {this.props.label}
-        </label>
-        <div className={'col-sm-' + this.props.inputColumn}>
-          <select
-            ref='input'
-            className='form-control'
-            disabled={this.props.readOnly}
-            onChange={this.handleValueChange}
-            value={this.state.value}>
-            {this.props.children}
-          </select>
-          {
-            this.state.status === 'invalid'
-            ? <span className="help-block">{this.state.errors[0]}</span>
-            : ''
-          }
-        </div>
+    var selectInputField = (
+      <div className={classNames('col-xs-' + this.props.inputColumn, cssStatus)}>
+        <select
+          ref='input'
+          className='form-control'
+          disabled={this.props.readOnly}
+          onChange={this.handleValueChange}
+          value={this.state.value}>
+          {this.props.children}
+        </select>
+        {
+          this.state.status === 'invalid'
+          // ? <span className="help-block">{this.state.errors[0]}</span>
+          ? ''
+          : ''
+        }
       </div>
     );
+
+    return this.props.label
+      ? (
+        <div className={classNames('form-group', cssStatus)}>
+          <label
+            htmlFor={this.props.htmlId}
+            className={classNames('control-label', 'col-sm-'+labelColumn)}>
+            {this.props.label}
+          </label>
+          {selectInputField}
+        </div>
+        )
+      : selectInputField;
   }
 });
 

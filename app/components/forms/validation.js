@@ -8,7 +8,11 @@ function required(value){
   }
 
   if(typeof value !== 'string'){
-    return 'Invalid value. Must be string';
+    try{
+      value = value.toString();
+    } catch(error){
+      return error.toString();
+    }
   }
 
   return value.trim() ? null : "This field is required";

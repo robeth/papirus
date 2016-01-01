@@ -1,6 +1,10 @@
 var React = require('react');
 
 var DynamicForm = React.createClass({
+  getPropTypes: {
+    refLabel: React.PropTypes.string
+  },
+
   getInitialState: function(){
     return {
       childrenIds:[0],
@@ -8,9 +12,10 @@ var DynamicForm = React.createClass({
     }
   },
 
-  remove: function(childId){
+  removeRow: function(childId){
     var component = this;
-    return function(){
+    return function(event){
+      event.preventDefault();
       console.log('remove child id:' + childId);
       var childrenIds = component.state.childrenIds;
       var childIndex = childrenIds.indexOf(childId);
@@ -23,7 +28,8 @@ var DynamicForm = React.createClass({
     };
   },
 
-  addRow: function(){
+  addRow: function(event){
+    event.preventDefault();
     var newLastIndex = this.state.lastIndex + 1;
     this.state.childrenIds.push(newLastIndex);
 
@@ -32,12 +38,77 @@ var DynamicForm = React.createClass({
     });
   },
 
+  validate: function(){
+    function validateForm(form){
+      var fieldErrors = form.component.validate();
+      return fieldErrors.length > 0
+        ? {ref: form.key, errors: fieldErrors}
+        : null;
+    }
+
+    return this.mapFormRefs(validateForm);
+  },
+
+  mapFormRefs: function(mappedFunction){
+    var forms = [];
+    var results = [];
+
+    for(var key in this.refs){
+      if(this.refs[key].validate){
+        forms.push({component: this.refs[key], key: key});
+      }
+    }
+
+    console.log('dynamic form all refs:');
+    console.log(this.refs)
+    console.log('dynamic form form refs: ');
+    console.log(forms);
+
+    for(var i = 0; i < forms.length; i++){
+      if(forms[i].component.validate){
+        var result = mappedFunction(forms[i]);
+        console.log('validation form-'+i);
+        console.log(result);
+        if(result){
+          results.push(result);
+        }
+      }
+    }
+
+    return results;
+  },
+
+  save: function(args){
+    this.getChildrenForms().map(function(childForm, index, arr){
+      childForm.save(args);
+    });
+  },
+
+  getChildrenForms: function(){
+    var childrenForms = [];
+
+    for(var key in this.refs){
+      if(this.refs[key].save){
+        childrenForms.push(this.refs[key]);
+      }
+    }
+    console.log('result forms:')
+    console.log(childrenForms);
+
+    return childrenForms;
+  },
+
+  generateRef: function(index){
+    return (this.props.refLabel || 'dynamic-form-') + index;
+  },
+
   render: function(){
     var component = this;
     var rows = component.state.childrenIds.map(function(childId, index, arr){
       return component.props.element({
-        onRemoveClick: component.remove(childId),
-        key:childId
+        onRemoveClick: component.removeRow(childId),
+        key: childId,
+        ref: component.generateRef(childId)
       });
     });
 
