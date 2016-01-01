@@ -3,8 +3,10 @@ var Umzug = require('umzug');
 var jetpack = require('fs-jetpack');
 
 var modelsDir = jetpack.cwd(__dirname);
-var migrationFiles = modelsDir.list('migrations/');
+var migrationFiles = modelsDir.list('migrations/production');
 migrationFiles = migrationFiles.sort();
+var dummyMigrationFiles = modelsDir.list('migrations/dummy');
+dummyMigrationFiles = dummyMigrationFiles.sort();
 
 var sequelize = new Sequelize(
   'papirus',
@@ -27,25 +29,20 @@ var umzug = new Umzug({
   },
   migrations: {
     params: [sequelize.getQueryInterface(), Sequelize],
-    path: __dirname + '/migrations'
+    path: __dirname + '/migrations/production'
   }
 });
 
 
 function up(){
-  umzug.execute({
+  return umzug.execute({
     migrations: migrationFiles.sort(),
     method: 'up'
-  }).then(function(migrations){
-    console.log("migrations finished");
-    console.log(migrations);
-  }).catch(function(error){
-    console.log(error);
-  });
+  })
 }
 
 function down(){
-  umzug.execute({
+  return umzug.execute({
     migrations: migrationFiles.sort().reverse(),
     method: 'down'
   }).then(function(migrations){
@@ -56,7 +53,29 @@ function down(){
   });
 }
 
+var dummyUmzug = new Umzug({
+  storage: 'sequelize',
+  storageOptions: {
+    sequelize: sequelize,
+    modelName: 'DummyMigration'
+  },
+  migrations: {
+    params: [sequelize.getQueryInterface(), Sequelize],
+    path: __dirname + '/migrations/dummy'
+  }
+});
+
+function upDummy(){
+  console.log('Dummy Migrations started');
+  console.log(dummyMigrationFiles);
+  return dummyUmzug.execute({
+    migrations: dummyMigrationFiles,
+    method: 'up'
+  });
+}
+
 module.exports = {
   up: up,
-  down: down
+  down: down,
+  upDummy: upDummy,
 }
