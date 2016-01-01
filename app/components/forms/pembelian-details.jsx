@@ -1,6 +1,6 @@
 var React = require('react');
 var Field = require('./field');
-var SelectField = require('./select-field');
+var ReactSelectField = require('./react-select-field');
 var Kategori = window.Models.Kategori;
 var Stok = window.Models.Stok;
 var StokPembelian = window.Models.StokPembelian;
@@ -111,18 +111,13 @@ var Element = React.createClass({
     return results;
   },
 
-  formatKategoriOption: function(state){
-    return $('<div><code>' + this.findCodeByKategoriId(state.id) + '</code> ' + state.text + '</div>');
-  },
-
-  findCodeByKategoriId: function(id){
-    var needles = this.state.kategoriInstances.filter(
-      function(kategoriInstance, index, arr){
-        return kategoriInstance.id == id;
-      }
+  optionRenderer: function(option){
+    return (
+      <div>
+        <code>{option.code}</code>
+        {option.label}
+      </div>
     );
-
-    return needles.length > 0 ? needles[0].kode : null;
   },
 
   resetFields: function(){
@@ -134,24 +129,24 @@ var Element = React.createClass({
   render: function(){
     var kategoriOptions = this.state.kategoriInstances.map(
       function(kategoriInstance, index, arr){
-        return (
-          <option key={index} value={kategoriInstance.id}>
-            {kategoriInstance.nama}
-          </option>
-        );
+        return {
+          value: kategoriInstance.id,
+          code: kategoriInstance.kode,
+          label: kategoriInstance.nama
+        };
       }
     );
 
     return (
       <div className='row row-margin'>
-        <SelectField
+        <ReactSelectField
           ref='kategori_id'
           inputColumn={3}
-          select2={true}
-          formatOption={this.formatKategoriOption}
-          validation={['required']}>
-          {kategoriOptions}
-        </SelectField>
+          optionRenderer={this.optionRenderer}
+          validation={['required']}
+          readOnly={this.state.isReadOnly}
+          options={kategoriOptions}>
+        </ReactSelectField>
         <Field
           ref='jumlah'
           inputColumn={3}

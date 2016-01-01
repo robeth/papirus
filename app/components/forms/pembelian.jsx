@@ -2,7 +2,7 @@ var React = require('react');
 var Box = require('../box');
 var Field = require('./field');
 var DateField = require('./date-field');
-var SelectField = require('./select-field');
+var ReactSelectField = require('./react-select-field');
 var PembelianDetails = require('./pembelian-details');
 var DynamicForm = require('./dynamic-form');
 var Alert = require('../alert');
@@ -20,9 +20,9 @@ var PembelianForm = React.createClass({
       isReadOnly: this.props.mode === 'edit',
       nasabahInstances: [],
       pembelianInstance: {
-        tanggal: '',
-        nasabah_id: undefined,
-        nota: ''
+        tanggal: null,
+        nasabah_id: null,
+        nota: null
       }
     };
   },
@@ -145,20 +145,22 @@ var PembelianForm = React.createClass({
     return childrenForms;
   },
 
-  formatOption: function (state){
-    return $('<div><span class="label label-info">N' + state.id + '</span> ' + state.text + '</div>');
+  optionRenderer: function(option){
+    return (
+      <div>
+        <span className='label label-info'> N{option.value}</span>
+        {option.label}
+      </div>
+    );
   },
 
   render: function(){
     var nasabahOptions = this.state.nasabahInstances.map(
       function(nasabahInstance, index, arr){
-        return (
-          <option
-            key={index}
-            value={nasabahInstance.id}>
-            {nasabahInstance.nama}
-          </option>
-        );
+        return {
+          value: nasabahInstance.id,
+          label: nasabahInstance.nama
+        };
       }
     );
 
@@ -200,18 +202,17 @@ var PembelianForm = React.createClass({
                   label='Nota'
                   readOnly={this.state.isReadOnly}
                   initialValue={this.state.pembelianInstance.nota}/>
-                <SelectField
+                <ReactSelectField
                   ref='nasabah_id'
                   inputColumn={10}
                   htmlId='nasabah-type'
                   label='Nasabah'
-                  select2={true}
-                  formatOption={this.formatOption}
+                  optionRenderer={this.optionRenderer}
                   validation={['required']}
                   readOnly={this.state.isReadOnly}
+                  options={nasabahOptions}
                   initialValue={this.state.pembelianInstance.nasabah_id}>
-                  {nasabahOptions}
-                </SelectField>
+                </ReactSelectField>
                 <hr/>
               </div>
             </div>

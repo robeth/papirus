@@ -1,8 +1,9 @@
 var React = require('react');
 var classNames = require('classnames');
 var Validation = require('./validation');
+var Select = require('react-select');
 
-var SelectField = React.createClass({
+var ReactSelectField = React.createClass({
   propTypes: {
     inputColumn: React.PropTypes.number,
     htmlId: React.PropTypes.string,
@@ -10,7 +11,9 @@ var SelectField = React.createClass({
     onSelectChange: React.PropTypes.func,
     validation: React.PropTypes.arrayOf(React.PropTypes.string),
     readOnly: React.PropTypes.bool,
-    initialValue: React.PropTypes.string
+    initialValue: React.PropTypes.string,
+    optionRenderer: React.PropTypes.func,
+    options: React.PropTypes.array
   },
 
   getInitialState: function(){
@@ -27,16 +30,24 @@ var SelectField = React.createClass({
         value: nextProps.initialValue
       });
     }
+
+    // Both are not initialized
+    // Auto select first option in next props if possible
+    else if(nextProps.options && nextProps.options.length > 0){
+      this.setState({
+        value: nextProps.options[0].value
+      });
+    }
   },
 
   value: function(){
     return this.state.value;
   },
 
-  handleValueChange: function(event){
-    console.log('Change value: ' + event.target.value);
+  handleValueChange: function(newValue){
+    console.log('Change value: ' + newValue);
     this.setState({
-      value: event.target.value
+      value: newValue
     });
   },
 
@@ -79,14 +90,12 @@ var SelectField = React.createClass({
 
     var selectInputField = (
       <div className={classNames('col-xs-' + this.props.inputColumn, cssStatus)}>
-        <select
-          ref='input'
-          className='form-control'
-          disabled={this.props.readOnly}
+        <Select
+          value={this.state.value}
           onChange={this.handleValueChange}
-          value={this.state.value}>
-          {this.props.children}
-        </select>
+          options={this.props.options}
+          optionRenderer={this.props.optionRenderer}
+          valueRenderer={this.props.optionRenderer}/>
         {
           this.state.status === 'invalid'
           ? <span className="help-block">{this.state.errors[0]}</span>
@@ -110,4 +119,4 @@ var SelectField = React.createClass({
   }
 });
 
-module.exports = SelectField;
+module.exports = ReactSelectField;
