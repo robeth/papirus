@@ -1,7 +1,7 @@
 var React = require('react');
-var Field = require('../forms/field');
-var DateField = require('../forms/date-field');
-var SelectField = require('../forms/select-field');
+var Field = require('./fields/field');
+var DateField = require('./fields/date-field');
+var SelectField = require('./fields/select-field');
 var Alert = require('../alert');
 
 var Nasabah = window.Models.Nasabah;
