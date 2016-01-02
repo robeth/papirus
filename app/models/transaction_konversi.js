@@ -1,7 +1,7 @@
 /* jshint indent: 2 */
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('transaction_konversi', {
+  return sequelize.define('Konversi', {
     id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
