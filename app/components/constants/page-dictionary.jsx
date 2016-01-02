@@ -4,6 +4,7 @@ var DataNasabahIndividu = require('./../pages/data-nasabah-individu');
 var FormNasabah = require('./../pages/form-nasabah');
 var DetailNasabah = require('./../pages/detail-nasabah');
 var FormPembelian = require('./../pages/form-pembelian');
+var DataPembelian = require('./../pages/data-pembelian');
 
 module.exports = {
   'dashboard': {
@@ -48,6 +49,15 @@ module.exports = {
       { label: 'Home', to: 'dashboard'},
       { label: 'Form', to : ''},
       { label: 'Pembelian', to: 'form-pembelian'}
+    ]
+  },
+  'data-pembelian': {
+    title: 'Data Pembelian',
+    element: React.createFactory(DataPembelian),
+    path: [
+      { label: 'Home', to: 'dashboard'},
+      { label: 'Data', to : ''},
+      { label: 'Pembelian', to: 'xxx'}
     ]
   }
 }

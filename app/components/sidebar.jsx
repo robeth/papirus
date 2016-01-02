@@ -1,11 +1,11 @@
 var React = require('react');
+var Helper = require('./helper');
 
 var Sidebar = React.createClass({
-  propTypes: {
-    onItemClick: React.PropTypes.func.isRequired
-  },
-  _generateOnItemClick: function(argument){
-    return function(){return this.props.onItemClick(argument)}.bind(this);
+  _generateOnItemClick: function(nextPage){
+    return function(){
+      Helper.call('changePage',[nextPage]);
+    };
   },
   render: function(){
     return (
@@ -48,7 +48,7 @@ var Sidebar = React.createClass({
                     <li><a href="#" data-link="data-keuangan-kategori"><i className="fa fa-list-ol"></i> Kategori</a></li>
                   </ul>
                 </li>
-                <li><a href="#" data-link="data-pembelian"><i className="fa fa-arrow-right"></i> Pembelian</a></li>
+                <li><a href="#" onClick={this._generateOnItemClick('data-pembelian')}><i className="fa fa-arrow-right"></i> Pembelian</a></li>
                 <li><a href="#" data-link="data-penjualan"><i className="fa fa-arrow-left"></i> Penjualan</a></li>
                 <li><a href="#" data-link="data-konversi"><i className="fa fa-recycle"></i> Konversi</a></li>
                 <li><a href="#" data-link="data-penarikan"><i className="fa fa-hand-lizard-o"></i> Penarikan</a></li>

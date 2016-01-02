@@ -2,8 +2,8 @@ var React = require('react');
 var Field = require('./fields/field');
 var ReactSelectField = require('./fields/react-select-field');
 var Kategori = window.Models.Kategori;
-var Stok = window.Models.Stok;
-var StokPembelian = window.Models.StokPembelian;
+var Stock = window.Models.Stock;
+var PembelianStock = window.Models.PembelianStock;
 
 var Header = React.createClass({
   render: function(){
@@ -67,7 +67,7 @@ var Element = React.createClass({
     var stokPayload = this.collectPayload();
     stokPayload.tanggal = args.tanggal;
     var component = this;
-    Stok
+    Stock
       .create(stokPayload)
       .then(function(stok){
         console.log('success. new stok');
@@ -77,7 +77,7 @@ var Element = React.createClass({
           pembelian_id: args.id
         };
 
-        return StokPembelian.create(stokPembelianPayload);
+        return PembelianStock.create(stokPembelianPayload);
       })
       .then(function(stokPembelian){
         console.log('success. new stok pembelian');

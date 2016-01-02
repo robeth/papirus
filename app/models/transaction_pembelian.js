@@ -1,7 +1,9 @@
 /* jshint indent: 2 */
+var Moment = require('moment');
+var Promise = require('bluebird');
 
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('transaction_pembelian', {
+  return sequelize.define('Pembelian', {
     id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
@@ -18,7 +20,11 @@ module.exports = function(sequelize, DataTypes) {
     },
     tanggal: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
+      get: function(){
+        var pembelianDate = this.getDataValue('tanggal');
+        return Moment(pembelianDate).format('YYYY-MM-DD');
+      }
     },
     nota: {
       type: DataTypes.STRING,
@@ -34,6 +40,42 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     tableName: 'transaction_pembelian',
-    freezeTableName: true
+    freezeTableName: true,
+    instanceMethods: {
+      getStocks: function(){
+        return this.getPembelianStocks()
+          .then(function(pembelianStocks){
+            var stockPromises = pembelianStocks.map(function(pembelianStock){
+              return pembelianStock.getStock();
+            });
+
+            return Promise.all(stockPromises);
+          })
+      },
+      getValue: function(){
+        return this.getStocks()
+          .then(function(stocks){
+            return stocks
+              .map(function(stock){
+                return stock.jumlah * stock.harga;
+              })
+              .reduce(function(previousValue, currentValue){
+                return previousValue + currentValue;
+              });
+          });
+      },
+      getWeight: function(){
+        return this.getStocks()
+          .then(function(stocks){
+            return stocks
+              .map(function(stock){
+                return stock.jumlah;
+              })
+              .reduce(function(previousValue, currentValue){
+                return previousValue + currentValue;
+              });
+          });
+      }
+    }
   });
 };

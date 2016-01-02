@@ -4,15 +4,20 @@ var Content = require('./content');
 var Sidebar = require('./sidebar');
 var Header = require('./header');
 var PageContainer = require('./page-container');
+var Helper = require('./helper');
 
 var PAGE_DICTIONARY = require('./constants/page-dictionary');
 
 var BinaMandiri = React.createClass({
   getInitialState: function(){
     return {
-      currentPage: PAGE_DICTIONARY['form-pembelian'],
-      properties: {nasabahId: 40}
+      currentPage: PAGE_DICTIONARY['data-pembelian'],
+      properties: null
     };
+  },
+
+  componentDidMount: function() {
+    Helper.register('changePage', this.changePage, this);
   },
 
   render: function(){
@@ -20,11 +25,11 @@ var BinaMandiri = React.createClass({
       <div className="skin-blue sidebar-mini">
         <div className="wrapper">
           <Header/>
-          <Sidebar onItemClick={this.changePage}/>
+          <Sidebar/>
           <PageContainer
             title={this.state.currentPage.title}
             path={this.state.currentPage.path}>
-            {this.state.currentPage.element(this.getProperties())}
+            {this.state.currentPage.element(this.state.properties)}
           </PageContainer>
         </div>
       </div>
@@ -38,12 +43,6 @@ var BinaMandiri = React.createClass({
         properties: properties
       });
     }
-  },
-
-  getProperties: function(){
-    var suppliedProperties = this.state.properties || {};
-    suppliedProperties.changePage = this.changePage;
-    return suppliedProperties;
   }
 });
 

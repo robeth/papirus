@@ -20,25 +20,52 @@ var MODEL_DICTIONARY = {
   'Vendor': 'transaction_vendor',
   'ReportKategori': 'transaction_reportkategori',
   'Kategori': 'transaction_kategori',
-  'Stok': 'transaction_stok',
+  'Stock': 'transaction_stok',
   'Penarikan': 'transaction_penarikan',
   'Pembelian': 'transaction_pembelian',
-  'StokPembelian': 'transaction_pembelian_stocks',
-  'DetailPenarikan': 'transaction_detailpenarikan',
+  'PembelianStock': 'transaction_pembelian_stocks',
+  'PenarikanDetail': 'transaction_detailpenarikan',
   'Penjualan': 'transaction_penjualan',
-  'DetailPenjualan': 'transaction_detailpenjualan',
+  'PenjualanStock': 'transaction_detailpenjualan',
   'Konversi': 'transaction_konversi',
-  'DetailIn': 'transaction_detailin',
-  'KonversiOut': 'transaction_konversi_outs'
+  'KonversiInStock': 'transaction_detailin',
+  'KonversiOutStock': 'transaction_konversi_outs'
 }
 
-module.exports = {}
+var models = {}
 
 // Register All Models
 for(var modelName in MODEL_DICTIONARY){
   // Make sure prototype/built-in attribute doesn't pass
   if(MODEL_DICTIONARY.hasOwnProperty(modelName)){
     var tableName = MODEL_DICTIONARY[modelName];
-    module.exports[modelName] = sequelize.import(tableName, require('./' + tableName));
+    models[modelName] = sequelize.import(tableName, require('./' + tableName));
   }
 }
+
+models.Nasabah.hasMany(models.Pembelian, {
+  as: 'Pembelians',
+  foreignKey: 'nasabah_id'
+});
+
+models.Pembelian.belongsTo(models.Nasabah, {
+  as: 'Nasabah',
+  foreignKey: 'nasabah_id'
+});
+
+models.Pembelian.hasMany(models.PembelianStock, {
+  as: 'PembelianStocks',
+  foreignKey: 'pembelian_id'
+});
+
+models.PembelianStock.belongsTo(models.Pembelian, {
+  as: 'Pembelian',
+  foreignKey: 'pembelian_id'
+});
+
+models.PembelianStock.belongsTo(models.Stock, {
+  as: 'Stock',
+  foreignKey: 'stok_id'
+});
+
+module.exports = models;

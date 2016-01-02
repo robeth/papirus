@@ -1,74 +1,157 @@
-<div data-content="data-pembelian" class="content-wrapper hide">
-  <!-- Content Header (Page header) -->
-  <section class="content-header">
-    <h1>
-      Data Pembelian
-    </h1>
-    <ol class="breadcrumb">
-      <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-      <li>Data</li>
-      <li class="active">Pembelian</li>
-    </ol>
-  </section>
+var React = require('react');
+var Helper = require('../helper');
+var Pembelian = window.Models.Pembelian;
 
-  <section class="content">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="box">
-          <div class="box-header">
-            <h3 class="box-title">Periode</h3>
-          </div>
-          <div class="box-body">
-            <div class="form-group">
-              <div class="input-group">
-                <div class="input-group-addon"><i class="fa fa-calendar"></i></div>
-                <input data-widget="calendar-range" class="form-control pull-right" value="11/01/2015 - 11/30/2015"></input>
+var PembelianRow = React.createClass({
+  propTypes:{
+    index: React.PropTypes.number.isRequired,
+    pembelian: React.PropTypes.object.isRequired
+  },
+
+  getInitialState: function(){
+    return {
+      id: this.props.pembelian.id,
+      tanggal: this.props.pembelian.tanggal,
+      nota: this.props.pembelian.nota,
+      nasabah: {},
+      value: null,
+      weight: null
+    };
+  },
+
+  componentDidMount: function() {
+    var component = this;
+    component.props.pembelian.getNasabah()
+      .then(function(nasabahInstance){
+        component.setState({nasabah: nasabahInstance});
+      })
+      .catch(function(error){
+        console.log('DataPembelian-Row-Error retrieving nasabah');
+      })
+
+    component.props.pembelian.getValue()
+      .then(function(value){
+        console.log('Pembelian (' + component.props.pembelian.id + ') value : ' + value);
+        component.setState({value: value});
+      })
+      .catch(function(error){
+        console.log('Error fetching value of Pembelian (' + component.props.pembelian.id + ')');
+      });
+
+    component.props.pembelian.getWeight()
+      .then(function(weight){
+        console.log('Pembelian (' + component.props.pembelian.id + ') weight : ' + weight);
+        component.setState({weight: weight});
+      })
+      .catch(function(error){
+        console.log('Error fetching weight of Pembelian (' + component.props.pembelian.id + ')');
+      });
+  },
+
+  generateOnItemClick: function(pembelianId){
+    return function(){
+      Helper.call('changePage',['detail-pembelian', {pembelianId: pembelianId}]);
+    };
+  },
+
+  render: function(){
+    return (
+      <tr>
+        <td className="text-center">{this.props.index}</td>
+        <td className="text-center">
+          <a onClick={this.generateOnItemClick(this.state.id)}>
+            <span className="label label-primary">B{this.state.id}</span>
+          </a>
+        </td>
+        <td className="text-center">{this.state.nota}</td>
+        <td>
+          <span className="label label-info">N{this.state.nasabah.id}</span>
+          {this.state.nasabah.nama}
+        </td>
+        <td className="text-center">{this.state.tanggal.toString()}</td>
+        <td className="text-right">{this.state.value}</td>
+        <td className="text-right">{this.state.weight}</td>
+      </tr>
+    );
+  }
+});
+
+var DataPembelian = React.createClass({
+  getInitialState: function(){
+    return {pembelianInstances: []};
+  },
+  componentDidMount: function(){
+    var instance = this;
+    Pembelian
+      .findAll()
+      .then(function onPembeliansRetrieveSuccess(pembelians){
+        console.log('Retrieve all pembelians data success!');
+        console.log(pembelians);
+        instance.setState({pembelianInstances: pembelians});
+      })
+      .catch(function onPembeliansRetrieveFailed(error){
+        console.log('Retrieving pembelians failed...');
+        console.log(error);
+      });
+  },
+
+  _generateOnItemClick: function(argument, pembelianId){
+    var component = this;
+    return function(){return component.props.changePage(argument, {pembelianId: pembelianId})};
+  },
+
+  render: function(){
+    var component = this;
+    var rows = this.state.pembelianInstances.map(function(pembelian, index){
+      return <PembelianRow key={pembelian.id} index={index} pembelian={pembelian}/>;
+    });
+
+    return (
+      <section className="content">
+        <div className="row">
+          <div className="col-md-6">
+            <div className="box">
+              <div className="box-header">
+                <h3 className="box-title">Periode</h3>
+              </div>
+              <div className="box-body">
+                <div className="form-group">
+                  <div className="input-group">
+                    <div className="input-group-addon"><i className="fa fa-calendar"></i></div>
+                    <input data-widget="calendar-range" className="form-control pull-right"></input>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-12">
-        <div class="box box-info">
-          <div class="box-body">
-            <table data-widget="advanced-table" class="table table-bordered table-striped">
-              <thead>
-                <tr>
-                  <th class="text-center">#</th>
-                  <th class="text-center">Kode</th>
-                  <th class="text-center">Nota</th>
-                  <th class="text-center">Nasabah</th>
-                  <th class="text-center">Tanggal</th>
-                  <th class="text-center">Nilai</th>
-                  <th class="text-center">Tonase</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="text-center">1</td>
-                  <td class="text-center"><a href="#"><span class="label label-primary">B2115</span></a></td>
-                  <td class="text-center">N12345</td>
-                  <td>Ningsih</td>
-                  <td class="text-center">2015-07-21</td>
-                  <td class="text-right">25.000,00</td>
-                  <td class="text-right">20.00</td>
-                </tr>
-                <tr>
-                  <td class="text-center">2</td>
-                  <td class="text-center"><a href="#"><span class="label label-primary">B2121</span></a></td>
-                  <td class="text-center">N1800</td>
-                  <td>Dede</td>
-                  <td class="text-center">2015-07-21</td>
-                  <td class="text-right">125.000,00</td>
-                  <td class="text-right">10.00</td>
-                </tr>
-              </tbody>
-            </table>
+        <div className="row">
+          <div className="col-xs-12">
+            <div className="box box-info">
+              <div className="box-body">
+                <table data-widget="advanced-table" className="table table-bordered table-striped">
+                  <thead>
+                    <tr>
+                      <th className="text-center">#</th>
+                      <th className="text-center">Kode</th>
+                      <th className="text-center">Nota</th>
+                      <th className="text-center">Nasabah</th>
+                      <th className="text-center">Tanggal</th>
+                      <th className="text-center">Nilai</th>
+                      <th className="text-center">Tonase</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
-</div>
+      </section>
+    );
+  }
+});
+
+module.exports = DataPembelian;
