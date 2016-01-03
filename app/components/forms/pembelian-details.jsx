@@ -4,6 +4,7 @@ var ReactSelectField = require('./fields/react-select-field');
 var Kategori = window.Models.Kategori;
 var Stock = window.Models.Stock;
 var PembelianStock = window.Models.PembelianStock;
+var FormMixin = require('../mixins/form-mixin');
 
 var Header = React.createClass({
   render: function(){
@@ -19,14 +20,45 @@ var Header = React.createClass({
 });
 
 var Element = React.createClass({
-  getInitialState: function(){
-    return {
-      kategoriInstances: []
-    };
+  mixins: [FormMixin],
+  statics: {
+    destroy: function(instance){
+      var stockId = instance.stok_id;
+      return instance
+        .destroy()
+        .then(function(){
+          return Stock.destroy({
+            where: {
+              id: stockId
+            }
+          });
+        })
+    }
+  },
+  propTypes: {
+    mode: React.PropTypes.oneOf(['add', 'edit']),
+    instance: React.PropTypes.object,
+    onRemoveClick: React.PropTypes.func.isRequired,
+    initialIsReadOnly: React.PropTypes.bool
   },
 
-  propTypes: {
-    onRemoveClick: React.PropTypes.func.isRequired
+  getInitialState: function(){
+    console.log('PembelianDetails-INITIAL_STATE');
+    console.log(this.props);
+    return {
+      isReadOnly: this.props.initialIsReadOnly,
+      instance: {
+        id: null,
+        stock: {
+          id: null,
+          kategori_id: null,
+          jumlah: null,
+          harga: null
+        }
+      },
+      pembelianStockInstance: null,
+      kategoriInstances: []
+    };
   },
 
   componentDidMount: function(){
@@ -38,36 +70,47 @@ var Element = React.createClass({
       .then(function onFound(kategoriInstances){
         component.setState({kategoriInstances: kategoriInstances});
       });
+    this.updateState(this.props.instance);
   },
 
-  collectPayload: function(){
-    var kategori_id = this.refs['kategori_id'].value();
-    var jumlah = this.refs['jumlah'].value();
-    var harga = this.refs['harga'].value();
-
-    return {
-      kategori_id: kategori_id,
-      jumlah: jumlah,
-      harga: harga
-    };
-  },
-
-  validate: function(){
-    function validateInput(input){
-      var fieldErrors = input.component.validate();
-      return fieldErrors.length > 0
-        ? {ref: input.key, errors: fieldErrors}
-        : null;
+  componentWillReceiveProps: function(nextProps) {
+    console.log('PembelianDetails-CWRP-nextProps:');
+    console.log(nextProps);
+    if(nextProps.mode === 'edit' &&
+      nextProps.instance &&
+      nextProps.instance !== this.props.instance){
+      this.updateState(nextProps.instance);
     }
+  },
 
-    return this.mapInputRefs(validateInput);
+  updateState: function(pembelianStock){
+    console.log('PembelianDetails-Update-state');
+    if(pembelianStock){
+      var component = this;
+      pembelianStock.getStock()
+        .then(function onStockFound(stock){
+          console.log('PembelianDetails-Update-state-stock');
+          console.log(stock);
+          component.setState({
+            instance: {
+              id: pembelianStock.id,
+              stock: stock
+            },
+            pembelianStockInstance: pembelianStock
+          });
+        })
+        .catch(function onRetrieveStockError(error){
+          console.log(error);
+        });
+    }
   },
 
   save: function(args){
     var stokPayload = this.collectPayload();
     stokPayload.tanggal = args.tanggal;
     var component = this;
-    Stock
+
+    var newPembelianStockPromise = Stock
       .create(stokPayload)
       .then(function(stok){
         console.log('success. new stok');
@@ -78,37 +121,51 @@ var Element = React.createClass({
         };
 
         return PembelianStock.create(stokPembelianPayload);
-      })
+      });
+
+    newPembelianStockPromise
       .then(function(stokPembelian){
         console.log('success. new stok pembelian');
         console.log(stokPembelian);
-        component.resetFields();
+        // component.resetFields();
       })
       .catch(function(error){
         console.error(error);
       });
+
+    return newPembelianStockPromise;
   },
 
-  mapInputRefs: function(callback){
-    var fields = [];
-    var results = [];
+  saveChanges: function(args){
+    var stokPayload = this.collectPayload();
+    console.log('PembelianDetails-saveChanges-prevStock:');
+    console.log(this.state.instance);
+    console.log('PembelianDetails-saveChanges-payload:')
+    stokPayload.tanggal = args.tanggal;
+    console.log(stokPayload);
+    var component = this;
+    var updatePromise = component.state.instance.stock.update(stokPayload);
+    var updatePembelianStockPromise = updatePromise
+      .then(function(stock){
+        return component.state.pembelianStockInstance;
+      });
 
-    for(var key in this.refs){
-      if(this.refs[key].validate){
-        fields.push({component: this.refs[key], key: key});
-      }
-    }
+    updatePromise
+      .then(function(stok){
+        console.log('Sucess update stock ' + stok.id);
+        console.log(stok);
+        var updatedInstance = component.state.instance;
+        updatedInstance.stock = stok;
+        component.setState({
+          instance: updatedInstance
+        });
+        // component.resetFields();
+      })
+      .catch(function(error){
+        console.error(error);
+      });
 
-    for(var i = 0; i < fields.length; i++){
-      if(fields[i].component.validate){
-        var result = callback(fields[i]);
-        if(result){
-          results.push(result);
-        }
-      }
-    }
-
-    return results;
+    return updatePembelianStockPromise;
   },
 
   optionRenderer: function(option){
@@ -120,13 +177,15 @@ var Element = React.createClass({
     );
   },
 
-  resetFields: function(){
-    this.mapInputRefs(function resetField(input){
-      input.component.reset();
-    });
+  reset: function(){
+    console.log('PembelianDetails reset');
+    this.resetFields();
   },
 
   render: function(){
+    // console.log('PembelianDetails-Render:');
+    // console.log(this.state);
+
     var kategoriOptions = this.state.kategoriInstances.map(
       function(kategoriInstance, index, arr){
         return {
@@ -142,29 +201,36 @@ var Element = React.createClass({
         <ReactSelectField
           ref='kategori_id'
           inputColumn={3}
-          optionRenderer={this.optionRenderer}
-          validation={['required']}
+          options={kategoriOptions}
+          initialValue={this.state.instance.stock.kategori_id}
           readOnly={this.state.isReadOnly}
-          options={kategoriOptions}>
+          validation={['required']}
+          optionRenderer={this.optionRenderer}>
         </ReactSelectField>
         <Field
           ref='jumlah'
           inputColumn={3}
+          initialValue={this.state.instance.stock.jumlah}
+          readOnly={this.state.isReadOnly}
           validation={['required']}
           suffixAddon='Kg'/>
         <Field
           ref='harga'
           inputColumn={3}
+          initialValue={this.state.instance.stock.harga}
+          readOnly={this.state.isReadOnly}
           validation={['required']}
           prefixAddon='Rp'
           placeholder='@unit'/>
-        <div className="col-xs-3">
-          <button
-            className='btn btn-danger btn-xs'
-            onClick={this.props.onRemoveClick}>
-            <i className='fa fa-trash'/>
-          </button>
-        </div>
+        {!this.state.isReadOnly && (
+          <div className="col-xs-3">
+            <button
+              className='btn btn-danger btn-xs'
+              onClick={this.props.onRemoveClick}>
+              <i className='fa fa-trash'/>
+            </button>
+          </div>
+        )}
       </div>
     );
   }

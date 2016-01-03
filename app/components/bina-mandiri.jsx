@@ -11,8 +11,8 @@ var PAGE_DICTIONARY = require('./constants/page-dictionary');
 var BinaMandiri = React.createClass({
   getInitialState: function(){
     return {
-      currentPage: PAGE_DICTIONARY['data-pembelian'],
-      properties: null
+      currentPage: PAGE_DICTIONARY['detail-pembelian'],
+      properties: {pembelianId: 6}
     };
   },
 

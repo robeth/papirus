@@ -2,8 +2,10 @@ var React = require('react');
 var classNames = require('classnames');
 var Validation = require('./validation');
 var Select = require('react-select');
+var InputMixin = require('../../mixins/field-mixin');
 
 var ReactSelectField = React.createClass({
+  mixins: [InputMixin],
   propTypes: {
     inputColumn: React.PropTypes.number,
     htmlId: React.PropTypes.string,
@@ -11,7 +13,10 @@ var ReactSelectField = React.createClass({
     onSelectChange: React.PropTypes.func,
     validation: React.PropTypes.arrayOf(React.PropTypes.string),
     readOnly: React.PropTypes.bool,
-    initialValue: React.PropTypes.string,
+    initialValue: React.PropTypes.oneOfType([
+      React.PropTypes.number,
+      React.PropTypes.string
+    ]),
     optionRenderer: React.PropTypes.func,
     options: React.PropTypes.array
   },
@@ -25,7 +30,11 @@ var ReactSelectField = React.createClass({
   },
 
   componentWillReceiveProps: function(nextProps){
+    // console.log('ReactSelectField new props: ');
+    // console.log(nextProps);
+
     if(this.props.initialValue !== nextProps.initialValue){
+      console.log('ReactSelectField update state from initialValue: ' + nextProps.initialValue )
       this.setState({
         value: nextProps.initialValue
       });
@@ -33,7 +42,9 @@ var ReactSelectField = React.createClass({
 
     // Both are not initialized
     // Auto select first option in next props if possible
-    else if(nextProps.options && nextProps.options.length > 0){
+    else if(!nextProps.initialValue &&
+      nextProps.options &&
+      nextProps.options.length > 0){
       this.setState({
         value: nextProps.options[0].value
       });
@@ -95,7 +106,8 @@ var ReactSelectField = React.createClass({
           onChange={this.handleValueChange}
           options={this.props.options}
           optionRenderer={this.props.optionRenderer}
-          valueRenderer={this.props.optionRenderer}/>
+          valueRenderer={this.props.optionRenderer}
+          disabled={this.props.readOnly}/>
         {
           this.state.status === 'invalid'
           ? <span className="help-block">{this.state.errors[0]}</span>

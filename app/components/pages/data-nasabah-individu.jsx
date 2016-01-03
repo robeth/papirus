@@ -33,7 +33,7 @@ var DataNasabahIndividu = React.createClass({
       return (
         <tr key={index}>
           <td className="text-center">{index}</td>
-          <td className="text-center"><a onClick={this._generateOnItemClick(account.id).bind(component)}><span className="label label-info">{account.id}</span></a></td>
+          <td className="text-center"><a onClick={this.generateOnItemClick(account.id).bind(component)}><span className="label label-info">{account.id}</span></a></td>
           <td className="text-center">I01234</td>
           <td>{account.nama} </td>
           <td>{account.alamat}</td>

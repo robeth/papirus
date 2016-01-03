@@ -1,15 +1,83 @@
 var React = require('react');
+var FormMixin = require('../mixins/form-mixin');
+var _ = require('lodash');
 
 var DynamicForm = React.createClass({
+  mixins: [FormMixin],
   getPropTypes: {
-    refLabel: React.PropTypes.string
+    mode: React.PropTypes.oneOf(['add', 'edit']),
+    refLabel: React.PropTypes.string,
+    instances: React.PropTypes.array,
+    initialIsReadOnly: React.PropTypes.bool
   },
 
   getInitialState: function(){
+    console.log('DF-gis:' + this.props.initialIsReadOnly);
     return {
-      childrenIds:[0],
-      lastIndex: 0
+      isReadOnly: this.props.initialIsReadOnly,
+      childrenIds: this.props.mode === 'add' ? [0] : [],
+      editedIds: [],
+      lastIndex: 0,
+      instances: this.props.instances,
+      instanceDictionary: {},
+      headerFactory: React.createFactory(this.props.header),
+      elementFactory: React.createFactory(this.props.element)
     }
+  },
+
+  componentWillReceiveProps: function(nextProps) {
+    console.log('DynamicForm-CWRP-nextProps:');
+    console.log(nextProps);
+    if(nextProps.mode === 'edit' &&
+      nextProps.instances &&
+      nextProps.instances !== this.props.instances){
+      this.updateInstances(nextProps.instances);
+    }
+  },
+
+  updateInstances: function(newInstances){
+    var currentLastIndex = this.state.lastIndex;
+    var instanceDictionary = {};
+    var newIds = newInstances.map(
+      function(instance, index){
+        var currentIndex = currentLastIndex + index + 1;
+        instanceDictionary[currentIndex] = instance;
+        return currentIndex;
+      });
+    var newLastIndex = currentLastIndex + newIds.length + 1;
+    console.log('DynamicForm-updateInstances: ids-instances-dictionary');
+    console.log(newIds);
+    console.log(newInstances);
+    console.log(instanceDictionary);
+    this.setState({
+      childrenIds: newIds.slice(),
+      editedIds: newIds.slice(),
+      lastIndex: newLastIndex,
+      instances: newInstances,
+      instanceDictionary: instanceDictionary
+    });
+  },
+
+  getMode: function(childId){
+    return this.state.editedIds.indexOf(childId) !== -1 ? 'edit' : 'add';
+  },
+
+  reset: function(){
+    console.log('DF-reset: state');
+    console.log(this.state);
+    var newLastIndex = this.state.lastIndex + 1;
+    var initialChildrenIds = this.props.mode === 'edit'
+      ? this.state.editedIds
+      : [newLastIndex];
+
+    this.setState({
+      childrenIds: initialChildrenIds,
+      lastIndex: newLastIndex
+    });
+
+    this.getChildrenForms().map(function(childrenForm){
+      childrenForm.component.reset();
+    });
   },
 
   removeRow: function(childId){
@@ -22,6 +90,7 @@ var DynamicForm = React.createClass({
       if(childId !== -1){
         childrenIds.splice(childIndex, 1);
       }
+
       component.setState({
         childrenIds: childrenIds
       });
@@ -38,64 +107,76 @@ var DynamicForm = React.createClass({
     });
   },
 
-  validate: function(){
-    function validateForm(form){
-      var fieldErrors = form.component.validate();
-      return fieldErrors.length > 0
-        ? {ref: form.key, errors: fieldErrors}
-        : null;
-    }
-
-    return this.mapFormRefs(validateForm);
-  },
-
-  mapFormRefs: function(mappedFunction){
-    var forms = [];
-    var results = [];
-
-    for(var key in this.refs){
-      if(this.refs[key].validate){
-        forms.push({component: this.refs[key], key: key});
-      }
-    }
-
-    console.log('dynamic form all refs:');
-    console.log(this.refs)
-    console.log('dynamic form form refs: ');
-    console.log(forms);
-
-    for(var i = 0; i < forms.length; i++){
-      if(forms[i].component.validate){
-        var result = mappedFunction(forms[i]);
-        console.log('validation form-'+i);
-        console.log(result);
-        if(result){
-          results.push(result);
-        }
-      }
-    }
-
-    return results;
-  },
-
   save: function(args){
-    this.getChildrenForms().map(function(childForm, index, arr){
-      childForm.save(args);
+    this.getNewForms().map(function(childForm, index, arr){
+      return childForm.component.save(args);
     });
   },
 
-  getChildrenForms: function(){
-    var childrenForms = [];
+  getRefsFromIds: function(childIds){
+    var component = this;
+    return childIds.map(function(childId){
+      var childRef = component.generateRef(childId);
+      return {
+        ref: childRef,
+        component: component.refs[childRef]
+      };
+    });
+  },
 
-    for(var key in this.refs){
-      if(this.refs[key].save){
-        childrenForms.push(this.refs[key]);
+  getEditedForms: function(){
+    var editedIds = _.intersection(
+      this.state.editedIds,
+      this.state.childrenIds);
+    console.log('editedIds:');
+    console.log(editedIds);
+    return this.getRefsFromIds(editedIds);
+  },
+
+  getNewForms: function(){
+    var newIds = _.difference(
+      this.state.childrenIds,
+      this.state.editedIds);
+    console.log('newIds:');
+    console.log(newIds);
+    return this.getRefsFromIds(newIds);
+  },
+
+  getDeletedIds: function(){
+    var allIds = this.state.childrenIds;
+    var editedIds = this.state.editedIds;
+    return _.difference(
+      this.state.editedIds,
+      this.state.childrenIds);
+  },
+
+  saveChanges: function(args){
+    console.log('DF-saveChanges');
+    var component = this;
+
+    var editedPromises =  this.getEditedForms().map(
+      function(childForm, index, arr){
+        return childForm.component.saveChanges(args);
       }
-    }
-    console.log('result forms:')
-    console.log(childrenForms);
+    );
 
-    return childrenForms;
+    var newPromises = this.getNewForms().map(
+      function(childForm, index, arr){
+        return childForm.component.save(args);
+      }
+    );
+
+    var deletedPromises = this.getDeletedIds().map(
+      function(deletedId, index, arr){
+        console.log('DF-delete:');
+        console.log(component.props.element.destroy);
+        return component.props.element.destroy(
+          component.state.instanceDictionary[deletedId]
+        );
+      }
+    );
+
+    return editedPromises.concat(newPromises, deletedPromises);
   },
 
   generateRef: function(index){
@@ -105,25 +186,34 @@ var DynamicForm = React.createClass({
   render: function(){
     var component = this;
     var rows = component.state.childrenIds.map(function(childId, index, arr){
-      return component.props.element({
+      console.log('DynamicForm-render-map: instance');
+      console.log(component.state.instanceDictionary[childId]);
+      return component.state.elementFactory({
         onRemoveClick: component.removeRow(childId),
         key: childId,
-        ref: component.generateRef(childId)
+        ref: component.generateRef(childId),
+        mode: component.getMode(childId),
+        instance: component.state.instanceDictionary[childId],
+        initialIsReadOnly: component.state.isReadOnly
       });
     });
 
     return (
       <div>
-        {component.props.header()}
+        {component.state.headerFactory()}
         {rows}
-        <div className='row'>
-          <div className="col-xs-12">
-            <button className="btn btn-block btn-default btn-sm"
-              onClick={this.addRow}>
-              <i className='fa fa-plus'/> Tambah
-            </button>
-          </div>
-        </div>
+        {!this.state.isReadOnly &&
+          (
+            <div className='row'>
+              <div className="col-xs-12">
+                <button className="btn btn-block btn-default btn-sm"
+                  onClick={this.addRow}>
+                  <i className='fa fa-plus'/> Tambah
+                  </button>
+                </div>
+              </div>
+          )
+        }
       </div>
     );
   }

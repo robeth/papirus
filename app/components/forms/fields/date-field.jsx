@@ -1,8 +1,10 @@
 var React = require('react');
 var classNames = require('classnames');
 var Validation = require('./validation');
+var InputMixin = require('../../mixins/field-mixin');
 
 var DateField = React.createClass({
+  mixins: [InputMixin],
   propTypes: {
     inputColumn: React.PropTypes.number,
     htmlId: React.PropTypes.string,

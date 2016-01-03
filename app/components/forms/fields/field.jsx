@@ -1,8 +1,10 @@
 var React = require('react');
 var classNames = require('classnames');
 var Validation = require('./validation');
+var InputMixin = require('../../mixins/field-mixin');
 
 var Field = React.createClass({
+  mixins: [InputMixin],
   propTypes: {
     inputColumn: React.PropTypes.number,
     htmlId: React.PropTypes.string,
@@ -10,12 +12,16 @@ var Field = React.createClass({
     placeholder: React.PropTypes.string,
     validation: React.PropTypes.arrayOf(React.PropTypes.string),
     readOnly: React.PropTypes.bool,
-    initialValue: React.PropTypes.string,
+    initialValue: React.PropTypes.oneOfType([
+      React.PropTypes.number,
+      React.PropTypes.string
+    ]),
     prefixAddon: React.PropTypes.string,
     suffixAddon: React.PropTypes.string
   },
 
   getInitialState: function(){
+    console.log('Field-CWRP-field InitialState:');
     return {
       value: this.props.initialValue,
       status: 'neutral',
@@ -24,7 +30,11 @@ var Field = React.createClass({
   },
 
   componentWillReceiveProps: function(nextProps){
+    // console.log('Field-CWRP-field nextProps:');
+    // console.log(this.props);
+    // console.log(nextProps);
     if(this.props.initialValue !== nextProps.initialValue){
+      console.log('Field-CWRP-field accept newProps');
       this.setState({
         value: nextProps.initialValue
       });
@@ -56,12 +66,15 @@ var Field = React.createClass({
     // Never return blank/whitespace string
     // If blank/whitespace, return null instead
     if(currentValue){
-      currentValue = currentValue.trim();
+      currentValue = currentValue.toString().trim();
     }
+    console.log('Field value: ' + currentValue);
     return  currentValue || null;
   },
 
   reset: function(){
+    console.log('Field-CWRP-field reset:');
+
     this.setState({
       value: this.props.initialValue,
       status: 'neutral',

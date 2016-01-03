@@ -3,12 +3,13 @@ var Field = require('./fields/field');
 var DateField = require('./fields/date-field');
 var SelectField = require('./fields/select-field');
 var Alert = require('../alert');
-
+var FormMixin = require('../mixins/form-mixin');
 var Nasabah = window.Models.Nasabah;
 
 var FormNasabah = React.createClass({
+  mixins: [FormMixin],
   getPropTypes: {
-    mode: React.PropTypes.oneOf(['add', 'edit']),
+    mode: React.PropTypes.oneOf(['add', 'edit']).isRequired,
     nasabahId: React.PropTypes.number
   },
 
@@ -50,31 +51,6 @@ var FormNasabah = React.createClass({
     });
   },
 
-  collectPayload: function(){
-    var type = this.refs['nasabah-type'].value();
-    var nama = this.refs['nasabah-nama'].value();
-    var ktp = this.refs['nasabah-ktp'].value();
-    var alamat = this.refs['nasabah-alamat'].value();
-    var pj = this.refs['nasabah-pj'].value();
-    var noInduk = this.refs['nasabah-no-induk'].value();
-    var telepon = this.refs['nasabah-telepon'].value();
-    var tanggalLahir = this.refs['nasabah-tanggal-lahir'].value();
-    var email = this.refs['nasabah-email'].value();
-
-    return {
-      jenis: type,
-      nama: nama,
-      ktp: ktp,
-      alamat: alamat,
-      nama_pj: pj,
-      no_induk: noInduk,
-      telepon: telepon,
-      tanggal_lahir: tanggalLahir,
-      email: email,
-      tanggal_daftar: new Date(),
-    };
-  },
-
   onNewFormSubmit: function(event){
     event.preventDefault();
     this.resetAlert();
@@ -87,6 +63,7 @@ var FormNasabah = React.createClass({
     }
 
     var nasabahPayload = this.collectPayload();
+    nasabahPayload['tanggal_daftar'] = new Date();
 
     Nasabah
       .create(nasabahPayload)
@@ -100,17 +77,6 @@ var FormNasabah = React.createClass({
         console.log("Failed creating new nasabah...");
         console.log(error);
       });
-  },
-
-  validate: function(){
-    function validateInput(input){
-      var fieldErrors = input.component.validate();
-      return fieldErrors.length > 0
-        ? {ref: input.key, errors: fieldErrors}
-        : null;
-    }
-
-    return this.mapInputRefs(validateInput);
   },
 
   onCancel: function(event){
@@ -155,37 +121,9 @@ var FormNasabah = React.createClass({
 
   },
 
-  mapInputRefs: function(callback){
-    var fields = [];
-    var results = [];
-
-    for(var key in this.refs){
-      if(this.refs[key].validate){
-        fields.push({component: this.refs[key], key: key});
-      }
-    }
-
-    for(var i = 0; i < fields.length; i++){
-      if(fields[i].component.validate){
-        var result = callback(fields[i]);
-        if(result){
-          results.push(result);
-        }
-      }
-    }
-
-    return results;
-  },
-
   resetAlert: function(){
     this.refs['add-success-alert'].hide();
     this.refs['edit-success-alert'].hide();
-  },
-
-  resetFields: function(){
-    this.mapInputRefs(function resetField(input){
-      input.component.reset();
-    });
   },
 
   render: function(){
@@ -235,7 +173,7 @@ var FormNasabah = React.createClass({
         <div className="row">
           <div className="col-xs-6">
             <SelectField
-              ref='nasabah-type'
+              ref='jenis'
               inputColumn={10}
               htmlId='nasabah-type'
               label='Jenis'
@@ -246,7 +184,7 @@ var FormNasabah = React.createClass({
               <option value="kolektif">Kolektif</option>
             </SelectField>
             <Field
-              ref='nasabah-ktp'
+              ref='ktp'
               inputColumn={10}
               htmlId='nasabah-ktp'
               label='KTP'
@@ -254,7 +192,7 @@ var FormNasabah = React.createClass({
               readOnly={this.state.isReadOnly}
               initialValue={this.state.nasabahInstance.ktp}/>
             <Field
-              ref='nasabah-nama'
+              ref='nama'
               inputColumn={10}
               htmlId='nasabah-nama'
               label='Nama'
@@ -262,7 +200,7 @@ var FormNasabah = React.createClass({
               readOnly={this.state.isReadOnly}
               initialValue={this.state.nasabahInstance.nama}/>
             <Field
-              ref='nasabah-alamat'
+              ref='alamat'
               inputColumn={10}
               htmlId='nasabah-alamat'
               label='Alamat'
@@ -272,27 +210,27 @@ var FormNasabah = React.createClass({
           </div>
           <div className="col-xs-6">
             <Field
-            ref='nasabah-pj'
+            ref='nama_pj'
             inputColumn={10}
             htmlId='nasabah-pj'
             label='Nama PJ'
             readOnly={this.state.isReadOnly}
             initialValue={this.state.nasabahInstance.nama_pj}/>
             <Field
-              ref='nasabah-no-induk'
+              ref='no_induk'
               inputColumn={10}
               htmlId='nasabah-ktp'
               label='No Induk'
               readOnly={this.state.isReadOnly}
               initialValue={this.state.nasabahInstance.no_induk}/>
             <Field
-              ref='nasabah-telepon'
+              ref='telepon'
               inputColumn={10}
               htmlId='nasabah-telepon'
               label='Telepon'
               readOnly={this.state.isReadOnly}
               initialValue={this.state.nasabahInstance.telepon}/>
-            <DateField ref='nasabah-tanggal-lahir'
+            <DateField ref='tanggal_lahir'
               type='single'
               inputColumn={10}
               htmlId='nasabah-tanggal-lahir'
@@ -300,7 +238,7 @@ var FormNasabah = React.createClass({
               readOnly={this.state.isReadOnly}
               initialValue={this.state.nasabahInstance.tanggal_lahir}/>
             <Field
-              ref='nasabah-email'
+              ref='email'
               inputColumn={10}
               htmlId='nasabah-email'
               label='Email'
