@@ -11,7 +11,7 @@ var PAGE_DICTIONARY = require('./constants/page-dictionary');
 var BinaMandiri = React.createClass({
   getInitialState: function(){
     return {
-      currentPage: PAGE_DICTIONARY['data-vendor'],
+      currentPage: PAGE_DICTIONARY['form-penjualan'],
       properties: {pembelianId: 6}
     };
   },

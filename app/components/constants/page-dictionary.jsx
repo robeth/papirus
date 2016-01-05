@@ -9,6 +9,7 @@ var DetailPembelian = require('./../pages/detail-pembelian');
 var VendorForm = require('./../pages/form-vendor');
 var VendorDetail = require('./../pages/detail-vendor');
 var VendorData = require('./../pages/data-vendor');
+var PenjualanForm = require('./../pages/form-penjualan');
 
 module.exports = {
   'dashboard': {
@@ -100,4 +101,13 @@ module.exports = {
       { label: 'Vendor', to: 'form-vendor'}
     ]
   },
+  'form-penjualan': {
+    title: 'Form Penjualan',
+    element: React.createFactory(PenjualanForm),
+    path: [
+      { label: 'Home', to: 'dashboard'},
+      { label: 'Form', to : ''},
+      { label: 'Penjualan', to: 'form-penjualan'}
+    ]
+  }
 }
