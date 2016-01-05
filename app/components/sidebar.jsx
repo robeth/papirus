@@ -62,12 +62,12 @@ var Sidebar = React.createClass({
               </a>
               <ul className="treeview-menu">
                 <li><a href="#" data-link="form-pembelian" onClick={this._generateOnItemClick('form-pembelian')}><i className="fa fa-arrow-right"></i> Pembelian</a></li>
-                <li><a href="#" data-link="form-penjualan"><i className="fa fa-arrow-left"></i> Penjualan</a></li>
+                <li><a href="#" data-link="form-penjualan" onClick={this._generateOnItemClick('form-penjualan')}><i className="fa fa-arrow-left"></i> Penjualan</a></li>
                 <li><a href="#" data-link="form-konversi"><i className="fa fa-recycle"></i> Konversi</a></li>
                 <li><a href="#" data-link="form-penarikan"><i className="fa fa-hand-lizard-o"></i> Penarikan</a></li>
                 <li><a href="#" data-link="form-transaksi"><i className="fa fa-file"></i> Transaksi</a></li>
                 <li><a href="#" data-link="form-nasabah" onClick={this._generateOnItemClick('form-nasabah')}><i className="fa fa-users"></i> Nasabah</a></li>
-                <li><a href="#" data-link="form-vendor"><i className="fa fa-truck"></i> Vendor</a></li>
+                <li><a href="#" data-link="form-vendor" onClick={this._generateOnItemClick('form-vendor')}><i className="fa fa-truck"></i> Vendor</a></li>
                 <li><a href="#" data-link="form-kategori-transaksi"><i className="fa fa-list-ol"></i> Kategori Transaksi</a></li>
               </ul>
             </li>

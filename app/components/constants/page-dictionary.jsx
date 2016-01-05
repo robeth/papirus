@@ -6,6 +6,9 @@ var DetailNasabah = require('./../pages/detail-nasabah');
 var FormPembelian = require('./../pages/form-pembelian');
 var DataPembelian = require('./../pages/data-pembelian');
 var DetailPembelian = require('./../pages/detail-pembelian');
+var VendorForm = require('./../pages/form-vendor');
+var VendorDetail = require('./../pages/detail-vendor');
+var VendorData = require('./../pages/data-vendor');
 
 module.exports = {
   'dashboard': {
@@ -69,5 +72,32 @@ module.exports = {
       { label: 'Data', to : ''},
       { label: 'Pembelian', to: 'xxx'}
     ]
-  }
+  },
+  'form-vendor': {
+    title: 'Form Vendor',
+    element: React.createFactory(VendorForm),
+    path: [
+      { label: 'Home', to: 'dashboard'},
+      { label: 'Form', to : ''},
+      { label: 'Vendor', to: 'form-vendor'}
+    ]
+  },
+  'data-vendor': {
+    title: 'Data Vendor',
+    element: React.createFactory(VendorData),
+    path: [
+      { label: 'Home', to: 'dashboard'},
+      { label: 'Data', to : ''},
+      { label: 'Vendor', to: 'data-vendor'}
+    ]
+  },
+  'detail-vendor': {
+    title: 'Detail Vendor',
+    element: React.createFactory(VendorDetail),
+    path: [
+      { label: 'Home', to: 'dashboard'},
+      { label: 'Data', to : ''},
+      { label: 'Vendor', to: 'form-vendor'}
+    ]
+  },
 }
