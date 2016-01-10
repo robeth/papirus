@@ -1,5 +1,6 @@
 CREATE VIEW `transaction_stok_det` AS
 SELECT `s`.`id` AS `id`,
+       `k`.`id` AS `kategori_id`,
        `k`.`kode` AS `kode`,
        `k`.`nama` AS `nama`,
        `k`.`deskripsi` AS `deskripsi`,

@@ -28,7 +28,8 @@ var paths = {
         './vendor/**',
         './**/*.html',
         './models/**',
-        './migrations/**'
+        './migrations/**',
+        './helpers/**'
     ],
     react: {
       entry: './app/components/bina-mandiri.jsx',

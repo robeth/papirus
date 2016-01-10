@@ -1,5 +1,11 @@
 CREATE VIEW `stok_remain` AS
-SELECT `k`.`kode` AS `kode`,
+SELECT
+      `k`.`id` AS `id`,
+      `k`.`kode` AS `kode`,
+      `k`.`nama` AS `nama`,
+      `k`.`satuan` AS `satuan`,
+      `k`.`stabil` AS `stabil`,
+      `k`.`fluktuatif` AS `fluktuatif`,
        coalesce(`ins`.`jumlah`,0) AS `jumlah_in`,
        coalesce(`op`.`jumlah`,0) AS `jumlah_penjualan`,
        coalesce(`ok`.`jumlah`,0) AS `jumlah_konversi`,

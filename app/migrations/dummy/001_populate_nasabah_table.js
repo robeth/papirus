@@ -1,4 +1,5 @@
 var tableName = 'transaction_reportkategori';
+var DatabaseHelper = require('../../helpers/database');
 
 var DATA = [
   {
@@ -29,33 +30,11 @@ var DATA = [
   }
 ];
 
-function getSqlValueString(){
-  return DATA
-    .map(function(data, index, array){
-      return "(" +
-        data.id + ",'" +
-        data.jenis + "','" +
-        data.ktp + "','" +
-        data.nama + "','" +
-        data.alamat + "','" +
-        data.telepon + "','" +
-        data.email + "','" +
-        data.tanggal_lahir + "','" +
-        data.tanggal_daftar + "','" +
-        data.nama_pj + "','" +
-        data.no_induk + "')";
-    })
-    .join(',');
-}
+var query = DatabaseHelper.insertQueryBuilder('transaction_nasabah', DATA);
 
 module.exports = {
   up: function(queryInterface, DataTypes){
     console.log('Dummy Migration 001 UP');
-    var query = 'insert into transaction_nasabah ' +
-    '(id, jenis, ktp, nama, alamat, telepon, email, tanggal_lahir,' +
-    ' tanggal_daftar, nama_pj, no_induk) values ' +
-    getSqlValueString();
-    console.log(query);
     return queryInterface.sequelize.query(query);
   },
   down: function(queryInterface, DataTypes){
