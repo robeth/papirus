@@ -42,7 +42,16 @@ module.exports={
 
     var fieldValidationResult = inputs.map(validateInput);
     var formValidationResult = forms.map(validateInput);
-    var validationResult = fieldValidationResult.concat(formValidationResult);
+
+    // Additional validation implemented by form
+    var additionalValidationResult = this.additionalValidation
+      ? this.additionalValidation()
+      : [];
+
+    var validationResult = fieldValidationResult
+      .concat(formValidationResult)
+      .concat(additionalValidationResult);
+
     validationResult = validationResult.filter(function(result){
       return result !== null;
     });

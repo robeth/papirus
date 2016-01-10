@@ -9,6 +9,7 @@ var Alert = require('../alert');
 var Vendor = window.Models.Vendor;
 var Penjualan = window.Models.Penjualan;
 var PenjualanStock = window.Models.PenjualanStock;
+var Kategori = window.Models.Kategori;
 var FormMixin = require('../mixins/form-mixin');
 var Promise = require('bluebird');
 var _ = require('lodash');
@@ -25,28 +26,43 @@ var PenjualanForm = React.createClass({
     return {
       isReadOnly: this.props.initialIsReadOnly,
       vendorInstances: [],
+      availabilityInstances: [],
       penjualanInstance: {
         tanggal: null,
         vendor_id: null,
         nota: null
       },
-      penjualanStockInstances: null
+      penjualanStockInstances: null,
+      errorMessages: null
     };
   },
 
   componentDidMount: function(){
     var component = this;
+    var vendorInstancesResult = null;
+    var categoryAvailabilityResult = null;
 
     // Initialize vendor selection
     Vendor
     .findAll()
-    .then(function onFound(vendorInstances){
+    .then(function onVendorFound(vendorInstances){
       console.log('All vendor found');
       console.log(vendorInstances);
-      component.setState({vendorInstances: vendorInstances});
+      vendorInstancesResult = vendorInstances;
+      return Kategori.getAvailability();
+    })
+    .then(function onAvailibityFound(availabilityInstances){
+      console.log('Availability calculated');
+      console.log(availabilityInstances);
+      categoryAvailabilityResult = availabilityInstances;
+
+      component.setState({
+        vendorInstances: vendorInstancesResult,
+        availabilityInstances: categoryAvailabilityResult
+      });
     })
     .catch(function onError(error){
-      console.log('error fetching all vendor');
+      console.log('error initializing penjualan form');
       console.log(error);
     });
     console.log(this.props)
@@ -83,10 +99,15 @@ var PenjualanForm = React.createClass({
       console.log(formErrors);
       return;
     }
-    var penjualanPayload = this.collectPayload();
+
+    var preparationPromise = this.preparePenjualanDetailForms();
     var component = this;
-    Penjualan
-      .create(penjualanPayload)
+
+    preparationPromise
+      .then(function(){
+        var penjualanPayload = component.collectPayload();
+        return Penjualan.create(penjualanPayload);
+      })
       .then(function onPenjualanCreationSuccess(penjualan){
         console.log("success creating new penjualan!");
         console.log(penjualan);
@@ -94,19 +115,32 @@ var PenjualanForm = React.createClass({
         // Instruct child forms to save
         penjualanStockPromises = component.getChildrenForms().map(
           function(childForm, index, arr){
-            childForm.component.save(penjualan);
+            return childForm.component.save(penjualan);
           }
         );
         return Promise.all(penjualanStockPromises);
       })
       .then(function onPenjualanStocksSaved(penjualanStocks){
+        console.log(penjualanStocks);
         component.refs['add-success-alert'].show();
         component.resetFields();
         component.resetChildrenForms();
+        return Kategori.getAvailability();
+      })
+      .then(function onAvailibityFound(availabilityInstances){
+        console.log('Availability calculated');
+        console.log(availabilityInstances);
+
+        component.setState({
+          availabilityInstances: availabilityInstances
+        });
       })
       .catch(function onPenjualanCreationError(error){
         console.log("Failed creating new penjualan...");
         console.log(error);
+
+        component.setState({errorMessages: [error.message]});
+        component.refs['error-alert'].show();
       });
 
   },
@@ -171,9 +205,93 @@ var PenjualanForm = React.createClass({
       });
   },
 
+  preparePenjualanDetailForms: function(){
+    // Prepare stock for penjualan-details
+    var penjualanDetailForms = this.refs['penjualan_stocks']
+      .getChildrenForms()
+      .map(function(form){
+        return form.component;
+      });
+
+    var categoryIdSet = new Set();
+    for(var i = 0, n = penjualanDetailForms.length; i < n; i++){
+      console.log(penjualanDetailForms[i]);
+      var payload = penjualanDetailForms[i].collectPayload();
+      categoryIdSet.add(payload['kategori_id']);
+    }
+
+    var categoryIds = [];
+    categoryIdSet.forEach(function(categoryId){
+      categoryIds.push(categoryId);
+    });
+
+    var assignmentPromise = this.getAvailability(categoryIds)
+      .then(function(results){
+        for(var i = 0, n = penjualanDetailForms.length; i < n; i++){
+          var payload = penjualanDetailForms[i].collectPayload();
+          var expectedAmount = parseFloat(payload.jumlah);
+          var categoryId = payload.kategori_id;
+          var candidates = [];
+
+          for(var j = 0, m = results[categoryId].length; j < m;){
+            // 1st loop control: expectedAmount is satisfied
+            if(expectedAmount <= 0){
+              break;
+            }
+
+            var candidate = results[categoryId][j];
+            if(candidate.sisa > 0) {
+              var currentAmount = Math.min(expectedAmount, candidate.sisa);
+              candidate.sisa -= currentAmount;
+              expectedAmount -= currentAmount;
+              candidates.push({
+                stockId: candidate.id,
+                amount: currentAmount
+              });
+            }
+            // 2nd loop control: iterate through candidates
+            if(candidate.sisa === 0){
+              j++;
+            }
+          }
+
+          if(expectedAmount !== 0) {
+            throw new Error('Insufficient amount of '
+              + categoryId + ': -' + expectedAmount);
+          }
+
+          penjualanDetailForms[i].setCandidates(candidates);
+        }
+      });
+
+    return assignmentPromise;
+  },
+
+  getAvailability: function(categoryIds){
+    var queryPromises = [];
+    categoryIds.map(function(categoryId){
+      var queryPromise = Kategori.getRemainingStocks(categoryId)
+        .then(function(availabilities){
+          return {categoryId: categoryId, data: availabilities};
+        });
+      queryPromises.push(queryPromise);
+    });
+
+    return Promise.all(queryPromises)
+      .then(function(results){
+        console.log(results);
+        var availabilities = {};
+        results.map(function(result){
+          availabilities[result.categoryId] = result.data;
+        });
+        return availabilities;
+      });
+  },
+
   resetAlert: function(){
     this.refs['add-success-alert'].hide();
     this.refs['edit-success-alert'].hide();
+    this.refs['error-alert'].hide();
   },
 
   optionRenderer: function(option){
@@ -277,6 +395,23 @@ var PenjualanForm = React.createClass({
                   title={<div><i className='icon fa fa-check'/> Success!</div>}>
                   Penjualan successfully updated
                 </Alert>
+                <Alert
+                  ref='error-alert'
+                  type='danger'
+                  show={false}
+                  title={
+                    <div><i className='icon fa fa-bug'/>
+                      Unexpected Error!
+                    </div>
+                  }>
+                  <ul>
+                    { this.state.errorMessages
+                      && this.state.errorMessages.map(function(message){
+                        return <li>{message}</li>
+                      })
+                    }
+                  </ul>
+                </Alert>
               </div>
             </div>
             <div className="row">
@@ -318,10 +453,13 @@ var PenjualanForm = React.createClass({
             <DynamicForm
               header={PenjualanDetails.Header}
               element={PenjualanDetails.Element}
-              ref='pembelian_stocks'
+              ref='penjualan_stocks'
               mode={this.props.mode}
               instances={this.state.penjualanStockInstances}
               initialIsReadOnly={this.state.isReadOnly}
+              childFormParams={{
+                availabilityInstances: this.state.availabilityInstances
+              }}
               />
           </Box.Body>
         </Box.Container>

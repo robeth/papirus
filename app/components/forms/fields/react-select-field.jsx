@@ -22,16 +22,25 @@ var ReactSelectField = React.createClass({
   },
 
   getInitialState: function(){
+    var initialValue = null;
+
+    initialValue = this.props.initialValue;
+    if(!initialValue
+      && this.props.options
+      && this.props.options.length > 0){
+      initialValue = this.props.options[0].value;
+    }
+
     return {
-      value: this.props.initialValue,
+      value: initialValue,
       status: 'neutral',
       errors: []
     };
   },
 
   componentWillReceiveProps: function(nextProps){
-    // console.log('ReactSelectField new props: ');
-    // console.log(nextProps);
+    console.log('ReactSelectField new props: ');
+    console.log(nextProps);
 
     if(this.props.initialValue !== nextProps.initialValue){
       console.log('ReactSelectField update state from initialValue: ' + nextProps.initialValue )
@@ -43,7 +52,7 @@ var ReactSelectField = React.createClass({
     // Both are not initialized
     // Auto select first option in next props if possible
     else if(!nextProps.initialValue &&
-      nextProps.options &&
+      this.props.options.length !== nextProps.options.length &&
       nextProps.options.length > 0){
       this.setState({
         value: nextProps.options[0].value
@@ -56,10 +65,12 @@ var ReactSelectField = React.createClass({
   },
 
   handleValueChange: function(newValue){
-    console.log('Change value: ' + newValue);
     this.setState({
       value: newValue
     });
+    if(this.props.onChange){
+      this.props.onChange(newValue);
+    }
   },
 
   validate: function(){

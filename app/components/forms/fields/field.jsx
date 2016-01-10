@@ -9,7 +9,7 @@ var Field = React.createClass({
     inputColumn: React.PropTypes.number,
     htmlId: React.PropTypes.string,
     label: React.PropTypes.string,
-    placeholder: React.PropTypes.string,
+    placeholder: React.PropTypes.node,
     validation: React.PropTypes.arrayOf(React.PropTypes.string),
     readOnly: React.PropTypes.bool,
     initialValue: React.PropTypes.oneOfType([

@@ -1,5 +1,6 @@
 var React = require('react');
 var FormMixin = require('../mixins/form-mixin');
+var Promise = require('bluebird');
 var _ = require('lodash');
 
 var DynamicForm = React.createClass({
@@ -8,7 +9,8 @@ var DynamicForm = React.createClass({
     mode: React.PropTypes.oneOf(['add', 'edit']),
     refLabel: React.PropTypes.string,
     instances: React.PropTypes.array,
-    initialIsReadOnly: React.PropTypes.bool
+    initialIsReadOnly: React.PropTypes.bool,
+    childFormParams: React.PropTypes.object
   },
 
   getInitialState: function(){
@@ -108,9 +110,11 @@ var DynamicForm = React.createClass({
   },
 
   save: function(args){
-    this.getNewForms().map(function(childForm, index, arr){
+    var childPromises = this.getNewForms().map(function(childForm, index, arr){
       return childForm.component.save(args);
     });
+
+    return Promise.all(childPromises);
   },
 
   getRefsFromIds: function(childIds){
@@ -194,7 +198,8 @@ var DynamicForm = React.createClass({
         ref: component.generateRef(childId),
         mode: component.getMode(childId),
         instance: component.state.instanceDictionary[childId],
-        initialIsReadOnly: component.state.isReadOnly
+        initialIsReadOnly: component.state.isReadOnly,
+        params: component.props.childFormParams
       });
     });
 

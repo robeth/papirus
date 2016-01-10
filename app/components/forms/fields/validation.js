@@ -18,8 +18,17 @@ function required(value){
   return value.trim() ? null : "This field is required";
 }
 
+// Error if value is not numeric
+// Source: http://stackoverflow.com/questions/18082/validate-decimal-numbers-in-javascript-isnumeric
+function isNumeric(n) {
+  var result = !isNaN(parseFloat(n)) && isFinite(n);
+
+  return result ? null : 'Must be a number';
+}
+
 var VALIDATION_DICTIONARY = {
-  required: required
+  required: required,
+  isNumeric: isNumeric
 }
 
 function check(validationFunctionNames, value){

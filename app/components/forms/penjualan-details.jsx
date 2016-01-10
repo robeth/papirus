@@ -30,57 +30,57 @@ var Element = React.createClass({
     mode: React.PropTypes.oneOf(['add', 'edit']),
     instance: React.PropTypes.object,
     onRemoveClick: React.PropTypes.func.isRequired,
-    initialIsReadOnly: React.PropTypes.bool
+    initialIsReadOnly: React.PropTypes.bool,
+    params: React.PropTypes.object
   },
 
   getInitialState: function(){
     console.log('PenjualanDetails-INITIAL_STATE');
     console.log(this.props);
+
     return {
       isReadOnly: this.props.initialIsReadOnly,
+      currentCategoryId: this.getCurrentCategoryId(),
       instance: {
         id: null,
         jumlah: null,
         harga: null
       },
       penjualanStockInstance: null,
-      kategoriInstances: []
+      candidates: null,
+      errorMessage: null
     };
   },
 
   componentDidMount: function(){
     var component = this;
-
-    // Initialize kategori for detail penjualan forms
-    Kategori
-      .findAll()
-      .then(function onFound(kategoriInstances){
-        component.setState({kategoriInstances: kategoriInstances});
-      });
-    this.updateState(this.props.instance);
   },
 
   componentWillReceiveProps: function(nextProps) {
-    console.log('PenjualanDetails-CWRP-nextProps:');
+    console.log('CWRP-PenjualanDetails-nextProps');
     console.log(nextProps);
-    if(nextProps.mode === 'edit' &&
-      nextProps.instance &&
-      nextProps.instance !== this.props.instance){
+    if(nextProps.instance
+      && nextProps.instance !== this.props.instance){
+      // Update instance
       this.updateState(nextProps.instance);
     }
+
+    // Update selected category
+    this.setState({
+      currentCategoryId: this.getCurrentCategoryId(nextProps)
+    });
   },
 
   updateState: function(penjualanStock){
-    console.log('PenjualanDetails-Update-state');
     if(penjualanStock){
       var component = this;
       penjualanStock.getStock()
         .then(function onStockFound(stock){
-          console.log('PenjualanDetails-Update-state-stock');
-          console.log(stock);
           component.setState({
             instance: {
               id: penjualanStock.id,
+              jumlah: penjualanStock.jumlah,
+              harga: penjualanStock.harga,
               stock: stock
             },
             penjualanStockInstance: penjualanStock
@@ -92,26 +92,70 @@ var Element = React.createClass({
     }
   },
 
+  getCurrentCategoryId: function(newProps){
+    var props = newProps || this.props;
+
+    // Cases:
+    // No instance. No selected. No availability = null
+    // No instance. No selected. available  = first_element.id
+    // Instance. No selected = instance.kategory.id
+    // Instance. Selected = selected.id
+    // 1st priority: selected cateory
+    if(this.state
+      && this.state.currentCategoryId) {
+      return this.state.currentCategoryId;
+    }
+    // 2nd priority: instance kategori_id
+    else if(this.state
+      && this.state.instance
+      && this.state.instance.kategori_id){
+      return this.state.instance.kategori_id;
+    }
+    // 3rd priority: first element of stock availability
+    else{
+      if(props.params
+        && props.params.availabilityInstances
+        && props.params.availabilityInstances.length > 0){
+        return props.params.availabilityInstances[0].id;
+      } else {
+        return null;
+      }
+    }
+  },
+
+  setCandidates: function(candidates){
+    console.log(candidates);
+    this.setState({candidates: candidates});
+  },
+
   save: function(args){
-    var penjualanStockPayload = this.collectPayload();
-    // TODO: find valid stok id (available & FIFO)
-    penjualanStockPayload.stok_id = 1;
-    penjualanStockPayload.penjualan_id = args.id;
     var component = this;
 
-    var newPenjualanStockPromise = PenjualanStock.create(penjualanStockPayload);
+    // Assign candidates
+    var penjualanStockPayloads = [];
+    var promises = this.state.candidates.map(function(candidate){
+      var formPayload = component.collectPayload();
+      var payload = {
+        penjualan_id: args.id,
+        stok_id: candidate.stockId,
+        jumlah: candidate.amount,
+        harga: formPayload.harga
+      };
+      return PenjualanStock.create(payload);
+    });
+    var penjualanStockPromises = Promise.all(promises);
 
-    newPenjualanStockPromise
-      .then(function(penjualanStock){
-        console.log('success. new penjualan stock');
-        console.log(penjualanStock);
+    penjualanStockPromises
+      .then(function(penjualanStocks){
+        console.log('success. new penjualan stocks');
+        console.log(penjualanStocks);
         // component.resetFields();
       })
       .catch(function(error){
         console.error(error);
       });
 
-    return newPenjualanStockPromise;
+    return penjualanStockPromises;
   },
 
   saveChanges: function(args){
@@ -156,24 +200,70 @@ var Element = React.createClass({
     );
   },
 
+  handleNewCategory: function(newCategoryId){
+    console.log('newCategoryId:');
+    console.log(newCategoryId);
+    this.setState({currentCategoryId: newCategoryId});
+  },
+
+  getCategory: function(categoryId){
+    console.log(this.props.params)
+    if(categoryId === null ||
+      !this.props.params ||
+      !this.props.params.availabilityInstances) {
+      console.log('invalidCategoryId:' + categoryId);
+      return {};
+    }
+
+    var results = this.props.params.availabilityInstances.filter(function(instance){
+      return instance.id === categoryId;
+    });
+    console.log('results:');
+    console.log(results);
+
+    return results.length > 0 ? results[0] : [];
+  },
+
+  additionalValidation: function(){
+    var payload = this.collectPayload();
+    var currentCategory = this.getCategory(this.state.currentCategoryId);
+    var validationResult = null;
+
+    if(payload.jumlah > currentCategory.sisa){
+      validationResult = {
+        ref: 'penjualan-details',
+        errors : ['Jumlah > Sisa']
+      }
+    }
+
+    this.setState({
+      errorMessage: validationResult && validationResult.errors[0]
+    });
+
+    return [validationResult];
+  },
+
   reset: function(){
     console.log('PenjualanDetails reset');
     this.resetFields();
+    this.setState({errorMessage: null});
   },
 
   render: function(){
     // console.log('PembelianDetails-Render:');
     // console.log(this.state);
+    var currentCategory = this.getCategory(this.state.currentCategoryId);
 
-    var kategoriOptions = this.state.kategoriInstances.map(
-      function(kategoriInstance, index, arr){
-        return {
-          value: kategoriInstance.id,
-          code: kategoriInstance.kode,
-          label: kategoriInstance.nama
-        };
-      }
-    );
+    var kategoriOptions = this.props.params &&
+    (this.props.params.availabilityInstances || []).map(
+        function(availabilityInstance, index, arr){
+          return {
+            value: availabilityInstance.id,
+            code: availabilityInstance.kode,
+            label: availabilityInstance.nama
+          };
+        }
+      );
 
     return (
       <div className='row row-margin'>
@@ -184,32 +274,39 @@ var Element = React.createClass({
           initialValue={this.state.instance.kategori_id}
           readOnly={this.state.isReadOnly}
           validation={['required']}
-          optionRenderer={this.optionRenderer}>
+          optionRenderer={this.optionRenderer}
+          onChange={this.handleNewCategory}>
         </ReactSelectField>
         <Field
           ref='jumlah'
           inputColumn={3}
           initialValue={this.state.instance.jumlah}
           readOnly={this.state.isReadOnly}
-          validation={['required']}
-          suffixAddon='Kg'/>
+          validation={['required', 'isNumeric']}
+          suffixAddon={currentCategory ? currentCategory.satuan : '-'}
+          placeholder={'Tersisa: ' + currentCategory.sisa}
+          dataType='number'/>
         <Field
           ref='harga'
           inputColumn={3}
           initialValue={this.state.instance.harga}
           readOnly={this.state.isReadOnly}
-          validation={['required']}
+          validation={['required', 'isNumeric']}
           prefixAddon='Rp'
-          placeholder='@unit'/>
+          placeholder={'Stabil: ' + currentCategory.stabil}
+          dataType='number'/>
+        <div className="col-xs-3">
         {!this.state.isReadOnly && (
-          <div className="col-xs-3">
             <button
               className='btn btn-danger btn-xs'
               onClick={this.props.onRemoveClick}>
               <i className='fa fa-trash'/>
             </button>
-          </div>
         )}
+        {
+          this.state.errorMessage && (<code>{this.state.errorMessage}</code>)
+        }
+        </div>
       </div>
     );
   }
