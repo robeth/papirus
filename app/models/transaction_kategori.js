@@ -1,4 +1,5 @@
 /* jshint indent: 2 */
+var RawQuery = require('./queries');
 
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('Kategori', {
@@ -48,6 +49,39 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     tableName: 'transaction_kategori',
-    freezeTableName: true
+    freezeTableName: true,
+    classMethods: {
+      getAvailability: function(){
+        return sequelize.query(
+          'SELECT * from stok_remain',
+          {
+            type: sequelize.QueryTypes.SELECT
+          }
+        );
+      },
+      isValidState: function(){
+        return sequelize.models.Kategori.getRemainingStock()
+          .then(function(remainingStocks){
+            var isValid = true;
+            for(var i = 0, n = remainingStocks.length; i < n; i++){
+              if(remainingStocks.sisa < 0){
+                isValid = false;
+                break;
+              }
+            }
+            return isValid;
+          });
+      },
+      getRemainingStocks: function(categoryId){
+        return sequelize.query(RawQuery.getRemainingStocks,
+          {
+            type: sequelize.QueryTypes.SELECT,
+            replacements: {
+              categoryId: categoryId
+            }
+          }
+        );
+      }
+    }
   });
 };
