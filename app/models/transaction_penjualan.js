@@ -26,6 +26,29 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     tableName: 'transaction_penjualan',
-    freezeTableName: true
+    freezeTableName: true,
+    instanceMethods: {
+      getValue: function(){
+        return this.getPenjualanStocks()
+          .then(function(penjualanStocks){
+            return penjualanStocks
+              .map(function(penjualanStock){
+                return penjualanStock.jumlah * penjualanStock.harga;
+              })
+              .reduce(function(previousValue, currentValue){
+                return previousValue + currentValue;
+              });
+          });
+      },
+      getWeight: function(){
+        return this.getPenjualanStocks()
+          .then(function(penjualanStocks){
+            return penjualanStocks
+              .reduce(function(previousValue, penjualanStock){
+                return previousValue + penjualanStock.jumlah
+              }, 0);
+          });
+      }
+    }
   });
 };

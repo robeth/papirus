@@ -68,4 +68,29 @@ models.PembelianStock.belongsTo(models.Stock, {
   foreignKey: 'stok_id'
 });
 
+models.Vendor.hasMany(models.Penjualan, {
+  as: 'Penjualans',
+  foreignKey: 'vendor_id'
+});
+
+models.Penjualan.belongsTo(models.Vendor, {
+  as: 'Vendor',
+  foreignKey: 'vendor_id'
+});
+
+models.Penjualan.hasMany(models.PenjualanStock, {
+  as: 'penjualanStocks',
+  foreignKey: 'penjualan_id'
+});
+
+models.PenjualanStock.belongsTo(models.Penjualan, {
+  as: 'Penjualan',
+  foreignKey: 'penjualan_id'
+});
+
+models.PenjualanStock.belongsTo(models.Stock, {
+  as: 'Stock',
+  foreignKey: 'stok_id'
+});
+
 module.exports = models;

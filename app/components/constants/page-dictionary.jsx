@@ -10,6 +10,7 @@ var VendorForm = require('./../pages/form-vendor');
 var VendorDetail = require('./../pages/detail-vendor');
 var VendorData = require('./../pages/data-vendor');
 var PenjualanForm = require('./../pages/form-penjualan');
+var PenjualanData = require('./../pages/data-penjualan');
 
 module.exports = {
   'dashboard': {
@@ -108,6 +109,15 @@ module.exports = {
       { label: 'Home', to: 'dashboard'},
       { label: 'Form', to : ''},
       { label: 'Penjualan', to: 'form-penjualan'}
+    ]
+  },
+  'data-penjualan': {
+    title: 'Data Penjualan',
+    element: React.createFactory(PenjualanData),
+    path: [
+      { label: 'Home', to: 'dashboard'},
+      { label: 'Data', to : ''},
+      { label: 'Penjualan', to: 'data-penjualan'}
     ]
   }
 }
