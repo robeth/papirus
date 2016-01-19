@@ -12,7 +12,7 @@ var BinaMandiri = React.createClass({
   getInitialState: function(){
     return {
       currentPage: PAGE_DICTIONARY['data-penjualan'],
-      properties: {pembelianId: 6}
+      properties: {instanceId: 1}
     };
   },
 

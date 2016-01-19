@@ -35,7 +35,7 @@ var Sidebar = React.createClass({
                     <li><a href="#" data-link="data-nasabah-kolektif"><i className="fa fa-building"></i> Kolektif</a></li>
                   </ul>
                 </li>
-                <li><a href="#" data-link="data-vendor"><i className="fa fa-truck"></i> Vendor</a></li>
+                <li><a href="#" onClick={this._generateOnItemClick('data-vendor')}><i className="fa fa-truck"></i> Vendor</a></li>
                 <li><a href="#" data-link="data-barang"><i className="fa fa-rocket"></i> Barang</a></li>
                 <li>
                   <a href="#">
@@ -49,7 +49,7 @@ var Sidebar = React.createClass({
                   </ul>
                 </li>
                 <li><a href="#" onClick={this._generateOnItemClick('data-pembelian')}><i className="fa fa-arrow-right"></i> Pembelian</a></li>
-                <li><a href="#" data-link="data-penjualan"><i className="fa fa-arrow-left"></i> Penjualan</a></li>
+                <li><a href="#" onClick={this._generateOnItemClick('data-penjualan')}><i className="fa fa-arrow-left"></i> Penjualan</a></li>
                 <li><a href="#" data-link="data-konversi"><i className="fa fa-recycle"></i> Konversi</a></li>
                 <li><a href="#" data-link="data-penarikan"><i className="fa fa-hand-lizard-o"></i> Penarikan</a></li>
               </ul>

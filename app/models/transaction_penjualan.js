@@ -1,4 +1,5 @@
 /* jshint indent: 2 */
+var Moment = require('moment');
 
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('Penjualan', {
@@ -18,7 +19,11 @@ module.exports = function(sequelize, DataTypes) {
     },
     tanggal: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
+      get: function(){
+        var pembelianDate = this.getDataValue('tanggal');
+        return Moment(pembelianDate).format('YYYY-MM-DD');
+      }
     },
     nota: {
       type: DataTypes.STRING,

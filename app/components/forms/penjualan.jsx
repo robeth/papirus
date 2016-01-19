@@ -13,6 +13,7 @@ var Kategori = window.Models.Kategori;
 var FormMixin = require('../mixins/form-mixin');
 var Promise = require('bluebird');
 var _ = require('lodash');
+var sequelize = window.Models.Kategori.sequelize;
 
 var PenjualanForm = React.createClass({
   mixins: [FormMixin],
@@ -100,7 +101,14 @@ var PenjualanForm = React.createClass({
       return;
     }
 
-    var preparationPromise = this.preparePenjualanDetailForms();
+    // Prepare stock for penjualan-details
+    var penjualanDetailForms = this.refs['penjualan_stocks']
+      .getChildrenForms()
+      .map(function(form){
+        return form.component;
+      });
+
+    var preparationPromise = this.preparePenjualanDetailForms(penjualanDetailForms);
     var component = this;
 
     preparationPromise
@@ -113,9 +121,11 @@ var PenjualanForm = React.createClass({
         console.log(penjualan);
 
         // Instruct child forms to save
-        penjualanStockPromises = component.getChildrenForms().map(
+        var penjualanStockPromises = component.getChildrenForms().map(
           function(childForm, index, arr){
-            return childForm.component.save(penjualan);
+            return childForm.component.save({
+                penjualan: penjualan
+              });
           }
         );
         return Promise.all(penjualanStockPromises);
@@ -148,71 +158,160 @@ var PenjualanForm = React.createClass({
   saveChanges: function(){
     event.preventDefault();
     this.resetAlert();
-    var formErrors = this.validate();
+    var formErrors = this.validate({ignoreAdditionalValidation: true});
 
     if(formErrors.length > 0){
       console.log('Penjualan form is invalid');
       console.log('Invalid: ');
       console.log(formErrors);
-      return;
+      throw new Error('Invalid!');
     }
-    var penjualanPayload = this.collectPayload();
     var component = this;
-    component.state.penjualanInstance
-      .update(penjualanPayload)
-      .then(function onPenjualanCreationSuccess(penjualan){
-        console.log("success updating penjualan!");
-        console.log(penjualan);
-        component.setState({penjualanInstance: penjualan});
 
-        // Instruct child forms to save changes
-        var childrenFormsPromise = component.getChildrenForms().map(
-          function(childForm, index, arr){
-            var childPromise = childForm.component.saveChanges(penjualan);
-            console.log('Penjualan-childPromise:');
-            console.log(childPromise);
+    sequelize.transaction({
+      isolationLevel: sequelize.Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED
+    },function(t){
+      var editedPenjualanDetails = component.refs['penjualan_stocks']
+        .getEditedForms();
 
-            return childPromise;
-          }
-        );
-
-        childrenFormsPromise = _.flatten(childrenFormsPromise, true);
-        console.log('Penjualan-childrenPromise:');
-        console.log(childrenFormsPromise);
-        return Promise.all(childrenFormsPromise);
-      })
-      .then(function onAllChildrenFormsUpdated(penjualanStocks){
-        console.log('PenjualanStocks updated');
-        console.log(penjualanStocks);
-        component.refs['edit-success-alert'].show();
-        component.resetFields();
-        component.resetChildrenForms();
-        component.setReadOnly(true);
-
-        var newPenjualanStocks = penjualanStocks.filter(function(s){
-          return s.isNewRecord === false ;
-        });
-
-        console.log(newPenjualanStocks);
-
-        component.setState({
-          penjualanStockInstances: newPenjualanStocks
-        });
-      })
-      .catch(function onPenjualanCreationError(error){
-        console.log("Failed to update penjualan...");
-        console.log(error);
+      var deleteChildPromises = editedPenjualanDetails.map(function(form){
+        return form.component.delete({transaction: t});
       });
+
+      var childPromises = Promise.all(_.flatten(deleteChildPromises, true));
+      return childPromises
+        .then(function onDeleteOldDetailSucess(){
+          // Prepare stock for penjualan-details
+          var newPenjualanDetailForms = component.refs['penjualan_stocks']
+            .getNewForms();
+          var editedPenjualanDetailForms = component.refs['penjualan_stocks']
+            .getEditedForms();
+
+          var penjualanDetailForms = newPenjualanDetailForms
+            .concat(editedPenjualanDetailForms)
+            .map(function(form){
+              return form.component;
+            });
+
+          return component.preparePenjualanDetailForms(penjualanDetailForms, t);
+        })
+        .then(function onStockAllocationSuccess(){
+          var penjualanPayload = component.collectPayload();
+          return component.state.penjualanInstance.update(penjualanPayload,{
+            transaction: t
+          });
+        })
+        .then(function onPenjualanUpdateSuccess(penjualan){
+          console.log("success updating new penjualan!");
+          console.log(penjualan);
+
+          // Instruct child forms to save changes
+          var penjualanStockPromises = component.getChildrenForms().map(
+            function(childForm, index, arr){
+              return childForm.component.saveChanges({
+                  penjualan: penjualan,
+                  transaction: t
+                });
+            }
+          );
+          return Promise.all(_.flatten(penjualanStockPromises, true));
+        })
+        .then(function onPenjualanStocksUpdated(penjualanStocks){
+          console.log('success updating penjualan stocks!');
+          console.log(penjualanStocks);
+          component.refs['edit-success-alert'].show();
+          component.resetFields();
+          component.resetChildrenForms();
+          component.setReadOnly(true);
+
+          var newPenjualanStocks = penjualanStocks.filter(function(s){
+            return s && s.isNewRecord === false ;
+          });
+
+          console.log(newPenjualanStocks);
+
+          component.setState({
+            penjualanStockInstances: newPenjualanStocks
+          });
+
+          return Kategori.getAvailability();
+        })
+        .then(function onAvailibityFound(availabilityInstances){
+          console.log('Availability calculated');
+          console.log(availabilityInstances);
+
+          component.setState({
+            availabilityInstances: availabilityInstances
+          });
+        })
+        .catch(function onUpdateProcessError(error){
+          console.log("Failed creating new penjualan...");
+          console.log(error);
+
+          component.setState({errorMessages: [error.message]});
+          component.refs['error-alert'].show();
+
+          throw new Error('Invalid transaction!');
+        });
+    })
+    .then(function(){
+      console.log('Penjualan-saveChanges: committed');
+    })
+    .catch(function(error){
+      console.log('Penjualan-saveChanges: rollback');
+      console.log(error);
+    });
+
+
+    // var penjualanPayload = this.collectPayload();
+    // component.state.penjualanInstance
+    //   .update(penjualanPayload)
+    //   .then(function onPenjualanCreationSuccess(penjualan){
+    //     console.log("success updating penjualan!");
+    //     console.log(penjualan);
+    //     component.setState({penjualanInstance: penjualan});
+    //
+    //     // Instruct child forms to save changes
+    //     var childrenFormsPromise = component.getChildrenForms().map(
+    //       function(childForm, index, arr){
+    //         var childPromise = childForm.component.saveChanges(penjualan);
+    //         console.log('Penjualan-childPromise:');
+    //         console.log(childPromise);
+    //
+    //         return childPromise;
+    //       }
+    //     );
+    //
+    //     childrenFormsPromise = _.flatten(childrenFormsPromise, true);
+    //     console.log('Penjualan-childrenPromise:');
+    //     console.log(childrenFormsPromise);
+    //     return Promise.all(childrenFormsPromise);
+    //   })
+    //   .then(function onAllChildrenFormsUpdated(penjualanStocks){
+    //     console.log('PenjualanStocks updated');
+    //     console.log(penjualanStocks);
+    //     component.refs['edit-success-alert'].show();
+    //     component.resetFields();
+    //     component.resetChildrenForms();
+    //     component.setReadOnly(true);
+    //
+    //     var newPenjualanStocks = penjualanStocks.filter(function(s){
+    //       return s.isNewRecord === false ;
+    //     });
+    //
+    //     console.log(newPenjualanStocks);
+    //
+    //     component.setState({
+    //       penjualanStockInstances: newPenjualanStocks
+    //     });
+    //   })
+    //   .catch(function onPenjualanCreationError(error){
+    //     console.log("Failed to update penjualan...");
+    //     console.log(error);
+    //   });
   },
 
-  preparePenjualanDetailForms: function(){
-    // Prepare stock for penjualan-details
-    var penjualanDetailForms = this.refs['penjualan_stocks']
-      .getChildrenForms()
-      .map(function(form){
-        return form.component;
-      });
-
+  preparePenjualanDetailForms: function(penjualanDetailForms, transaction){
     var categoryIdSet = new Set();
     for(var i = 0, n = penjualanDetailForms.length; i < n; i++){
       console.log(penjualanDetailForms[i]);
@@ -225,16 +324,18 @@ var PenjualanForm = React.createClass({
       categoryIds.push(categoryId);
     });
 
-    var assignmentPromise = this.getAvailability(categoryIds)
+    var assignmentPromise = this.getAvailability(categoryIds, transaction)
       .then(function(results){
         for(var i = 0, n = penjualanDetailForms.length; i < n; i++){
           var payload = penjualanDetailForms[i].collectPayload();
           var expectedAmount = parseFloat(payload.jumlah);
+          console.log('Candidate ' + i + ' : ' + expectedAmount);
           var categoryId = payload.kategori_id;
           var candidates = [];
 
           for(var j = 0, m = results[categoryId].length; j < m;){
             // 1st loop control: expectedAmount is satisfied
+            console.log('Stock ' + i + ' : available ' + results[categoryId][j].sisa);
             if(expectedAmount <= 0){
               break;
             }
@@ -267,10 +368,10 @@ var PenjualanForm = React.createClass({
     return assignmentPromise;
   },
 
-  getAvailability: function(categoryIds){
+  getAvailability: function(categoryIds, transaction){
     var queryPromises = [];
     categoryIds.map(function(categoryId){
-      var queryPromise = Kategori.getRemainingStocks(categoryId)
+      var queryPromise = Kategori.getRemainingStocks(categoryId, transaction)
         .then(function(availabilities){
           return {categoryId: categoryId, data: availabilities};
         });
@@ -279,6 +380,7 @@ var PenjualanForm = React.createClass({
 
     return Promise.all(queryPromises)
       .then(function(results){
+        console.log('Availabilities result:');
         console.log(results);
         var availabilities = {};
         results.map(function(result){

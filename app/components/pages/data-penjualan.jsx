@@ -50,7 +50,7 @@ var PenjualanRow = React.createClass({
 
   generateOnItemClick: function(penjualanId){
     return function(){
-      Helper.call('changePage',['detail-penjualan', {penjualanId: penjualanId}]);
+      Helper.call('changePage',['detail-penjualan', {instanceId: penjualanId}]);
     };
   },
 

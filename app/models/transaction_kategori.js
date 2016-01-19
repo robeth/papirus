@@ -72,10 +72,15 @@ module.exports = function(sequelize, DataTypes) {
             return isValid;
           });
       },
-      getRemainingStocks: function(categoryId){
+      getRemainingStocks: function(categoryId, t){
+        console.log('TransactionKategori-getRemainingStocks');
+        console.log('categoriId:' + categoryId);
+        console.log('transaction:');
+        console.log(t);
         return sequelize.query(RawQuery.getRemainingStocks,
           {
             type: sequelize.QueryTypes.SELECT,
+            transaction: t,
             replacements: {
               categoryId: categoryId
             }

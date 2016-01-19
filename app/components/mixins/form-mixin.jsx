@@ -30,7 +30,7 @@ module.exports={
 
     return childrenForms;
   },
-  validate: function(){
+  validate: function(args){
     function validateInput(input){
       var fieldErrors = input.component.validate();
       return fieldErrors.length > 0
@@ -42,11 +42,14 @@ module.exports={
 
     var fieldValidationResult = inputs.map(validateInput);
     var formValidationResult = forms.map(validateInput);
+    var additionalValidationResult = [];
 
-    // Additional validation implemented by form
-    var additionalValidationResult = this.additionalValidation
-      ? this.additionalValidation()
-      : [];
+    if(args && args.ignoreAdditionalValidation){
+      // Don't evaluate additionalValidation
+    } else if(this.additionalValidation) {
+      // Additional validation implemented by form
+      additionalValidationResult = this.additionalValidation();
+    }
 
     var validationResult = fieldValidationResult
       .concat(formValidationResult)

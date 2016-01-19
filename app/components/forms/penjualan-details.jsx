@@ -23,7 +23,9 @@ var Element = React.createClass({
   mixins: [FormMixin],
   statics: {
     destroy: function(instance){
-      return instance.destroy();
+      return instance.destroy().then(function(){
+        console.log('Penjualan details successfully deleted');
+      });
     }
   },
   propTypes: {
@@ -44,7 +46,10 @@ var Element = React.createClass({
       instance: {
         id: null,
         jumlah: null,
-        harga: null
+        harga: null,
+        stock: {
+          kategori_id: null
+        }
       },
       penjualanStockInstance: null,
       candidates: null,
@@ -54,6 +59,24 @@ var Element = React.createClass({
 
   componentDidMount: function(){
     var component = this;
+
+    if(component.props.instance){
+      var instance = component.props.instance;
+      instance.getStock()
+        .then(function(stock){
+          if(component.isMounted()){
+            component.setState({
+              instance: {
+                id: instance.id,
+                jumlah: instance.jumlah,
+                harga: instance.harga,
+                stock: stock
+              },
+              penjualanStockInstance: instance
+            });
+          }
+        });
+    }
   },
 
   componentWillReceiveProps: function(nextProps) {
@@ -108,8 +131,8 @@ var Element = React.createClass({
     // 2nd priority: instance kategori_id
     else if(this.state
       && this.state.instance
-      && this.state.instance.kategori_id){
-      return this.state.instance.kategori_id;
+      && this.state.instance.stock.kategori_id){
+      return this.state.instance.stock.kategori_id;
     }
     // 3rd priority: first element of stock availability
     else{
@@ -136,12 +159,14 @@ var Element = React.createClass({
     var promises = this.state.candidates.map(function(candidate){
       var formPayload = component.collectPayload();
       var payload = {
-        penjualan_id: args.id,
+        penjualan_id: args.penjualan.id,
         stok_id: candidate.stockId,
         jumlah: candidate.amount,
         harga: formPayload.harga
       };
-      return PenjualanStock.create(payload);
+      return PenjualanStock.create(payload, {
+        transaction: args.transaction
+      });
     });
     var penjualanStockPromises = Promise.all(promises);
 
@@ -155,7 +180,7 @@ var Element = React.createClass({
         console.error(error);
       });
 
-    return penjualanStockPromises;
+    return promises;
   },
 
   saveChanges: function(args){
@@ -188,7 +213,13 @@ var Element = React.createClass({
     //   });
 
     // return updatePembelianStockPromise;
-    throw "Unimplemented Error";
+    return this.save(args);
+  },
+
+  delete: function(args){
+    return this.state.penjualanStockInstance.destroy({
+      transaction: args.transaction
+    });
   },
 
   optionRenderer: function(option){
@@ -271,7 +302,7 @@ var Element = React.createClass({
           ref='kategori_id'
           inputColumn={3}
           options={kategoriOptions}
-          initialValue={this.state.instance.kategori_id}
+          initialValue={this.state.instance.stock.kategori_id}
           readOnly={this.state.isReadOnly}
           validation={['required']}
           optionRenderer={this.optionRenderer}

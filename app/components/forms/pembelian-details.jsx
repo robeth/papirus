@@ -68,7 +68,9 @@ var Element = React.createClass({
     Kategori
       .findAll()
       .then(function onFound(kategoriInstances){
-        component.setState({kategoriInstances: kategoriInstances});
+        if(component.isMounted()){
+          component.setState({kategoriInstances: kategoriInstances});
+        }
       });
     this.updateState(this.props.instance);
   },
@@ -91,13 +93,15 @@ var Element = React.createClass({
         .then(function onStockFound(stock){
           console.log('PembelianDetails-Update-state-stock');
           console.log(stock);
-          component.setState({
-            instance: {
-              id: pembelianStock.id,
-              stock: stock
-            },
-            pembelianStockInstance: pembelianStock
-          });
+          if(component.isMounted()){
+            component.setState({
+              instance: {
+                id: pembelianStock.id,
+                stock: stock
+              },
+              pembelianStockInstance: pembelianStock
+            });
+          }
         })
         .catch(function onRetrieveStockError(error){
           console.log(error);

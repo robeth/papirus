@@ -180,6 +180,11 @@ var DynamicForm = React.createClass({
       }
     );
 
+    console.log('edit, new, delete promises');
+    console.log(editedPromises);
+    console.log(newPromises);
+    console.log(deletedPromises);
+
     return editedPromises.concat(newPromises, deletedPromises);
   },
 
