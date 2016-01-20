@@ -11,7 +11,7 @@ var PAGE_DICTIONARY = require('./constants/page-dictionary');
 var BinaMandiri = React.createClass({
   getInitialState: function(){
     return {
-      currentPage: PAGE_DICTIONARY['form-barang'],
+      currentPage: PAGE_DICTIONARY['data-barang'],
       properties: {instanceId: 1}
     };
   },

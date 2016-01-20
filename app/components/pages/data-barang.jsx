@@ -32,7 +32,7 @@ var CategoryRow = React.createClass({
 
   generateOnItemClick: function(categoryId){
     return function(){
-      Helper.call('changePage',['detail-kategori', {instanceId: categoryId}]);
+      Helper.call('changePage',['detail-barang', {instanceId: categoryId}]);
     };
   },
 
