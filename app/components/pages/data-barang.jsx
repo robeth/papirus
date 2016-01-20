@@ -1,66 +1,114 @@
-<div data-content="data-barang" class="content-wrapper hide">
-  <!-- Content Header (Page header) -->
-  <section class="content-header">
-    <h1>
-      Data Barang
-    </h1>
-    <ol class="breadcrumb">
-      <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-      <li>Data</li>
-      <li class="active">Barang</li>
-    </ol>
-  </section>
+var React = require('react');
+var Kategori = window.Models.Kategori;
+var Helper = require('../helper');
 
-  <section class="content">
-    <div class="row">
-      <div class="col-xs-12">
-        <div class="box box-info">
-          <div class="box-body">
-            <table data-widget="advanced-table" class="table table-bordered table-striped">
-              <thead>
-                <tr>
-                  <th class="text-center">#</th>
-                  <th class="text-center">Kode</th>
-                  <th class="text-center">Nama</th>
-                  <th class="text-center">Jenis</th>
-                  <th class="text-center">Harga Normal</th>
-                  <th class="text-center">Harga Fluktuatif</th>
-                  <th class="text-center">Satuan</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="text-center">1</td>
-                  <td class="text-center"><code>B1</code></td>
-                  <td>Super</td>
-                  <td>Lain-Lain</td>
-                  <td class="text-right">2.500,00</td>
-                  <td class="text-right">2.500,00</td>
-                  <td class="text-center">kg</td>
-                </tr>
-                <tr>
-                  <td class="text-center">2</td>
-                  <td class="text-center"><code>T</code></td>
-                  <td>Tembaga</td>
-                  <td>Lain-Lain</td>
-                  <td class="text-right">56.500,00</td>
-                  <td class="text-right">45.500,00</td>
-                  <td class="text-center">kg</td>
-                </tr>
-                <tr>
-                  <td class="text-center">3</td>
-                  <td class="text-center"><code>AL1</code></td>
-                  <td>Plat</td>
-                  <td>Logam</td>
-                  <td class="text-right">12.500,00</td>
-                  <td class="text-right">9.500,00</td>
-                  <td class="text-center">kg</td>
-                </tr>
-              </tbody>
-            </table>
+var CategoryRow = React.createClass({
+  propTypes: {
+    index: React.PropTypes.number.isRequired,
+    instance: React.PropTypes.object.isRequired
+  },
+
+  getInitialState: function(){
+    return {
+      reportCategory: {
+        nama: null
+      }
+    };
+  },
+
+  componentDidMount: function(){
+    var component = this;
+    component.props.instance.getReportCategory()
+      .then(function onReportCategoryFound(reportCategory){
+        component.setState({
+          reportCategory: reportCategory
+        });
+      })
+      .catch(function(error){
+        console.log('DataBarang-Row-Error retrieving report category');
+        console.log(error);
+      });
+  },
+
+  generateOnItemClick: function(categoryId){
+    return function(){
+      Helper.call('changePage',['detail-kategori', {instanceId: categoryId}]);
+    };
+  },
+
+
+  render: function(){
+    return (
+      <tr>
+        <td className="text-center">{this.props.index + 1}</td>
+        <td className="text-center">
+          <a onClick={this.generateOnItemClick(this.props.instance.id)}>
+            <code>{this.props.instance.kode}</code>
+          </a>
+        </td>
+        <td>{this.props.instance.nama} </td>
+        <td>{this.state.reportCategory.nama}</td>
+        <td className="text-center">{this.props.instance.stabil}</td>
+        <td className="text-center">{this.props.instance.fluktuatif}</td>
+        <td className="text-center">{this.props.instance.satuan}</td>
+      </tr>
+    );
+  }
+});
+
+var DataKategori = React.createClass({
+  getInitialState: function(){
+    return {instances: []};
+  },
+  componentDidMount: function(){
+    var instance = this;
+    Kategori
+      .findAll()
+      .then(function onKategoriRetrieveSuccess(categories){
+        console.log('Retrieve all categories data success!');
+        console.log(categories);
+        instance.setState({instances: categories});
+      })
+      .catch(function onKategoriRetrieveFailed(error){
+        console.log('Retrieving category failed...');
+        console.log(error);
+      });
+  },
+
+  render: function(){
+    var component = this;
+    var rows = this.state.instances.map(function(category, index){
+      return <CategoryRow key={category.id} instance={category} index={index}/>;
+    });
+    return (
+      <section className="content">
+        <div className="row">
+          <div className="col-xs-12">
+            <div className="box box-info">
+              <div className="box-body">
+                <table data-widget="advanced-table" className="table table-bordered table-striped">
+                  <thead>
+                    <tr>
+                      <th className="text-center">#</th>
+                      <th className="text-center">Kode</th>
+                      <th className="text-center">Nama</th>
+                      <th className="text-center">Jenis</th>
+                      <th className="text-center">Harga Normal</th>
+                      <th className="text-center">Harga Fluktuatif</th>
+                      <th className="text-center">Satuan</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
-</div>
+      </section>
+    );
+  }
+});
+
+module.exports = DataKategori;

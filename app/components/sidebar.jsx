@@ -36,7 +36,7 @@ var Sidebar = React.createClass({
                   </ul>
                 </li>
                 <li><a href="#" onClick={this._generateOnItemClick('data-vendor')}><i className="fa fa-truck"></i> Vendor</a></li>
-                <li><a href="#" data-link="data-barang"><i className="fa fa-rocket"></i> Barang</a></li>
+                <li><a href="#" onClick={this._generateOnItemClick('data-barang')}><i className="fa fa-rocket"></i> Barang</a></li>
                 <li>
                   <a href="#">
                     <i className="fa fa-dollar"></i> Keuangan

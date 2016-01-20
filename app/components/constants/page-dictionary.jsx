@@ -12,6 +12,7 @@ var VendorData = require('./../pages/data-vendor');
 var PenjualanForm = require('./../pages/form-penjualan');
 var PenjualanData = require('./../pages/data-penjualan');
 var PenjualanDetail = require('./../pages/detail-penjualan');
+var CategoryData = require('./../pages/data-barang');
 
 module.exports = {
   'dashboard': {
@@ -130,4 +131,13 @@ module.exports = {
       { label: 'Penjualan', to: 'form-penjualan'}
     ]
   },
+  'data-barang': {
+    title: 'Data Kategori Barang',
+    element: React.createFactory(CategoryData),
+    path: [
+      { label: 'Home', to: 'dashboard'},
+      { label: 'Data', to : ''},
+      { label: 'Barang', to: 'data-barang'}
+    ]
+  }
 }

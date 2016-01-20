@@ -79,7 +79,7 @@ models.Penjualan.belongsTo(models.Vendor, {
 });
 
 models.Penjualan.hasMany(models.PenjualanStock, {
-  as: 'penjualanStocks',
+  as: 'PenjualanStocks',
   foreignKey: 'penjualan_id'
 });
 
@@ -91,6 +91,16 @@ models.PenjualanStock.belongsTo(models.Penjualan, {
 models.PenjualanStock.belongsTo(models.Stock, {
   as: 'Stock',
   foreignKey: 'stok_id'
+});
+
+models.Kategori.belongsTo(models.ReportKategori, {
+  as: 'ReportCategory',
+  foreignKey: 'report_kategori_id'
+});
+
+models.ReportKategori.hasMany(models.Kategori, {
+  as: 'Categories',
+  foreignKey: 'report_kategori_id'
 });
 
 module.exports = models;
