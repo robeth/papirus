@@ -1,6 +1,7 @@
 var React = require('react');
 var Dashboard = require('./../pages/dashboard');
 var DataNasabahIndividu = require('./../pages/data-nasabah-individu');
+var DataNasabahKolektif = require('./../pages/data-nasabah-kolektif');
 var FormNasabah = require('./../pages/form-nasabah');
 var DetailNasabah = require('./../pages/detail-nasabah');
 var FormPembelian = require('./../pages/form-pembelian');
@@ -32,6 +33,15 @@ module.exports = {
       { label: 'Home', to: 'dashboard'},
       { label: 'Data', to : ''},
       { label: 'Nasabah individu', to: 'data-nasabah-individu'}
+    ]
+  },
+  'data-nasabah-kolektif': {
+    title: 'Data Nasabah Kolektif',
+    element: React.createFactory(DataNasabahKolektif),
+    path: [
+      { label: 'Home', to: 'dashboard'},
+      { label: 'Data', to : ''},
+      { label: 'Nasabah Kolektif', to: 'data-nasabah-kolektif'}
     ]
   },
   'form-nasabah': {

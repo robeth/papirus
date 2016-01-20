@@ -31,8 +31,8 @@ var Sidebar = React.createClass({
                     <i className="fa fa-angle-left pull-right"></i>
                   </a>
                   <ul className="treeview-menu">
-                    <li><a href="#" data-link="data-nasabah-individu" onClick={this._generateOnItemClick('data-nasabah-individu')}><i className="fa fa-child"></i> Individu</a></li>
-                    <li><a href="#" data-link="data-nasabah-kolektif"><i className="fa fa-building"></i> Kolektif</a></li>
+                    <li><a href="#" onClick={this._generateOnItemClick('data-nasabah-individu')}><i className="fa fa-child"></i> Individu</a></li>
+                    <li><a href="#" onClick={this._generateOnItemClick('data-nasabah-kolektif')}><i className="fa fa-building"></i> Kolektif</a></li>
                   </ul>
                 </li>
                 <li><a href="#" onClick={this._generateOnItemClick('data-vendor')}><i className="fa fa-truck"></i> Vendor</a></li>
