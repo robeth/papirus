@@ -15,20 +15,20 @@ function required(value){
     }
   }
 
-  return value.trim() ? null : "This field is required";
+  return value.trim() ? null : "required";
 }
 
 // Error if value is not numeric
 // Source: http://stackoverflow.com/questions/18082/validate-decimal-numbers-in-javascript-isnumeric
-function isNumeric(n) {
-  var result = !isNaN(parseFloat(n)) && isFinite(n);
+function isNumber(value) {
+  var result = !isNaN(parseFloat(value)) && isFinite(value);
 
-  return result ? null : 'Must be a number';
+  return result ? null : 'not a number';
 }
 
 var VALIDATION_DICTIONARY = {
   required: required,
-  isNumeric: isNumeric
+  isNumber: isNumber
 }
 
 function check(validationFunctionNames, value){

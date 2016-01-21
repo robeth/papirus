@@ -216,14 +216,14 @@ var Element = React.createClass({
           inputColumn={3}
           initialValue={this.state.instance.stock.jumlah}
           readOnly={this.state.isReadOnly}
-          validation={['required']}
+          validation={['required', 'isNumber']}
           suffixAddon='Kg'/>
         <Field
           ref='harga'
           inputColumn={3}
           initialValue={this.state.instance.stock.harga}
           readOnly={this.state.isReadOnly}
-          validation={['required']}
+          validation={['required', 'isNumber']}
           prefixAddon='Rp'
           placeholder='@unit'/>
         {!this.state.isReadOnly && (
