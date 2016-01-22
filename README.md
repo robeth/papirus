@@ -38,6 +38,11 @@ To be continued...
 
 Please see [electron-boilerplate](https://github.com/szwacz/electron-boilerplate) for detailed information.
 
+# Testing
+
+1. Prepare chromedriver: `chromedriver --url-base=/wd/hub --port=9515`
+2. Run test: `npm test`
+
 # License
 
 The MIT License (MIT)

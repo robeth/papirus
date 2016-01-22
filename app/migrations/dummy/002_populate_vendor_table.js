@@ -28,6 +28,7 @@ module.exports = {
     return queryInterface.sequelize.query(query);
   },
   down: function(queryInterface, DataTypes){
-    console.log("Dummy Migration 002 DOWN: nothing");
+    console.log("Dummy Migration 002 DOWN: delete all vendors");
+    return queryInterface.sequelize.query('DELETE FROM transaction_vendor');
   }
 };

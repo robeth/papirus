@@ -8,7 +8,8 @@ var BrowserWindow = require('browser-window');
 var env = require('./vendor/electron_boilerplate/env_config');
 var devHelper = require('./vendor/electron_boilerplate/dev_helper');
 var windowStateKeeper = require('./vendor/electron_boilerplate/window_state');
-var migration = require('./migration');
+var Migration = require('./migration');
+var migration = new Migration();
 
 migration.up()
   .then(migration.upDummy)
@@ -43,8 +44,8 @@ app.on('ready', function () {
     }
 
     if (env.name !== 'production') {
-        devHelper.setDevMenu();
-        mainWindow.openDevTools();
+        // devHelper.setDevMenu();
+        // mainWindow.openDevTools();
     }
 
     mainWindow.on('close', function () {

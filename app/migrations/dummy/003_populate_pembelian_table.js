@@ -148,6 +148,13 @@ module.exports = {
       });
   },
   down: function(queryInterface, DataTypes){
-    console.log("Dummy Migration 003 DOWN: nothing");
+    console.log("Dummy Migration 003 DOWN: delete all pembelian data");
+    return queryInterface.sequelize.query('DELETE FROM transaction_pembelian_stocks')
+      .then(function(){
+        return queryInterface.sequelize.query('DELETE FROM transaction_stok');
+      })
+      .then(function(){
+        return queryInterface.sequelize.query('DELETE FROM transaction_pembelian');
+      });
   }
 };

@@ -38,6 +38,7 @@ module.exports = {
     return queryInterface.sequelize.query(query);
   },
   down: function(queryInterface, DataTypes){
-    console.log("Dummy Migration 001 DOWN: nothing");
+    console.log("Dummy Migration 001 DOWN: delete all nasabah ");
+    return queryInterface.sequelize.query('DELETE FROM transaction_nasabah');
   }
 };

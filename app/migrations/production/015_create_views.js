@@ -32,18 +32,23 @@ var dropViewQueries = ViewNames
 
 module.exports = {
   up: function(queryInterface, DataTypes){
-    console.log('Up 015');
-    var viewPromises = ViewDefinitionPaths.map(function(path){
-      return readFile( __dirname + path, 'utf8')
-        .then(function(content){
-          return queryInterface.sequelize.query(content.replace(/\n/g, ' '));
-        })
-        .then(function(){
-          console.log('View: ' + path + ' success');
-        });
-    });
+    console.log('Migration 015');
 
-    return Promise.all(viewPromises);
+    var viewPromises = Promise.reduce(
+      ViewDefinitionPaths,
+      function(result, path){
+        return readFile( __dirname + path, 'utf8')
+          .then(function(content){
+            return queryInterface.sequelize.query(content.replace(/\n/g, ' '));
+          })
+          .then(function(){
+            return 0;
+          });
+      },
+      0
+    );
+
+    return viewPromises;
   },
   down: function(queryInterface, DataTypes){
     console.log("Down 015");

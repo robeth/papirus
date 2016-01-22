@@ -49,7 +49,6 @@ function insertQueryBuilder(tableName, data){
     + getDataQueries(data, columnNames).join(',')
     + ';';
   ;
-  console.log('query: ' + query);
   return query;
 }
 
