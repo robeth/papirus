@@ -48,7 +48,7 @@ var runGulpWatch = function () {
 };
 
 var runApp = function () {
-    var app = childProcess.spawn(electron, ['./build'], {
+    var app = childProcess.spawn(electron, [ '--app=./build', ], {
         stdio: 'inherit'
     });
 

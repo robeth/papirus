@@ -1,4 +1,11 @@
 {
   "name": "test",
-  "description": "Add here any environment specific stuff you like."
+  "description": "Test environment2",
+  "database": {
+    "host": "localhost",
+    "port": "3306",
+    "name": "papirus_test",
+    "username": "root",
+    "password": "root"
+  }
 }

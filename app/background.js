@@ -8,8 +8,8 @@ var BrowserWindow = require('browser-window');
 var env = require('./vendor/electron_boilerplate/env_config');
 var devHelper = require('./vendor/electron_boilerplate/dev_helper');
 var windowStateKeeper = require('./vendor/electron_boilerplate/window_state');
-var Migration = require('./migration');
-var migration = new Migration();
+var migration = require('./migration');
+var models = require('./models');
 
 migration.up()
   .then(migration.upDummy)
@@ -37,11 +37,7 @@ app.on('ready', function () {
         mainWindow.maximize();
     }
 
-    if (env.name === 'test') {
-        mainWindow.loadUrl('file://' + __dirname + '/spec.html');
-    } else {
-        mainWindow.loadUrl('file://' + __dirname + '/bina-mandiri.html');
-    }
+    mainWindow.loadUrl('file://' + __dirname + '/bina-mandiri.html');
 
     if (env.name !== 'production') {
         // devHelper.setDevMenu();

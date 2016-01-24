@@ -1,5 +1,5 @@
 var webdriverio = require('webdriverio');
-var Migration = require('../build/migration');
+var migration = require('../build/migration');
 
 var options = {
     host: "localhost",
@@ -13,15 +13,15 @@ var options = {
         }
 }
 
-var databaseParams = {
-  host: 'localhost',
-  port: '3306',
-  name: 'papirus_test',
-  username: 'root',
-  password: 'root'
-}
+var driver = webdriverio.remote(options);
+driver.addCommand('clickAnOption', function(htmlId, text){
+  return this
+    .click('#' + htmlId + ' div.Select-control')
+    .click('//*[@id="' + htmlId + '"]//div[@class="Select-menu-outer"]//div[contains(text(),"' + text + '")]')
+    .pause(1000);
+})
 
 module.exports = {
-  driver: webdriverio.remote(options),
-  migration: new Migration(databaseParams)
+  driver: driver,
+  migration: migration
 };

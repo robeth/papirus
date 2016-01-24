@@ -99,7 +99,8 @@ var DateField = React.createClass({
         <div className={'col-sm-' + this.props.inputColumn}>
           <input
             ref='input'
-            type="text"
+            type='text'
+            id={this.props.htmlId}
             className='form-control'
             placeholder={this.props.placeholder}
             disabled={this.props.readOnly}/>

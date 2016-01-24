@@ -33,7 +33,7 @@ var DataVendor = React.createClass({
       return (
         <tr key={index}>
           <td className="text-center">{index}</td>
-          <td className="text-center"><a onClick={this.generateOnItemClick(account.id).bind(component)}><span className="label label-warning">V{account.id}</span></a></td>
+          <td className="text-center"><a onClick={this.generateOnItemClick(account.id).bind(component)}><span className="label label-warning">{'V' + account.id}</span></a></td>
           <td>{account.nama} </td>
           <td>{account.alamat}</td>
           <td>{account.alamat}</td>

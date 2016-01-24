@@ -84,6 +84,7 @@ var SelectField = React.createClass({
         <select
           ref='input'
           className='form-control'
+          id={this.props.htmlId}
           disabled={this.props.readOnly}
           onChange={this.handleValueChange}
           value={this.state.value}>

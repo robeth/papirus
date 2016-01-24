@@ -1,7 +1,7 @@
 var React = require('react');
 var Field = require('./fields/field');
 var DateField = require('./fields/date-field');
-var SelectField = require('./fields/select-field');
+var ReactSelectField = require('./fields/react-select-field');
 var Alert = require('../alert');
 var FormMixin = require('../mixins/form-mixin');
 var Nasabah = window.Models.Nasabah;
@@ -159,30 +159,31 @@ var FormNasabah = React.createClass({
             <Alert
               ref='add-success-alert'
               type='success' show={false}
-              title={<div><i className='icon fa fa-check'/> Success!</div>}>
-              Nasabah successfully added
+              title={<div><i className='icon fa fa-check'/> Sukses!</div>}>
+              Data nasabah baru berhasil dibuat!
             </Alert>
             <Alert
               ref='edit-success-alert'
               type='info' show={false}
-              title={<div><i className='icon fa fa-check'/> Success!</div>}>
-              Nasabah successfully updated
+              title={<div><i className='icon fa fa-check'/> Sukses!</div>}>
+              Data nasabah berhasil diubah!
             </Alert>
           </div>
         </div>
         <div className="row">
           <div className="col-xs-6">
-            <SelectField
+            <ReactSelectField
               ref='jenis'
               inputColumn={10}
               htmlId='nasabah-type'
               label='Jenis'
-              readOnly={this.state.isReadOnly}
+              options={[
+                {value: 'individu', label: 'Individu'},
+                {value: 'kolektif', label: 'Kolektif'}
+              ]}
               initialValue={this.state.nasabahInstance.jenis}
-              onSelectChange={this.handleNasabahTypeChange}>
-              <option value="individu">Individu</option>
-              <option value="kolektif">Kolektif</option>
-            </SelectField>
+              readOnly={this.state.isReadOnly}
+              validation={['required']}/>
             <Field
               ref='ktp'
               inputColumn={10}
@@ -219,7 +220,7 @@ var FormNasabah = React.createClass({
             <Field
               ref='no_induk'
               inputColumn={10}
-              htmlId='nasabah-ktp'
+              htmlId='nasabah-no-induk'
               label='No Induk'
               readOnly={this.state.isReadOnly}
               initialValue={this.state.nasabahInstance.no_induk}/>

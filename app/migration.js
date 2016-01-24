@@ -1,7 +1,7 @@
 var Sequelize = require('sequelize');
 var Umzug = require('umzug');
 var jetpack = require('fs-jetpack');
-var config = jetpack.read(__dirname + '/env_config.json', 'json');
+var config = require('./vendor/electron_boilerplate/env_config');
 
 var modelsDir = jetpack.cwd(__dirname);
 var migrationFiles = modelsDir.list('migrations/production');
@@ -9,8 +9,8 @@ migrationFiles = migrationFiles.sort();
 var dummyMigrationFiles = modelsDir.list('migrations/dummy');
 dummyMigrationFiles = dummyMigrationFiles.sort();
 
-function Migration(databaseParams){
-  var databaseParams = databaseParams || config.database;
+function Migration(){
+  var databaseParams = config.database;
   console.log(databaseParams);
   var sequelize = new Sequelize(
     databaseParams.name,
@@ -81,4 +81,4 @@ Migration.prototype.downDummy = function(){
   });
 }
 
-module.exports = Migration;
+module.exports = new Migration();

@@ -1,11 +1,15 @@
 var Sequelize = require('sequelize');
+var config = require('./../vendor/electron_boilerplate/env_config');
+if(typeof window === 'object'){
+  config = window.env;
+}
 
 var sequelize = new Sequelize(
-  'papirus',
-  'root',
-  'root',
+  config.database.name,
+  config.database.username,
+  config.database.password,
   {
-    host: 'localhost',
+    host: config.database.host,
     dialect: 'mysql',
     define:{
       timestamps: false

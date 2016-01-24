@@ -121,7 +121,8 @@ var Field = React.createClass({
     var inputFieldWithoutAddon = (
       <input
         ref='input'
-        type="text"
+        type='text'
+        id={this.props.htmlId}
         className='form-control'
         onChange={this.handleValueChange}
         placeholder={this.props.placeholder}

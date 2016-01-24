@@ -152,14 +152,14 @@ var VendorForm = React.createClass({
             <Alert
               ref='add-success-alert'
               type='success' show={false}
-              title={<div><i className='icon fa fa-check'/> Success!</div>}>
-              Vendor successfully added
+              title={<div><i className='icon fa fa-check'/> Sukses!</div>}>
+              Data vendor berhasil dibuat!
             </Alert>
             <Alert
               ref='edit-success-alert'
               type='info' show={false}
-              title={<div><i className='icon fa fa-check'/> Success!</div>}>
-              Vendor successfully updated
+              title={<div><i className='icon fa fa-check'/> Sukses!</div>}>
+              Data vendor berhasil diubah!
             </Alert>
           </div>
         </div>

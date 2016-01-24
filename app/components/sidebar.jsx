@@ -19,24 +19,24 @@ var Sidebar = React.createClass({
             </li>
 
             <li className="treeview">
-              <a href="#">
+              <a href="#" id="menu-data">
                 <i className="fa fa-laptop"></i>
                 <span>Data</span>
                 <i className="fa fa-angle-left pull-right"></i>
               </a>
               <ul className="treeview-menu">
                 <li>
-                  <a href="#">
+                  <a href="#" id="menu-data-nasabah">
                     <i className="fa fa-users"></i> Nasabah
                     <i className="fa fa-angle-left pull-right"></i>
                   </a>
                   <ul className="treeview-menu">
-                    <li><a href="#" onClick={this._generateOnItemClick('data-nasabah-individu')}><i className="fa fa-child"></i> Individu</a></li>
-                    <li><a href="#" onClick={this._generateOnItemClick('data-nasabah-kolektif')}><i className="fa fa-building"></i> Kolektif</a></li>
+                    <li><a href="#" id="menu-data-nasabah-individu" onClick={this._generateOnItemClick('data-nasabah-individu')}><i className="fa fa-child"></i> Individu</a></li>
+                    <li><a href="#" id="menu-data-nasabah-kolektif" onClick={this._generateOnItemClick('data-nasabah-kolektif')}><i className="fa fa-building"></i> Kolektif</a></li>
                   </ul>
                 </li>
-                <li><a href="#" onClick={this._generateOnItemClick('data-vendor')}><i className="fa fa-truck"></i> Vendor</a></li>
-                <li><a href="#" onClick={this._generateOnItemClick('data-barang')}><i className="fa fa-rocket"></i> Barang</a></li>
+                <li><a href="#" id="menu-data-vendor" onClick={this._generateOnItemClick('data-vendor')}><i className="fa fa-truck"></i> Vendor</a></li>
+                <li><a href="#" id="menu-data-barang" onClick={this._generateOnItemClick('data-barang')}><i className="fa fa-rocket"></i> Barang</a></li>
                 <li>
                   <a href="#">
                     <i className="fa fa-dollar"></i> Keuangan
@@ -48,27 +48,27 @@ var Sidebar = React.createClass({
                     <li><a href="#" data-link="data-keuangan-kategori"><i className="fa fa-list-ol"></i> Kategori</a></li>
                   </ul>
                 </li>
-                <li><a href="#" onClick={this._generateOnItemClick('data-pembelian')}><i className="fa fa-arrow-right"></i> Pembelian</a></li>
-                <li><a href="#" onClick={this._generateOnItemClick('data-penjualan')}><i className="fa fa-arrow-left"></i> Penjualan</a></li>
+                <li><a href="#" id="menu-data-pembelian" onClick={this._generateOnItemClick('data-pembelian')}><i className="fa fa-arrow-right"></i> Pembelian</a></li>
+                <li><a href="#" id="menu-data-penjualan" onClick={this._generateOnItemClick('data-penjualan')}><i className="fa fa-arrow-left"></i> Penjualan</a></li>
                 <li><a href="#" data-link="data-konversi"><i className="fa fa-recycle"></i> Konversi</a></li>
                 <li><a href="#" data-link="data-penarikan"><i className="fa fa-hand-lizard-o"></i> Penarikan</a></li>
               </ul>
             </li>
 
             <li className="treeview">
-              <a href="#">
+              <a href="#" id="menu-form">
                 <i className="fa fa-edit"></i> <span>Form</span>
                 <i className="fa fa-angle-left pull-right"></i>
               </a>
               <ul className="treeview-menu">
-                <li><a href="#" onClick={this._generateOnItemClick('form-pembelian')}><i className="fa fa-arrow-right"></i> Pembelian</a></li>
-                <li><a href="#" onClick={this._generateOnItemClick('form-penjualan')}><i className="fa fa-arrow-left"></i> Penjualan</a></li>
+                <li><a href="#" id="menu-form-pembelian" onClick={this._generateOnItemClick('form-pembelian')}><i className="fa fa-arrow-right"></i> Pembelian</a></li>
+                <li><a href="#" id="menu-form-penjualan" onClick={this._generateOnItemClick('form-penjualan')}><i className="fa fa-arrow-left"></i> Penjualan</a></li>
                 <li><a href="#"><i className="fa fa-recycle"></i> Konversi</a></li>
                 <li><a href="#"><i className="fa fa-hand-lizard-o"></i> Penarikan</a></li>
                 <li><a href="#"><i className="fa fa-file"></i> Transaksi</a></li>
-                <li><a href="#" onClick={this._generateOnItemClick('form-nasabah')}><i className="fa fa-users"></i> Nasabah</a></li>
-                <li><a href="#" onClick={this._generateOnItemClick('form-vendor')}><i className="fa fa-truck"></i> Vendor</a></li>
-                <li><a href="#" onClick={this._generateOnItemClick('form-barang')}><i className="fa fa-rocket"></i> Barang</a></li>
+                <li><a href="#" id="menu-form-nasabah" onClick={this._generateOnItemClick('form-nasabah')}><i className="fa fa-users"></i> Nasabah</a></li>
+                <li><a href="#" id="menu-form-vendor" onClick={this._generateOnItemClick('form-vendor')}><i className="fa fa-truck"></i> Vendor</a></li>
+                <li><a href="#" id="menu-form-barang" onClick={this._generateOnItemClick('form-barang')}><i className="fa fa-rocket"></i> Barang</a></li>
                 <li><a href="#"><i className="fa fa-list-ol"></i> Kategori Transaksi</a></li>
               </ul>
             </li>

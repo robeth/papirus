@@ -24,6 +24,6 @@
     "build": "gulp build",
     "release": "gulp release --env=production",
     "start": "node ./tasks/start",
-    "test": "./node_modules/mocha/bin/mocha"
+    "test": "cp ./config/env_test.json ./build/env_config.json && ./node_modules/mocha/bin/mocha"
   }
 }

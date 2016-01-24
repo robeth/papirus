@@ -4,7 +4,7 @@
 // - is whitespace-only string
 function required(value){
   if(!value){
-    return "This field is required";
+    return "Wajib diisi";
   }
 
   if(typeof value !== 'string'){
@@ -15,7 +15,7 @@ function required(value){
     }
   }
 
-  return value.trim() ? null : "required";
+  return value.trim() ? null : "Wajib diisi";
 }
 
 // Error if value is not numeric

@@ -111,7 +111,9 @@ var ReactSelectField = React.createClass({
     }
 
     var selectInputField = (
-      <div className={classNames('col-xs-' + this.props.inputColumn, cssStatus)}>
+      <div
+        id={this.props.htmlId} 
+        className={classNames('col-xs-' + this.props.inputColumn, cssStatus)}>
         <Select
           value={this.state.value}
           onChange={this.handleValueChange}

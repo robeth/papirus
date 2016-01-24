@@ -12,7 +12,7 @@ var DATA = [
     email: 'hiero@gmail.com',
     tanggal_lahir: '1990-01-01',
     tanggal_daftar: new Date(),
-    nama_pj: null,
+    nama_pj: 'Casilas',
     no_induk: 'BSM001'
   },
   {
