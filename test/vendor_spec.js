@@ -158,7 +158,7 @@ describe('Vendor Scenarios', function(){
       });
     });
 
-    it('should not update nasabah on cancel', function(done){
+    it('should not update vendor on cancel', function(done){
       driver
       .setValue('#nama', 'Sakata Gintoki')
       .setValue('#alamat', 'Edo')
@@ -185,7 +185,7 @@ describe('Vendor Scenarios', function(){
       });
     });
 
-    it('should not update nasabah on invalid data', function(done){
+    it('should not update vendor on invalid data', function(done){
       driver
       .setValue('#nama', ' ')
       .setValue('#alamat', ' ')

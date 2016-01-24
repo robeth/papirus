@@ -212,14 +212,14 @@ var CategoryForm = React.createClass({
                 <Alert
                   ref='add-success-alert'
                   type='success' show={false}
-                  title={<div><i className='icon fa fa-check'/> Success!</div>}>
-                  Pembelian successfully added
+                  title={<div><i className='icon fa fa-check'/> Sukses!</div>}>
+                  Data kategori barang berhasil dibuat!
                 </Alert>
                 <Alert
                   ref='edit-success-alert'
                   type='info' show={false}
-                  title={<div><i className='icon fa fa-check'/> Success!</div>}>
-                  Pembelian successfully updated
+                  title={<div><i className='icon fa fa-check'/> Sukses!</div>}>
+                  Data kategori barang berhasil diubah!
                 </Alert>
               </div>
             </div>
