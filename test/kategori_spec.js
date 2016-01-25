@@ -5,18 +5,14 @@ var migration = setup.migration;
 var Models = require('../build/models/');
 
 describe.only('Kategori Scenarios', function(){
-  this.timeout(30000);
+  this.timeout(20000);
 
   before(function(done){
-    migration.down()
+    return driver
+      .init()
+      .pause(1000)
       .then(function(){
-        return migration.up();
-      })
-      .then(function(){
-        return driver.init().pause(1000)
-          .then(function(){
-            done();
-          });
+        done();
       });
   });
 
@@ -25,7 +21,11 @@ describe.only('Kategori Scenarios', function(){
   });
 
   beforeEach(function(done){
-    migration.downDummy()
+    migration
+      .down()
+      .then(function(){
+        return migration.up();
+      })
       .then(function(){
         return migration.upDummy();
       })
