@@ -107,6 +107,7 @@ var Field = React.createClass({
         <input
           ref='input'
           type="text"
+          id={this.props.htmlId}
           className='form-control'
           onChange={this.handleValueChange}
           placeholder={this.props.placeholder}

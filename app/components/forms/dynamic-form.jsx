@@ -200,6 +200,7 @@ var DynamicForm = React.createClass({
       return component.state.elementFactory({
         onRemoveClick: component.removeRow(childId),
         key: childId,
+        index: index,
         ref: component.generateRef(childId),
         mode: component.getMode(childId),
         instance: component.state.instanceDictionary[childId],

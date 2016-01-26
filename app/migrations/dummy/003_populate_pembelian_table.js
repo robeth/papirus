@@ -61,14 +61,14 @@ var STOCK_DATA = [
   },
   {
     id: 5,
-    kategori_id: 10,
+    kategori_id: 6,
     tanggal: today,
     jumlah: 50,
     harga: 5000
   },
   {
     id: 6,
-    kategori_id: 11,
+    kategori_id: 7,
     tanggal: today,
     jumlah: 60,
     harga: 6000

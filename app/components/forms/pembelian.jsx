@@ -268,14 +268,14 @@ var PembelianForm = React.createClass({
                 <Alert
                   ref='add-success-alert'
                   type='success' show={false}
-                  title={<div><i className='icon fa fa-check'/> Success!</div>}>
-                  Pembelian successfully added
+                  title={<div><i className='icon fa fa-check'/> Sukses!</div>}>
+                  Pembelian baru berhasil dibuat!
                 </Alert>
                 <Alert
                   ref='edit-success-alert'
                   type='info' show={false}
-                  title={<div><i className='icon fa fa-check'/> Success!</div>}>
-                  Pembelian successfully updated
+                  title={<div><i className='icon fa fa-check'/> Sukses!</div>}>
+                  Pembelian berhasil diubah!
                 </Alert>
               </div>
             </div>
@@ -299,7 +299,7 @@ var PembelianForm = React.createClass({
                 <ReactSelectField
                   ref='nasabah_id'
                   inputColumn={10}
-                  htmlId='nasabah-type'
+                  htmlId='nasabah-id'
                   label='Nasabah'
                   optionRenderer={this.optionRenderer}
                   validation={['required']}

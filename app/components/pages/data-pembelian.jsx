@@ -60,7 +60,7 @@ var PembelianRow = React.createClass({
         <td className="text-center">{this.props.index}</td>
         <td className="text-center">
           <a onClick={this.generateOnItemClick(this.state.id)}>
-            <span className="label label-primary">B{this.state.id}</span>
+            <span className="label label-primary">{ 'B' + this.state.id}</span>
           </a>
         </td>
         <td className="text-center">{this.state.nota}</td>

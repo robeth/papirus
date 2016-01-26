@@ -4,7 +4,7 @@ var driver = setup.driver;
 var migration = setup.migration;
 var Models = require('../build/models/');
 
-describe.only('Kategori Scenarios', function(){
+describe('Kategori Scenarios', function(){
   this.timeout(20000);
 
   before(function(done){

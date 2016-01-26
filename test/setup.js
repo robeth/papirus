@@ -14,10 +14,11 @@ var options = {
 }
 
 var driver = webdriverio.remote(options);
-driver.addCommand('clickAnOption', function(htmlId, text){
+driver.addCommand('clickAnOption', function(htmlId, text, customContainer){
+  customContainer = customContainer || 'div';
   return this
     .click('#' + htmlId + ' div.Select-control')
-    .click('//*[@id="' + htmlId + '"]//div[@class="Select-menu-outer"]//div[contains(text(),"' + text + '")]')
+    .click('//*[@id="' + htmlId + '"]//div[@class="Select-menu-outer"]//' + customContainer + '[contains(text(),"' + text + '")]')
     .pause(1000);
 })
 

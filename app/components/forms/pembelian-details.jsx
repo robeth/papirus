@@ -204,6 +204,7 @@ var Element = React.createClass({
       <div className='row row-margin'>
         <ReactSelectField
           ref='kategori_id'
+          htmlId={'pembelian-stock-kategori-id-' + this.props.index}
           inputColumn={3}
           options={kategoriOptions}
           initialValue={this.state.instance.stock.kategori_id}
@@ -213,6 +214,7 @@ var Element = React.createClass({
         </ReactSelectField>
         <Field
           ref='jumlah'
+          htmlId={'pembelian-stock-jumlah-' + this.props.index}
           inputColumn={3}
           initialValue={this.state.instance.stock.jumlah}
           readOnly={this.state.isReadOnly}
@@ -220,6 +222,7 @@ var Element = React.createClass({
           suffixAddon='Kg'/>
         <Field
           ref='harga'
+          htmlId={'pembelian-stock-harga-' + this.props.index}
           inputColumn={3}
           initialValue={this.state.instance.stock.harga}
           readOnly={this.state.isReadOnly}
