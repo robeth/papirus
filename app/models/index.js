@@ -107,4 +107,34 @@ models.ReportKategori.hasMany(models.Kategori, {
   foreignKey: 'report_kategori_id'
 });
 
+models.Konversi.hasMany(models.KonversiInStock, {
+  as: 'KonversiInStocks',
+  foreignKey: 'konversi_id'
+});
+
+models.Konversi.hasMany(models.KonversiOutStock, {
+  as: 'KonversiOutStocks',
+  foreignKey: 'konversi_id'
+});
+
+models.KonversiInStock.belongsTo(models.Konversi, {
+  as: 'Konversi',
+  foreignKey: 'konversi_id'
+});
+
+models.KonversiOutStock.belongsTo(models.Konversi, {
+  as: 'Konversi',
+  foreignKey: 'konversi_id'
+});
+
+models.KonversiInStock.belongsTo(models.Stock, {
+  as: 'Stock',
+  foreignKey: 'stok_id'
+});
+
+models.KonversiOutStock.belongsTo(models.Stock, {
+  as: 'Stock',
+  foreignKey: 'stok_id'
+});
+
 module.exports = models;

@@ -114,7 +114,7 @@ var DynamicForm = React.createClass({
       return childForm.component.save(args);
     });
 
-    return Promise.all(childPromises);
+    return _.flatten(childPromises, true);
   },
 
   getRefsFromIds: function(childIds){
