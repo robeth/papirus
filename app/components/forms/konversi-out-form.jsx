@@ -10,9 +10,9 @@ var Header = React.createClass({
   render: function(){
     return (
       <div className="row row-margin">
-        <div className="col-xs-3 text-center">Kategori</div>
-        <div className="col-xs-3 text-center">Unit</div>
-        <div className="col-xs-3 text-center"></div>
+        <div className="col-xs-6 text-center">Kategori</div>
+        <div className="col-xs-4 text-center">Unit</div>
+        <div className="col-xs-2 text-center"></div>
       </div>
     );
   }
@@ -211,7 +211,7 @@ var Element = React.createClass({
         <ReactSelectField
           ref='kategori_id'
           htmlId={'konversi-stock-kategori-id-' + this.props.index}
-          inputColumn={3}
+          inputColumn={6}
           options={kategoriOptions}
           initialValue={this.state.instance.stock.kategori_id}
           readOnly={this.state.isReadOnly}
@@ -221,13 +221,13 @@ var Element = React.createClass({
         <Field
           ref='jumlah'
           htmlId={'konversi-stock-jumlah-' + this.props.index}
-          inputColumn={3}
+          inputColumn={4}
           initialValue={this.state.instance.stock.jumlah}
           readOnly={this.state.isReadOnly}
           validation={['required', 'isNumber']}
           suffixAddon='Kg'/>
         {!this.state.isReadOnly && (
-          <div className="col-xs-3">
+          <div className="col-xs-2">
             <button
               className='btn btn-danger btn-xs'
               onClick={this.props.onRemoveClick}>

@@ -10,9 +10,9 @@ var Header = React.createClass({
   render: function(){
     return (
       <div className="row row-margin">
-        <div className="col-xs-3 text-center">Kategori</div>
-        <div className="col-xs-3 text-center">Unit</div>
-        <div className="col-xs-3 text-center"></div>
+        <div className="col-xs-6 text-center">Kategori</div>
+        <div className="col-xs-4 text-center">Unit</div>
+        <div className="col-xs-2 text-center"></div>
       </div>
     );
   }
@@ -266,7 +266,7 @@ var Element = React.createClass({
       <div className='row row-margin'>
         <ReactSelectField
           ref='kategori_id'
-          inputColumn={3}
+          inputColumn={6}
           options={kategoriOptions}
           initialValue={this.state.instance.stock.kategori_id}
           readOnly={this.state.isReadOnly}
@@ -276,14 +276,14 @@ var Element = React.createClass({
         </ReactSelectField>
         <Field
           ref='jumlah'
-          inputColumn={3}
+          inputColumn={4}
           initialValue={this.state.instance.jumlah}
           readOnly={this.state.isReadOnly}
           validation={['required', 'isNumber']}
           suffixAddon={currentCategory ? currentCategory.satuan : '-'}
           placeholder={'Tersisa: ' + currentCategory.sisa}
           dataType='number'/>
-        <div className="col-xs-3">
+        <div className="col-xs-2">
         {!this.state.isReadOnly && (
             <button
               className='btn btn-danger btn-xs'

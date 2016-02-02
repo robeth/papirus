@@ -580,38 +580,44 @@ var KonversiForm = React.createClass({
             </div>
           </Box.Body>
         </Box.Container>
-        <Box.Container className="box-danger">
-          <Box.Header showBorder={true} title='Daftar Input Konversi'/>
-          <Box.Body>
-            <DynamicForm
-              header={KonversiInForm.Header}
-              element={KonversiInForm.Element}
-              ref='konversi_in_form_group'
-              mode={this.props.mode}
-              instances={this.state.konversiInStockInstances}
-              initialIsReadOnly={this.state.isReadOnly}
-              childFormParams={{
-                availabilityInstances: this.state.availabilityInstances
-              }}
-              />
-          </Box.Body>
-        </Box.Container>
-        <Box.Container className="box-success">
-          <Box.Header showBorder={true} title='Daftar Output Konversi'/>
-          <Box.Body>
-            <DynamicForm
-              header={KonversiOutForm.Header}
-              element={KonversiOutForm.Element}
-              ref='konversi_out_form_group'
-              mode={this.props.mode}
-              instances={this.state.konversiOutStockInstances}
-              initialIsReadOnly={this.state.isReadOnly}
-              childFormParams={{
-                availabilityInstances: this.state.availabilityInstances
-              }}
-              />
-          </Box.Body>
-        </Box.Container>
+        <div className="row">
+          <div className="col-md-6 col-xs-12">
+            <Box.Container className="box-danger">
+              <Box.Header showBorder={true} title='Daftar Input Konversi'/>
+              <Box.Body>
+                <DynamicForm
+                  header={KonversiInForm.Header}
+                  element={KonversiInForm.Element}
+                  ref='konversi_in_form_group'
+                  mode={this.props.mode}
+                  instances={this.state.konversiInStockInstances}
+                  initialIsReadOnly={this.state.isReadOnly}
+                  childFormParams={{
+                    availabilityInstances: this.state.availabilityInstances
+                  }}
+                  />
+              </Box.Body>
+            </Box.Container>
+          </div>
+          <div className="col-md-6 col-xs-12">
+            <Box.Container className="box-success">
+              <Box.Header showBorder={true} title='Daftar Output Konversi'/>
+              <Box.Body>
+                <DynamicForm
+                  header={KonversiOutForm.Header}
+                  element={KonversiOutForm.Element}
+                  ref='konversi_out_form_group'
+                  mode={this.props.mode}
+                  instances={this.state.konversiOutStockInstances}
+                  initialIsReadOnly={this.state.isReadOnly}
+                  childFormParams={{
+                    availabilityInstances: this.state.availabilityInstances
+                  }}
+                  />
+              </Box.Body>
+            </Box.Container>
+          </div>
+        </div>
         <div className="row">
           <div className="col-xs-12">
             {buttons}
