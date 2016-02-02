@@ -1,65 +1,151 @@
-<div data-content="data-konversi" class="content-wrapper hide">
-  <!-- Content Header (Page header) -->
-  <section class="content-header">
-    <h1>
-      Data Konversi
-    </h1>
-    <ol class="breadcrumb">
-      <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-      <li>Data</li>
-      <li class="active">Konversi</li>
-    </ol>
-  </section>
+var React = require('react');
+var Helper = require('../helper');
+var Konversi = window.Models.Konversi;
 
-  <section class="content">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="box">
-          <div class="box-header">
-            <h3 class="box-title">Periode</h3>
-          </div>
-          <div class="box-body">
-            <div class="form-group">
-              <div class="input-group">
-                <div class="input-group-addon"><i class="fa fa-calendar"></i></div>
-                <input data-widget="calendar-range" class="form-control pull-right" value="11/01/2015 - 11/30/2015"></input>
+var KonversiRow = React.createClass({
+  propTypes:{
+    index: React.PropTypes.number.isRequired,
+    konversi: React.PropTypes.object.isRequired
+  },
+
+  getInitialState: function(){
+    return {
+      id: this.props.konversi.id,
+      tanggal: this.props.konversi.tanggal,
+      nota: this.props.konversi.nota,
+      value: null,
+      inputWeight: null,
+      outputWeight: null
+    };
+  },
+
+  componentDidMount: function() {
+    var component = this;
+
+    component.props.konversi.getValue()
+      .then(function(value){
+        console.log('Konversi (' + component.props.konversi.id + ') value : ' + value);
+        component.setState({value: value});
+      })
+      .catch(function(error){
+        console.log('Error fetching value of Konversi (' + component.props.konversi.id + ')');
+      });
+
+    component.props.konversi.getInputWeight()
+      .then(function(inputWeight){
+        console.log('Konversi (' + component.props.konversi.id + ') input weight : ' + inputWeight);
+        component.setState({inputWeight: inputWeight});
+      })
+      .catch(function(error){
+        console.log('Error fetching input weight of Konversi (' + component.props.konversi.id + ')');
+      });
+
+    component.props.konversi.getOutputWeight()
+      .then(function(outputWeight){
+        console.log('Konversi (' + component.props.konversi.id + ') output weight : ' + outputWeight);
+        component.setState({outputWeight: outputWeight});
+      })
+      .catch(function(error){
+        console.log('Error fetching output weight of Konversi (' + component.props.konversi.id + ')');
+      });
+  },
+
+  generateOnItemClick: function(instanceId){
+    return function(){
+      Helper.call('changePage',['detail-konversi', {instanceId: instanceId}]);
+    };
+  },
+
+  render: function(){
+    return (
+      <tr>
+        <td className="text-center">{this.props.index}</td>
+        <td className="text-center">
+          <a onClick={this.generateOnItemClick(this.state.id)}>
+            <span className="label label-warning">{ 'K' + this.state.id}</span>
+          </a>
+        </td>
+        <td className="text-center">{this.state.nota}</td>
+        <td className="text-center">{this.state.tanggal.toString()}</td>
+        <td className="text-right">{this.state.value}</td>
+        <td className="text-right">{this.state.inputWeight}</td>
+        <td className="text-right">{this.state.outputWeight}</td>
+      </tr>
+    );
+  }
+});
+
+var DataKonversi = React.createClass({
+  getInitialState: function(){
+    return {konversiInstances: []};
+  },
+  componentDidMount: function(){
+    var instance = this;
+    Konversi
+      .findAll()
+      .then(function onKonversisRetrieveSuccess(konversis){
+        console.log('Retrieve all konversis data success!');
+        console.log(konversis);
+        instance.setState({konversiInstances: konversis});
+      })
+      .catch(function onKonversisRetrieveFailed(error){
+        console.log('Retrieving konversis failed...');
+        console.log(error);
+      });
+  },
+
+  render: function(){
+    var component = this;
+    var rows = this.state.konversiInstances.map(function(konversi, index){
+      return <KonversiRow key={konversi.id} index={index} konversi={konversi}/>;
+    });
+
+    return (
+      <section className="content">
+        <div className="row">
+          <div className="col-md-6">
+            <div className="box">
+              <div className="box-header">
+                <h3 className="box-title">Periode</h3>
+              </div>
+              <div className="box-body">
+                <div className="form-group">
+                  <div className="input-group">
+                    <div className="input-group-addon"><i className="fa fa-calendar"></i></div>
+                    <input data-widget="calendar-range" className="form-control pull-right"></input>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-12">
-        <div class="box box-info">
-          <div class="box-body">
-            <table data-widget="advanced-table" class="table table-bordered table-striped">
-              <thead>
-                <tr>
-                  <th class="text-center">#</th>
-                  <th class="text-center">Kode</th>
-                  <th class="text-center">Nota</th>
-                  <th class="text-center">Tanggal</th>
-                  <th class="text-center">Nilai</th>
-                  <th class="text-center">Tonase In</th>
-                  <th class="text-center">Tonase Out</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="text-center">1</td>
-                  <td class="text-center"><a href="#"><span class="label label-primary">K8</span></a></td>
-                  <td class="text-center">A0345</td>
-                  <td class="text-center">2015-07-21</td>
-                  <td class="text-right">25.000,00</td>
-                  <td class="text-right">15</td>
-                  <td class="text-right">12.00</td>
-                </tr>
-              </tbody>
-            </table>
+        <div className="row">
+          <div className="col-xs-12">
+            <div className="box box-info">
+              <div className="box-body">
+                <table data-widget="advanced-table" className="table table-bordered table-striped">
+                  <thead>
+                    <tr>
+                      <th className="text-center">#</th>
+                      <th className="text-center">Kode</th>
+                      <th className="text-center">Nota</th>
+                      <th className="text-center">Tanggal</th>
+                      <th className="text-center">Nilai</th>
+                      <th className="text-center">Tonase In</th>
+                      <th className="text-center">Tonase Out</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {rows}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
-</div>
+      </section>
+    );
+  }
+});
+
+module.exports = DataKonversi;

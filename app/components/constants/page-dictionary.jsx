@@ -17,6 +17,8 @@ var CategoryData = require('./../pages/data-barang');
 var CategoryForm = require('./../pages/form-barang');
 var CategoryDetail = require('./../pages/detail-barang');
 var KonversiForm = require('./../pages/form-konversi');
+var KonversiData = require('./../pages/data-konversi');
+var KonversiDetail = require('./../pages/detail-konversi');
 
 module.exports = {
   'dashboard': {
@@ -178,6 +180,24 @@ module.exports = {
       { label: 'Home', to: 'dashboard'},
       { label: 'Form', to : ''},
       { label: 'Konversi', to: 'form-konversi'}
+    ]
+  },
+  'data-konversi': {
+    title: 'Data Konversi',
+    element: React.createFactory(KonversiData),
+    path: [
+      { label: 'Home', to: 'dashboard'},
+      { label: 'Data', to : ''},
+      { label: 'Barang', to: 'data-konversi'}
+    ]
+  },
+  'detail-konversi': {
+    title: 'Detail Konversi',
+    element: React.createFactory(KonversiDetail),
+    path: [
+      { label: 'Home', to: 'dashboard'},
+      { label: 'Data', to : ''},
+      { label: 'Barang', to: 'detail-konversi'}
     ]
   }
 }

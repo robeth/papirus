@@ -149,6 +149,7 @@ var Element = React.createClass({
     console.log(this.state.instance);
     console.log('KonversiOutForm-saveChanges-payload:')
     stockPayload.tanggal = args.konversi.tanggal;
+    stockPayload.harga = args.price;
     console.log(stockPayload);
     var component = this;
     var updatePromise = component.state.instance.stock.update(stockPayload, {

@@ -205,6 +205,7 @@ var KonversiForm = React.createClass({
       throw new Error('Invalid!');
     }
     var component = this;
+    var editedKonversi = null;
     var konversiInFormGroup = component.refs['konversi_in_form_group'];
     var konversiOutFormGroup = component.refs['konversi_out_form_group'];
 
@@ -242,6 +243,7 @@ var KonversiForm = React.createClass({
         .then(function onKonversiUpdateSuccess(konversi){
           console.log("success updating new konversi!");
           console.log(konversi);
+          editedKonversi = konversi;
 
           // Instruct child forms to save changes
           var konversiInStockPromises = konversiInFormGroup.saveChanges({
@@ -252,7 +254,7 @@ var KonversiForm = React.createClass({
           return Promise.all(_.flatten(konversiInStockPromises, true));
         })
         .then(function onKonversiInStocksUpdated(konversiInStocks){
-          console.log('success updating konversi stocks!');
+          console.log('Konversi in stocks updated!');
           console.log(konversiInStocks);
 
           var newKonversiStocks = konversiInStocks.filter(function(s){
@@ -265,8 +267,16 @@ var KonversiForm = React.createClass({
             konversiInStockInstances: newKonversiStocks
           });
 
+          return component.calculateKonversiValue(konversiInStocks);
+        })
+        .then(function onKonversiValueCalculated(konversiValue){
+          console.log('Konversi value calculated!');
+          console.log(konversiValue);
+
+          var outputQuantity =  component.calculateResultQuantity();
           var konversiOutStockPromises = konversiOutFormGroup.saveChanges({
-            konversi: konversi,
+            konversi: editedKonversi,
+            price: konversiValue/outputQuantity,
             transaction: t
           });
 
