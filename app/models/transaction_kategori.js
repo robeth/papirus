@@ -30,12 +30,12 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     },
     stabil: {
-      type: DataTypes.DECIMAL,
+      type: DataTypes.DECIMAL(15,2),
       allowNull: false,
       defaultValue: '0.00'
     },
     fluktuatif: {
-      type: DataTypes.DECIMAL,
+      type: DataTypes.DECIMAL(15,2),
       allowNull: false,
       defaultValue: '0.00'
     },

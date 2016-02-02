@@ -23,11 +23,11 @@ module.exports = {
         allowNull: false
       },
       jumlah: {
-        type: DataTypes.DECIMAL,
+        type: DataTypes.DECIMAL(8,2),
         allowNull: false
       },
       harga: {
-        type: DataTypes.DECIMAL,
+        type: DataTypes.DECIMAL(15,2),
         allowNull: false
       }
     });

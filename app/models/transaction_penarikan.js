@@ -21,7 +21,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false
     },
     total: {
-      type: DataTypes.DECIMAL,
+      type: DataTypes.DECIMAL(15,2),
       allowNull: false
     },
     nota: {
