@@ -1,6 +1,7 @@
 /* jshint indent: 2 */
 var Moment = require('moment');
 var Promise = require('bluebird');
+var _ = require('lodash');
 
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('Pembelian', {
@@ -75,6 +76,38 @@ module.exports = function(sequelize, DataTypes) {
                 return previousValue + currentValue;
               });
           });
+      }
+    },
+    classMethods: {
+      getPenarikanCandidates: function(nasabahId){
+        return sequelize.models.Pembelian.findAll({
+          attributes: {
+            include: [[sequelize.fn('SUM', sequelize.col('Penarikans.total')), 'taken']]
+          },
+          include: [{ model: sequelize.models.Penarikan, as: 'Penarikans'}],
+          where: {
+            nasabah_id: nasabahId
+          },
+          group: ['id']
+        }).then(function(pembelians){
+          var pembelianPromises = [];
+
+          pembelians.map(function(pembelian){
+            var pembelianPromise = pembelian.getValue()
+              .then(function(value){
+                pembelian.totalValue = value;
+                pembelian.paidValue = pembelian.get('taken');
+                pembelian.remainingValue = value - pembelian.get('taken');
+                return pembelian;
+              });
+            pembelianPromises.push(pembelianPromise);
+            return pembelianPromise;
+          });
+
+          return Promise.all(pembelianPromises);
+        }).then(function(pembelians){
+          return _.sortBy(pembelians, 'tanggal');
+        });
       }
     }
   });

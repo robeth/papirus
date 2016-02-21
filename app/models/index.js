@@ -137,4 +137,16 @@ models.KonversiOutStock.belongsTo(models.Stock, {
   foreignKey: 'stok_id'
 });
 
+models.Penarikan.belongsToMany(models.Pembelian, {
+  through: models.PenarikanDetail,
+  as: 'Pembelians',
+  foreignKey: 'penarikan_id'
+});
+
+models.Pembelian.belongsToMany(models.Penarikan, {
+  through: models.PenarikanDetail,
+  foreignKey: 'pembelian_id',
+  as: 'Penarikans'
+});
+
 module.exports = models;

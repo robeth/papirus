@@ -23,7 +23,7 @@ function required(value){
 function isNumber(value) {
   var result = !isNaN(parseFloat(value)) && isFinite(value);
 
-  return result ? null : 'not a number';
+  return result ? null : 'Bukan angka';
 }
 
 var VALIDATION_DICTIONARY = {

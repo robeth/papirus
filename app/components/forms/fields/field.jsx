@@ -17,7 +17,8 @@ var Field = React.createClass({
       React.PropTypes.string
     ]),
     prefixAddon: React.PropTypes.string,
-    suffixAddon: React.PropTypes.string
+    suffixAddon: React.PropTypes.string,
+    onChange: React.PropTypes.func
   },
 
   getInitialState: function(){
@@ -45,6 +46,10 @@ var Field = React.createClass({
     this.setState({
       value: event.target.value
     });
+    
+    if(this.props.onChange){
+      this.props.onChange(event.target.value);
+    }
   },
 
   validate: function(){
