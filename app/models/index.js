@@ -137,6 +137,16 @@ models.KonversiOutStock.belongsTo(models.Stock, {
   foreignKey: 'stok_id'
 });
 
+models.Nasabah.hasMany(models.Penarikan, {
+  as: 'Penarikans',
+  foreignKey: 'nasabah_id'
+});
+
+models.Penarikan.belongsTo(models.Nasabah, {
+  as: 'Nasabah',
+  foreignKey: 'nasabah_id'
+});
+
 models.Penarikan.belongsToMany(models.Pembelian, {
   through: models.PenarikanDetail,
   as: 'Pembelians',

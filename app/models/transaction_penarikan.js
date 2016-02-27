@@ -1,4 +1,5 @@
 /* jshint indent: 2 */
+var Moment = require('moment');
 
 module.exports = function(sequelize, DataTypes) {
   return sequelize.define('Penarikan', {
@@ -18,7 +19,11 @@ module.exports = function(sequelize, DataTypes) {
     },
     tanggal: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
+      get: function(){
+        var penarikanDate = this.getDataValue('tanggal');
+        return Moment(penarikanDate).format('YYYY-MM-DD');
+      }
     },
     total: {
       type: DataTypes.DECIMAL(15,2),
@@ -30,6 +35,16 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     tableName: 'transaction_penarikan',
-    freezeTableName: true
+    freezeTableName: true,
+    instanceMethods: {
+      getValue: function(){
+        return this.getDataValue('Pembelians').reduce(
+          function(prev, pembelian){
+            return pembelian.PenarikanDetail.jumlah + prev;
+          },
+          0
+        );
+      }
+    }
   });
 };
