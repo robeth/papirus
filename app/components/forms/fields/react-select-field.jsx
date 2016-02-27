@@ -112,7 +112,7 @@ var ReactSelectField = React.createClass({
 
     var selectInputField = (
       <div
-        id={this.props.htmlId} 
+        id={this.props.htmlId}
         className={classNames('col-xs-' + this.props.inputColumn, cssStatus)}>
         <Select
           value={this.state.value}

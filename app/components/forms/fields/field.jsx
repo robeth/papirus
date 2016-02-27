@@ -46,7 +46,7 @@ var Field = React.createClass({
     this.setState({
       value: event.target.value
     });
-    
+
     if(this.props.onChange){
       this.props.onChange(event.target.value);
     }

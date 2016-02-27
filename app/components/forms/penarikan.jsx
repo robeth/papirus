@@ -67,27 +67,6 @@ var PenarikanForm = React.createClass({
         console.log(error);
       });
     console.log(this.props);
-
-    // Edit mode: Fetch penarikan instance
-    // if(this.props.mode === 'edit'){
-    //   Penarikan
-    //     .findById(this.props.instanceId)
-    //     .then(function onPenarikanFound(penarikan){
-    //       console.log('penarikan found');
-    //       console.log(penarikan);
-    //       component.setState({instance: penarikan});
-    //       return penarikan.getPenarikanDetails();
-    //     })
-    //     .then(function onPenarikanStocksFound(penarikanDetails){
-    //       console.log('Penarikan stocks found');
-    //       console.log(penarikanDetails);
-    //       component.setState({penarikanDetailInstances: penarikanDetails});
-    //     })
-    //     .catch(function onError(error){
-    //       console.log('Failed to fetch penarikan ' + component.props.instanceId);
-    //       console.log(error);
-    //     });
-    // }
   },
 
   save: function(){

@@ -24,25 +24,54 @@ var PenarikanDetailTable = React.createClass({
   },
 
   componentWillMount: function() {
-    this.refreshCandidates(this.props.nasabahId);
+    var component = this;
+
+    component.refreshCandidates(this.props.nasabahId)
+      .then(function(newPembelianCandidates){
+        component.allocate(
+          newPembelianCandidates,
+          component.props.selectedAmount
+        );
+
+        component.setState({pembelianCandidates: newPembelianCandidates})
+      });
   },
 
   componentWillReceiveProps: function(newProps){
-    if(this.props.nasabahId != newProps.nasabahId){
-      this.refreshCandidates(newProps.nasabahId);
+    var component = this;
+
+    // New nasabah id: update candidates & reallocate amount
+    if(component.props.nasabahId != newProps.nasabahId){
+      component
+        .refreshCandidates(newProps.nasabahId)
+        .then(function(newPembelianCandidates){
+          component.allocate(
+            newPembelianCandidates,
+            newProps.selectedAmount
+          );
+
+          component.setState({pembelianCandidates: newPembelianCandidates})
+        });
+    }
+    // Only selectedAmount differ: reallocate amount
+    else if(component.props.selectedAmount != newProps.selectedAmount){
+      component.allocate(
+        component.state.pembelianCandidates,
+        newProps.selectedAmount
+      );
     }
   },
 
   refreshCandidates: function(nasabahId){
     var component = this;
 
-    Pembelian
+    return Pembelian
       .getPenarikanCandidates(nasabahId)
       .then(function(pembelianCandidates){
         console.log('Penarikan-Detail-Table CWP success');
         console.log(pembelianCandidates);
 
-        component.setState({pembelianCandidates: pembelianCandidates});
+        return pembelianCandidates;
       })
       .catch(function(error){
         console.log('Penarikan-Detail-Table CWP error');
@@ -50,14 +79,10 @@ var PenarikanDetailTable = React.createClass({
       });
   },
 
-  allocate: function(){
-    var candidates = this.state.pembelianCandidates;
-    // Clear previously allocated amount
+  allocate: function(candidates, expectedAmount){
     candidates.forEach(function(candidate){
       candidate.allocatedValue = 0;
     });
-
-    var expectedAmount = this.props.selectedAmount;
 
     for(var i = 0; i < candidates.length; i++){
       var takenAmount = Math.min(expectedAmount, candidates[i].remainingValue);
@@ -69,8 +94,6 @@ var PenarikanDetailTable = React.createClass({
         break;
       }
     }
-
-    return candidates;
   },
 
   value: function(){
@@ -105,7 +128,6 @@ var PenarikanDetailTable = React.createClass({
 
   render: function(){
     var component = this;
-    var remainingAmount = component.allocate();
 
     var pembelianRows = component.state.pembelianCandidates.map(
       function(candidate, index){
