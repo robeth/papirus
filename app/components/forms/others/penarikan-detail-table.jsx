@@ -24,17 +24,7 @@ var PenarikanDetailTable = React.createClass({
   },
 
   componentWillMount: function() {
-    var component = this;
-
-    component.refreshCandidates(this.props.nasabahId)
-      .then(function(newPembelianCandidates){
-        component.allocate(
-          newPembelianCandidates,
-          component.props.selectedAmount
-        );
-
-        component.setState({pembelianCandidates: newPembelianCandidates})
-      });
+    this.fetchCandidates();
   },
 
   componentWillReceiveProps: function(newProps){
@@ -60,6 +50,20 @@ var PenarikanDetailTable = React.createClass({
         newProps.selectedAmount
       );
     }
+  },
+
+  fetchCandidates: function(){
+    var component = this;
+
+    component.refreshCandidates(this.props.nasabahId)
+      .then(function(newPembelianCandidates){
+        component.allocate(
+          newPembelianCandidates,
+          component.props.selectedAmount
+        );
+
+        component.setState({pembelianCandidates: newPembelianCandidates})
+      });
   },
 
   refreshCandidates: function(nasabahId){
@@ -98,10 +102,19 @@ var PenarikanDetailTable = React.createClass({
 
   value: function(){
     console.log('PenarikanDetailTable value:');
+    return this.state.pembelianCandidates.reduce(
+      function(previousResult, candidate){
+        if(candidate.allocatedValue > 0){
+          previousResult.push(candidate);
+        }
+
+        return previousResult;
+      }, []);
   },
 
   reset: function(){
     console.log('PenarikanDetailTable reset:');
+    this.fetchCandidates();
   },
 
   validate: function(){

@@ -85,6 +85,10 @@ var Field = React.createClass({
       status: 'neutral',
       errors: []
     });
+
+    if(this.props.onChange){
+      this.props.onChange(this.props.initialValue);
+    }
   },
 
   render: function(){

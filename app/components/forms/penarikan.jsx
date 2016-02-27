@@ -81,12 +81,15 @@ var PenarikanForm = React.createClass({
       return;
     }
     var penarikanPayload = this.collectPayload();
+    // Fill total value manually to 0 (unused column)
+    penarikanPayload.total = 0;
+
     var component = this;
 
     sequelize.transaction({
       isolationLevel: sequelize.Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED
     },function(t){
-      Penarikan
+      return Penarikan
         .create(penarikanPayload, {
           transaction: t
         })
@@ -95,19 +98,22 @@ var PenarikanForm = React.createClass({
           console.log(penarikan);
 
           // get penarikan details
-          var penarikanDetailPayloads = component.getPenarikanDetailPayloads();
+          var penarikanDetailPayload = component.
+            refs['penarikan-detail-table'].value();
+
+          console.log(penarikanDetailPayload);
 
           // Save all penarikan details
-          var penarikanDetailPromises = penarikanDetailPayloads.map(
-            function(penarikanDetailPayload){
-              penarikanDetailPayload.penarikan_id = penarikan.id;
-              return PenarikanDetail.create(penarikanDetailPayload, {
-                transaction: t
+          var penarikanDetailPromises = penarikanDetailPayload.map(
+            function(pembelianCandidate){
+              return penarikan.addPembelian(pembelianCandidate, {
+                transaction: t,
+                jumlah: pembelianCandidate.allocatedValue
               });
             }
           );
 
-          return Promise.all(pembelianStockPromises);
+          return Promise.all(penarikanDetailPromises);
         })
         .then(function onPenarikanDetailsSaved(penarikanDetails){
           console.log('success creating penarikan details');
@@ -119,13 +125,16 @@ var PenarikanForm = React.createClass({
         .catch(function onPenarikanCreationError(error){
           console.log("Failed creating new penarikan...");
           console.log(error);
+
+          throw "Rollback request";
         });
     })
     .then(function(){
       console.log('Penarikan-save: comitted');
     })
-    .catch(function(){
+    .catch(function(error){
       console.log('Penarikan-save: rollback');
+      console.log(error);
     });
 
   },
@@ -227,9 +236,10 @@ var PenarikanForm = React.createClass({
 
   onSelectedAmountChange: function(newValue){
     var floatValue = parseFloat(newValue);
-    if(!isNaN(floatValue) && isFinite(newValue) && floatValue > 0){
-      this.setState({selectedAmount: floatValue});
+    if(isNaN(floatValue) || !isFinite(newValue) || floatValue < 0){
+      floatValue = 0;
     }
+    this.setState({selectedAmount: floatValue});
   },
 
   render: function(){

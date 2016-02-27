@@ -82,7 +82,7 @@ module.exports = function(sequelize, DataTypes) {
       getPenarikanCandidates: function(nasabahId){
         return sequelize.models.Pembelian.findAll({
           attributes: {
-            include: [[sequelize.fn('SUM', sequelize.col('Penarikans.total')), 'taken']]
+            include: [[sequelize.fn('SUM', sequelize.col('`Penarikans`.`PenarikanDetail`.`jumlah`')), 'taken']]
           },
           include: [{ model: sequelize.models.Penarikan, as: 'Penarikans'}],
           where: {
@@ -106,7 +106,11 @@ module.exports = function(sequelize, DataTypes) {
 
           return Promise.all(pembelianPromises);
         }).then(function(pembelians){
-          return _.sortBy(pembelians, 'tanggal');
+          var unsettledPembelians = pembelians.filter(function(pembelian){
+            return pembelian.remainingValue > 0;
+          });
+
+          return _.sortBy(unsettledPembelians, 'tanggal');
         });
       }
     }
