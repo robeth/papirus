@@ -21,6 +21,7 @@ var KonversiData = require('./../pages/data-konversi');
 var KonversiDetail = require('./../pages/detail-konversi');
 var PenarikanForm = require('./../pages/form-penarikan');
 var PenarikanData = require('./../pages/data-penarikan');
+var PenarikanDetail = require('./../pages/detail-penarikan');
 
 module.exports = {
   'dashboard': {
@@ -190,7 +191,7 @@ module.exports = {
     path: [
       { label: 'Home', to: 'dashboard'},
       { label: 'Data', to : ''},
-      { label: 'Barang', to: 'data-konversi'}
+      { label: 'Konversi', to: 'data-konversi'}
     ]
   },
   'detail-konversi': {
@@ -199,7 +200,7 @@ module.exports = {
     path: [
       { label: 'Home', to: 'dashboard'},
       { label: 'Data', to : ''},
-      { label: 'Barang', to: 'detail-konversi'}
+      { label: 'Konversi', to: 'detail-konversi'}
     ]
   },
   'form-penarikan': {
@@ -219,5 +220,14 @@ module.exports = {
       { label: 'Data', to : ''},
       { label: 'Penarikan', to: 'data-penarikan'}
     ]
-  }
+  },
+  'detail-penarikan': {
+    title: 'Detail Penarikan',
+    element: React.createFactory(PenarikanDetail),
+    path: [
+      { label: 'Home', to: 'dashboard'},
+      { label: 'Data', to : ''},
+      { label: 'Penarikan', to: 'detail-penarikan'}
+    ]
+  },
 }

@@ -31,7 +31,7 @@ var DataPenarikan = React.createClass({
   generateOnItemClick: function(penarikanId){
     var component = this;
     return function(){
-      return Helper.call('changePage', ['detail-penarikan', {penarikanId: penarikanId}])
+      return Helper.call('changePage', ['detail-penarikan', {instanceId: penarikanId}])
     };
   },
 
