@@ -8,8 +8,7 @@ var DetailPenarikanPage = React.createClass({
       <section className="content">
         <PenarikanForm
           mode='edit'
-          instanceId={this.props.instanceId}
-          initialIsReadOnly={true}/>
+          instanceId={this.props.instanceId}/>
       </section>
     );
   }

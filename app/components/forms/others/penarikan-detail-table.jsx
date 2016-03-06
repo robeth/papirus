@@ -3,6 +3,7 @@ var Alert = require('../../alert');
 var classNames = require('classnames');
 var InputMixin = require('../../mixins/field-mixin');
 var Pembelian = window.Models.Pembelian;
+var Penarikan = window.Models.Penarikan;
 
 var ERROR_MESSAGE = 'Jumlah lebih besar dari Pembelian Nasabah';
 
@@ -11,24 +12,42 @@ var PenarikanDetailTable = React.createClass({
   propTypes: {
     mode: React.PropTypes.oneOf(['add', 'edit']).isRequired,
     nasabahId: React.PropTypes.number.isRequired,
-    penarikanId: React.PropTypes.number,
+    penarikanInstance: React.PropTypes.object,
     readOnly: React.PropTypes.bool,
     selectedAmount: React.PropTypes.number.isRequired
   },
 
   getInitialState: function(){
     console.log('PenarikanDetailTable-CWRP-field InitialState:');
+    console.log(this.props);
+    var initialPembelianCandidates = this.props.mode === 'edit'
+      && this.props.penarikanInstance
+      ? this.props.penarikanInstance.Pembelians
+      : [];
+
     return {
-      pembelianCandidates: []
+      pembelianCandidates: initialPembelianCandidates
     };
   },
 
   componentWillMount: function() {
-    this.fetchCandidates();
+    if(this.props.mode === 'add'){
+      this.fetchCandidates();
+    }
   },
 
   componentWillReceiveProps: function(newProps){
     var component = this;
+
+    console.log(newProps);
+
+    // Edit Mode
+    if(newProps.mode === 'edit' && newProps.penarikanInstance){
+      component.setState({
+        pembelianCandidates: newProps.penarikanInstance.Pembelians
+      });
+      return;
+    }
 
     // New nasabah id: update candidates & reallocate amount
     if(component.props.nasabahId != newProps.nasabahId){
@@ -144,17 +163,46 @@ var PenarikanDetailTable = React.createClass({
 
     var pembelianRows = component.state.pembelianCandidates.map(
       function(candidate, index){
-        return (
-          <tr key={index}>
-            <td className="text-center">B{candidate.id}</td>
-            <td className="text-center">{candidate.tanggal}</td>
-            <td className="text-center">{candidate.totalValue}</td>
-            <td className="text-center">{candidate.remainingValue}</td>
-            <td className="text-center">{candidate.allocatedValue}</td>
-          </tr>
-        );
+        if(component.props.mode === 'add'){
+          return (
+            <tr key={index}>
+              <td className="text-center">B{candidate.id}</td>
+              <td className="text-center">{candidate.tanggal}</td>
+              <td className="text-center">{candidate.totalValue}</td>
+              <td className="text-center">{candidate.remainingValue}</td>
+              <td className="text-center">{candidate.allocatedValue}</td>
+            </tr>
+          );
+        } else {
+          var penarikanDetail = candidate.PenarikanDetail;
+          return (
+            <tr key={index}>
+              <td className="text-center">B{candidate.id}</td>
+              <td className="text-center">{candidate.tanggal}</td>
+              <td className="text-center">{penarikanDetail.jumlah}</td>
+            </tr>
+          );
+        }
       }
     );
+
+    var headerRow = component.props.mode === 'add'
+      ? (
+          <tr>
+            <th className="text-center">Pembelian</th>
+            <th className="text-center">Tanggal</th>
+            <th className="text-center">Total Lunas</th>
+            <th className="text-center">Belum Lunas</th>
+            <th className="text-center">Akan Lunas</th>
+          </tr>
+        )
+      : (
+        <tr>
+          <th className="text-center">Pembelian</th>
+          <th className="text-center">Tanggal</th>
+          <th className="text-center">Nilai</th>
+        </tr>
+        )
     return (
 
       <div>
@@ -166,13 +214,7 @@ var PenarikanDetailTable = React.createClass({
         </Alert>
         <table className="table table-bordered table-hover">
           <thead>
-            <tr>
-              <th className="text-center">Pembelian</th>
-              <th className="text-center">Tanggal</th>
-              <th className="text-center">Total Lunas</th>
-              <th className="text-center">Belum Lunas</th>
-              <th className="text-center">Akan Lunas</th>
-            </tr>
+            {headerRow}
           </thead>
           <tbody>
             {pembelianRows}

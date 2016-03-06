@@ -12,6 +12,7 @@ var FormMixin = require('../mixins/form-mixin');
 var Promise = require('bluebird');
 var _ = require('lodash');
 var sequelize = window.Models.Kategori.sequelize;
+var Helper = require('../helper');
 
 var PenarikanForm = React.createClass({
   mixins: [FormMixin],
@@ -24,7 +25,7 @@ var PenarikanForm = React.createClass({
 
   getInitialState: function(){
     return {
-      isReadOnly: this.props.initialIsReadOnly,
+      isReadOnly: this.props.mode === 'edit',
       selectedNasabahId: 0,
       selectedAmount: 0,
       nasabahInstances: [],
@@ -51,16 +52,45 @@ var PenarikanForm = React.createClass({
 
         if(component.props.instanceId){
           // Instance provided: edit mode
-          diffState.selectedNasabahId = component.state.instance.nasabah_id;
+          Penarikan
+            .findAll({
+              include: [ {model: Pembelian, as: 'Pembelians'}],
+              where: {
+                id: component.props.instanceId
+              }
+            })
+            .then(function(results){
+              console.log('Success retrieving penarikan instance');
+              console.log(results);
+
+              var penarikanInstance = results[0];
+              penarikanInstance.total = penarikanInstance.Pembelians
+                .map(function(pembelian){
+                  return pembelian.PenarikanDetail.jumlah
+                })
+                .reduce(function(prevValue, current){
+                  return prevValue + current
+                }, 0);
+
+              console.log(penarikanInstance);
+              diffState.instance = penarikanInstance;
+              diffState.selectedNasabahId = penarikanInstance.nasabah_id;
+              component.setState(diffState);
+            })
+            .catch(function(error){
+              console.log('Error retrieving penarikan instance');
+              console.log(error);
+            })
         } else if(component.props.initialNasabahId){
           // Initial nasabah id provided: form is accessed from report
           diffState.selectedNasabahId = component.props.initialNasabahId;
+          component.setState(diffState);
         } else if(nasabahInstances.length > 0){
           // No important props provided: add mode
           diffState.selectedNasabahId = nasabahInstances[0].id;
+          component.setState(diffState);
         }
 
-        component.setState(diffState);
       })
       .catch(function onError(error){
         console.log('error fetching all nasabah');
@@ -139,66 +169,6 @@ var PenarikanForm = React.createClass({
 
   },
 
-  saveChanges: function(){
-    event.preventDefault();
-    this.resetAlert();
-    // var formErrors = this.validate();
-    //
-    // if(formErrors.length > 0){
-    //   console.log('Pembelian form is invalid');
-    //   console.log('Invalid: ');
-    //   console.log(formErrors);
-    //   return;
-    // }
-    // var pembelianPayload = this.collectPayload();
-    // var component = this;
-    // component.state.pembelianInstance
-    //   .update(pembelianPayload)
-    //   .then(function onPenarikanCreationSuccess(pembelian){
-    //     console.log("success updating pembelian!");
-    //     console.log(pembelian);
-    //     component.setState({pembelianInstance: pembelian});
-    //
-    //     // Instruct child forms to save changes
-    //     var childrenFormsPromise = component.getChildrenForms().map(
-    //       function(childForm, index, arr){
-    //         var childPromise = childForm.component.saveChanges(pembelian);
-    //         console.log('Pembelian-childPromise:');
-    //         console.log(childPromise);
-    //
-    //         return childPromise;
-    //       }
-    //     );
-    //
-    //     childrenFormsPromise = _.flatten(childrenFormsPromise, true);
-    //     console.log('Pembelian-childrenPromise:');
-    //     console.log(childrenFormsPromise);
-    //     return Promise.all(childrenFormsPromise);
-    //   })
-    //   .then(function onAllChildrenFormsUpdated(pembelianStocks){
-    //     console.log('PembelianStocks updated');
-    //     console.log(pembelianStocks);
-    //     component.refs['edit-success-alert'].show();
-    //     component.resetFields();
-    //     component.resetChildrenForms();
-    //     component.setReadOnly(true);
-    //
-    //     var newPembelianStocks = pembelianStocks.filter(function(s){
-    //       return s.isNewRecord === false ;
-    //     });
-    //
-    //     console.log(newPembelianStocks);
-    //
-    //     component.setState({
-    //       pembelianStockInstances: newPembelianStocks
-    //     });
-    //   })
-    //   .catch(function onPenarikanCreationError(error){
-    //     console.log("Failed to update pembelian...");
-    //     console.log(error);
-    //   });
-  },
-
   resetAlert: function(){
     this.refs['add-success-alert'].hide();
     this.refs['edit-success-alert'].hide();
@@ -213,23 +183,6 @@ var PenarikanForm = React.createClass({
     );
   },
 
-  onCancel: function(event){
-    event.preventDefault();
-    this.resetAlert();
-    this.resetFields();
-    this.resetChildrenForms();
-    this.setReadOnly(true);
-    this.getChildrenForms().map(function(childForm){
-      childForm.component.reset();
-    });
-  },
-
-  onEdit: function(event){
-    event.preventDefault();
-    this.resetAlert();
-    this.setReadOnly(false);
-  },
-
   onNasabahSelectionChange: function(newNasabahId) {
     this.setState({selectedNasabahId: newNasabahId});
   },
@@ -242,6 +195,24 @@ var PenarikanForm = React.createClass({
     this.setState({selectedAmount: floatValue});
   },
 
+  onDelete: function(){
+    var penarikanInstance = this.state.instance;
+
+    penarikanInstance.setPembelians([])
+      .then(function(){
+        console.log('Success deleting PenarikanDetails');
+        return penarikanInstance.destroy();
+      })
+      .then(function(){
+        console.log('Success deleting penarikan');
+        Helper.call('changePage', ['data-penarikan']);
+      })
+      .catch(function(error){
+        console.log('Error deleting penarikan');
+        console.log(error);
+      });
+  },
+
   render: function(){
     var nasabahOptions = this.state.nasabahInstances.map(
       function(nasabahInstance, index, arr){
@@ -252,43 +223,21 @@ var PenarikanForm = React.createClass({
       }
     );
 
-    var buttons = null;
-
-    if(this.props.mode === 'add'){
-      buttons = (
-        <button
-          className="btn btn-success pull-right"
-          onClick={this.save}>
-          <i className="fa fa-save"></i> Simpan
-        </button>
-      );
-    }
-    else {
-      if(this.state.isReadOnly){
-        buttons = (
+    var buttons = this.props.mode === 'add'
+      ? (
           <button
-            className="btn btn-info pull-right"
-            onClick={this.onEdit}>
-            <i className="fa fa-save"></i> Edit
+            className="btn btn-success pull-right"
+            onClick={this.save}>
+            <i className="fa fa-save"></i> Simpan
+          </button>
+        )
+      : (
+          <button
+            className="btn btn-danger pull-right"
+            onClick={this.onDelete} >
+            <i className="fa fa-trash"></i> Hapus
           </button>
         );
-      } else {
-        buttons = (
-          <div>
-            <button
-              className="btn btn-danger pull-right"
-              onClick={this.onCancel} >
-              <i className="fa fa-undo"></i> Batal
-            </button>
-            <button
-              className="btn btn-success pull-right"
-              onClick={this.saveChanges}>
-              <i className="fa fa-pencil"></i> Simpan
-            </button>
-          </div>
-        );
-      }
-    }
 
     var doNothingHandler = function(event){
       event.preventDefault();
@@ -305,6 +254,7 @@ var PenarikanForm = React.createClass({
                   mode={this.props.mode}
                   nasabahId={this.state.selectedNasabahId}
                   readOnly={this.state.isReadOnly}
+                  penarikanInstance={this.state.instance}
                   selectedAmount={this.state.selectedAmount}
                   />
               </Box.Body>
