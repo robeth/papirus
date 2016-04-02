@@ -11,15 +11,15 @@ var DEFAULT_RANGES = {
 
 var DateField = React.createClass({
   propTypes: {
-    startDate: React.PropTypes.object,
-    endDate: React.PropTypes.object,
+    initialStartDate: React.PropTypes.object,
+    initialEndDate: React.PropTypes.object,
     onEvent: React.PropTypes.func
   },
 
   getInitialState: function () {
     return {
-      startDate: this.props.startDate || moment().startOf('month'),
-      endDate: this.props.endDate || moment().endOf('month')
+      startDate: this.props.initialStartDate || moment().startOf('month'),
+      endDate: this.props.initialEndDate || moment().endOf('month')
     };
   },
 

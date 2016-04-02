@@ -1,5 +1,9 @@
 var React = require('react');
 var DateRangeField = require('../forms/fields/date-range-field');
+var ReactBsTable = require('react-bootstrap-table');
+var BootstrapTable = ReactBsTable.BootstrapTable;
+var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
+
 var moment = require('moment');
 var RawQueries = window.Models.RawQueries;
 
@@ -7,7 +11,7 @@ var StockFlowReport = React.createClass({
   getInitialState: function(){
     return {
       stockSummary: [],
-      startDate: moment().startOf('month'),
+      startDate: moment(new Date('1900-01-01')),
       endDate: moment().endOf('month')
     };
   },
@@ -48,21 +52,61 @@ var StockFlowReport = React.createClass({
     });
   },
 
+  getCsvFilename: function(){
+    var start = this.state.startDate.format('YYYY-MM-DD');
+    var end = this.state.endDate.format('YYYY-MM-DD');
+    return 'StockFlow from ' + start + ' to ' + end + '.csv'
+  },
+
   render: function(){
-    var rows = this.state.stockSummary.map(function(stockEntry, index){
-      return (
-        <tr key={index}>
-          <td className="text-right">{index + 1}</td>
-          <td className="text-center">{stockEntry.kode}</td>
-          <td>{stockEntry.nama}</td>
-          <td className="text-right text-green">{stockEntry.individualDeposit}</td>
-          <td className="text-right text-green">{stockEntry.groupDeposit}</td>
-          <td className="text-right text-green">{stockEntry.convertionOutput}</td>
-          <td className="text-right text-red">{stockEntry.sale}</td>
-          <td className="text-right text-red">{stockEntry.convertionInput}</td>
-        </tr>
-      );
-    });
+    var table = (
+      <BootstrapTable
+        data={this.state.stockSummary}
+        condensed={true}
+        hover={true}
+        search={true}
+        pagination={true}
+        exportCSV={true}
+        csvFileName={this.getCsvFilename()}
+        options={{sizePerPage: 25}}>
+        <TableHeaderColumn isKey={true} dataField='kode' dataSort={true}>
+          Kode
+        </TableHeaderColumn>
+        <TableHeaderColumn dataField='nama' dataSort={true}>
+          Nama Barang
+        </TableHeaderColumn>
+        <TableHeaderColumn
+          dataField='individualDeposit'
+          dataAlign='right'
+          columnClassName='text-green'>
+          Pembelian Indiv
+        </TableHeaderColumn>
+        <TableHeaderColumn
+          dataField='groupDeposit'
+          dataAlign='right'
+          columnClassName='text-green'>
+          Pembelian Kolektif
+        </TableHeaderColumn>
+        <TableHeaderColumn
+          dataField='convertionOutput'
+          dataAlign='right'
+          columnClassName='text-green'>
+          Hasil Konversi
+        </TableHeaderColumn>
+        <TableHeaderColumn
+          dataField='sale'
+          dataAlign='right'
+          columnClassName='text-red'>
+          Penjualan
+        </TableHeaderColumn>
+        <TableHeaderColumn
+          dataField='convertionInput'
+          dataAlign='right'
+          columnClassName='text-red'>
+          Bahan Konversi
+        </TableHeaderColumn>
+      </BootstrapTable>
+    );
 
     return (
       <section className="content">
@@ -75,6 +119,8 @@ var StockFlowReport = React.createClass({
               <div className="box-body">
                 <DateRangeField
                   ref='date-picker'
+                  initialStartDate={this.state.startDate}
+                  initialEndDate={this.state.endDate}
                   onEvent={this.handleDateChange}
                 />
               </div>
@@ -85,25 +131,8 @@ var StockFlowReport = React.createClass({
           <div className="col-xs-12">
             <div className="box box-info">
               <div className="box-body">
-                <div className="table-responsive">
-                  <table data-widget="advanced-table" className="table table-bordered table-striped">
-                    <thead>
-                      <tr>
-                        <th className="text-center">#</th>
-                        <th className="text-center">Kode</th>
-                        <th className="text-center">Nama Barang</th>
-                        <th className="text-center">Pembelian Indiv</th>
-                        <th className="text-center">Pembelian Kolektif</th>
-                        <th className="text-center">Hasil Konversi</th>
-                        <th className="text-center">Penjualan</th>
-                        <th className="text-center">Input Konversi</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {rows}
-                    </tbody>
-                  </table>
-                </div>
+                {table}
+
               </div>
             </div>
           </div>
@@ -112,5 +141,4 @@ var StockFlowReport = React.createClass({
     );
   }
 });
-
 module.exports = StockFlowReport;
