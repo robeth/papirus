@@ -22,6 +22,7 @@ var KonversiDetail = require('./../pages/detail-konversi');
 var PenarikanForm = require('./../pages/form-penarikan');
 var PenarikanData = require('./../pages/data-penarikan');
 var PenarikanDetail = require('./../pages/detail-penarikan');
+var StockFlowReport = require('./../pages/laporan-arus-barang');
 
 module.exports = {
   'dashboard': {
@@ -230,4 +231,13 @@ module.exports = {
       { label: 'Penarikan', to: 'detail-penarikan'}
     ]
   },
+  'laporan-arus-barang': {
+    title: 'Laporan Arus Barang',
+    element: React.createFactory(StockFlowReport),
+    path: [
+      { label: 'Home', to: 'dashboard'},
+      { label: 'Laporan', to: ''},
+      { label: 'Arus Barang', to: 'laporan-arus-barang'}
+    ]
+  }
 }

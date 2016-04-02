@@ -82,7 +82,7 @@ var Sidebar = React.createClass({
               <ul className="treeview-menu">
                 <li><a href="#" data-link="laporan-laba-rugi"><i className="fa fa-balance-scale"></i> Laba Rugi</a></li>
                 <li><a href="#" data-link="laporan-buku-besar"><i className="fa fa-book"></i> Buku Besar</a></li>
-                <li><a href="#" data-link="laporan-arus-barang"><i className="fa fa-exchange"></i> Arus Barang</a></li>
+                <li><a href="#" onClick={this._generateOnItemClick('laporan-arus-barang')}><i className="fa fa-exchange"></i> Arus Barang</a></li>
                 <li>
                   <a href="#">
                     <i className="fa fa-credit-card"></i> Utang Nasabah

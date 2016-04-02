@@ -47,6 +47,9 @@ for(var modelName in MODEL_DICTIONARY){
   }
 }
 
+// Register Raw
+models.RawQueries = require('./raw_queries')(sequelize);
+
 models.Nasabah.hasMany(models.Pembelian, {
   as: 'Pembelians',
   foreignKey: 'nasabah_id'
