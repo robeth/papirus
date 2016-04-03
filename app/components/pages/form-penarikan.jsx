@@ -6,7 +6,9 @@ var FormPenarikanPage = React.createClass({
   render: function(){
     return (
       <section className="content">
-        <PenarikanForm mode='add'/>
+        <PenarikanForm
+          mode='add'
+          initialNasabahId={this.props.initialNasabahId}/>
       </section>
     );
   }

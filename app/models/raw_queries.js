@@ -74,7 +74,72 @@ var RawQueries = function(sequelize){
 
           return arrayResult;
         });
+    },
+
+    unsettledDeposit: function(accountType, startDate, endDate){
+      var Pembelian = sequelize.models.Pembelian;
+      return Pembelian.findAll({
+        attributes: {
+          include: [[sequelize.fn('SUM', sequelize.col('`Penarikans`.`PenarikanDetail`.`jumlah`')), 'taken']]
+        },
+        include: [
+          { model: sequelize.models.Penarikan, as: 'Penarikans'},
+          {
+            model: sequelize.models.Nasabah,
+            as: 'Nasabah',
+            where: {
+              jenis: accountType
+            }
+          }
+        ],
+        where: {
+          tanggal: {
+            $between: [startDate, endDate]
+          }
+        },
+        group: ['id']
+      }).then(function(pembelians){
+        var pembelianPromises = [];
+
+        pembelians.map(function(pembelian){
+          var pembelianPromise = pembelian.getValue()
+            .then(function(value){
+              pembelian.totalValue = value;
+              pembelian.paidValue = pembelian.get('taken');
+              pembelian.remainingValue = value - pembelian.get('taken');
+              return pembelian;
+            });
+          pembelianPromises.push(pembelianPromise);
+          return pembelianPromise;
+        });
+
+        return Promise.all(pembelianPromises);
+      }).then(function(pembelians){
+        var unsettledPembelians = pembelians.filter(function(pembelian){
+          return pembelian.remainingValue > 0;
+        });
+
+        var unsettledDepositHash = {};
+
+        unsettledPembelians.forEach(function(pembelian){
+          unsettledDepositHash[pembelian.nasabah_id] =
+            unsettledDepositHash[pembelian.nasabah_id] ||
+            {deposits: [], totalUnsettled: 0};
+          unsettledDepositHash[pembelian.nasabah_id].deposits.push(pembelian);
+          unsettledDepositHash[pembelian.nasabah_id].totalUnsettled += pembelian.remainingValue;
+        });
+
+        var unsettledDepositResult = [];
+        for(var accountId in unsettledDepositHash) {
+          if(unsettledDepositHash.hasOwnProperty(accountId)){
+            unsettledDepositResult.push(unsettledDepositHash[accountId]);
+          }
+        }
+
+        return unsettledDepositResult;
+      });
     }
+
   }
 }
 

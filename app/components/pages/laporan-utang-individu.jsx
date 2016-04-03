@@ -1,147 +1,165 @@
-<div data-content="laporan-utang-individu" class="content-wrapper hide">
-  <!-- Content Header (Page header) -->
-  <section class="content-header">
-    <h1>
-      Utang Individu
-    </h1>
-    <ol class="breadcrumb">
-      <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-      <li>Laporan</li>
-      <li class="active">Utang individu</li>
-    </ol>
-  </section>
+var React = require('react');
+var DateRangeField = require('../forms/fields/date-range-field');
 
-  <section class="content">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="box">
-          <div class="box-header">
-            <h3 class="box-title">Periode</h3>
-          </div>
-          <div class="box-body">
-            <div class="form-group">
-              <div class="input-group">
-                <div class="input-group-addon"><i class="fa fa-calendar"></i></div>
-                <input data-widget="calendar-range" class="form-control pull-right" value="11/01/2015 - 11/30/2015"></input>
+var moment = require('moment');
+var RawQueries = window.Models.RawQueries;
+var LinkHelper = require('../helpers/link-helper');
+
+var UnsettledDepositReport = React.createClass({
+  getInitialState: function(){
+    return {
+      summary: [],
+      startDate: moment(new Date('1900-01-01')),
+      endDate: moment().endOf('month')
+    };
+  },
+
+  componentDidMount: function() {
+    this.refreshReport();
+  },
+
+  componentDidUpdate: function(previousProps, previousState){
+    if(previousState.startDate === this.state.startDate &&
+      previousState.endDate === this.state.endDate){
+        return;
+      }
+    this.refreshReport();
+  },
+
+  refreshReport: function(){
+    var component = this;
+    var startDateString = component.state.startDate.format('YYYY-MM-DD');
+    var endDateString = component.state.endDate.format('YYYY-MM-DD');
+
+    RawQueries
+      .unsettledDeposit('individu', startDateString, endDateString)
+      .then(function(summary){
+        component.setState({
+          summary: summary
+        })
+      })
+      .catch(function(error){
+        console.log(error);
+      });
+  },
+
+  handleDateChange: function(eventData){
+    this.setState({
+      startDate: eventData.startDate,
+      endDate: eventData.endDate
+    });
+  },
+
+  getRows: function(){
+    var summary = this.state.summary;
+    var rows = [];
+
+    for(var accIdx = 0; accIdx < summary.length; accIdx++){
+      var account = summary[accIdx];
+      var deposits = account.deposits;
+
+      for(var depIdx = 0; depIdx < deposits.length; depIdx++){
+        var deposit = deposits[depIdx];
+        var row = null;
+        if(depIdx == 0){
+          row = (
+            <tr key={deposit.id}>
+              <td className='text-right' rowSpan={deposits.length}>
+                {accIdx + 1}
+              </td>
+              <td className='text-center'>
+                {LinkHelper.depositLink(deposit.id)}
+              </td>
+              <td className='text-center'>{deposit.nota}</td>
+              <td className='text-center' rowSpan={deposits.length}>
+                {LinkHelper.accountLink(deposit.Nasabah.id)}
+                {deposit.Nasabah.nama}
+              </td>
+              <td className='text-center'>{deposit.tanggal}</td>
+              <td className='text-center'>{deposit.tanggal}</td>
+              <td className='text-right'>{deposit.totalValue}</td>
+              <td className='text-right'>{deposit.remainingValue}</td>
+              <td className='text-right' rowSpan={deposits.length}>
+                {account.totalUnsettled}
+              </td>
+              <td className='text-center' rowSpan={deposits.length}>
+                <a onClick={LinkHelper.withdrawalHandler(deposit.Nasabah.id)}>
+                  Penarikan <i className='fa fa-tag'></i>
+                </a>
+              </td>
+            </tr>
+          );
+        } else {
+          row = (
+            <tr key={deposit.id}>
+              <td className='text-center'>
+                {LinkHelper.depositLink(deposit.id)}
+              </td>
+              <td className='text-center'>{deposit.nota}</td>
+              <td className='text-center'>{deposit.tanggal}</td>
+              <td className='text-center'>{deposit.tanggal}</td>
+              <td className='text-right'>{deposit.totalValue}</td>
+              <td className='text-right'>{deposit.remainingValue}</td>
+            </tr>
+          );
+        }
+
+        rows.push(row);
+      }
+    }
+
+    return rows;
+  },
+
+  render: function(){
+    return (
+      <section className="content">
+        <div className="row">
+          <div className="col-md-4 col-xs-12">
+            <div className="box">
+              <div className="box-header">
+                <h3 className="box-title">Periode</h3>
+              </div>
+              <div className="box-body">
+                <DateRangeField
+                  ref='date-picker'
+                  initialStartDate={this.state.startDate}
+                  initialEndDate={this.state.endDate}
+                  onEvent={this.handleDateChange}
+                />
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-12">
-        <div class="box box-info">
-          <div class="box-body">
-            <table class="table table-bordered table-hover">
-              <thead>
-                <tr>
-                  <th class="text-center">#</th>
-                  <th class="text-center">Kode</th>
-                  <th class="text-center">Nota</th>
-                  <th class="text-center">Nasabah</th>
-                  <th class="text-center">Tanggal</th>
-                  <th class="text-center">Jatuh Tempo</th>
-                  <th class="text-center">Total Transaksi</th>
-                  <th class="text-center">Belum Lunas</th>
-                  <th class="text-center">Total Utang</th>
-                  <th class="text-center">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="text-center" rowspan="5">1</td>
-                  <td class="text-center"><a href="/trans/pembelian_detail/2694/"><span class="label label-primary">B2694</span></a></td>
-                  <td class="text-center">A00150</td>
-                  <td class="text-center" rowspan="5">
-                    <a href="#"><span class="label label-info">N1</span></a>Budi
-                  </td>
-                  <td class="text-center">2014-07-02</td>
-                  <td class="text-center">2014-07-16</td>
-                  <td class="text-right">3,520.00</td>
-                  <td class="text-right">3,520.00</td>
-                  <td class="text-right" rowspan="5">32,070.00</td>
-                  <td class="text-center" rowspan="5">
-                    <a href="/trans/penarikan_add/128/"> Penarikan <span class="glyphicon glyphicon-tag"></span></a>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="text-center"><a href="/trans/pembelian_detail/2504/"><span class="label label-primary">B2504</span></a></td>
-                  <td class="text-center">A001651</td>
-                  <td class="text-center">2014-06-16</td>
-                  <td class="text-center">2014-06-30</td>
-                  <td class="text-right">5,930.00</td>
-                  <td class="text-right">5,930.00</td>
-                </tr>
-                <tr>
-                  <td class="text-center"><a href="/trans/pembelian_detail/2493/"><span class="label label-primary">B2493</span></a></td>
-                  <td class="text-center">A001583</td>
-                  <td class="text-center">2014-06-11</td>
-                  <td class="text-center">2014-06-25</td>
-                  <td class="text-right">8,960.00</td>
-                  <td class="text-right">8,960.00</td>
-                </tr>
-                <tr>
-                  <td class="text-center"><a href="/trans/pembelian_detail/2470/"><span class="label label-primary">B2470</span></a></td>
-                  <td class="text-center">A001441</td>
-                  <td class="text-center">2014-06-02</td>
-                  <td class="text-center">2014-06-16</td>
-                  <td class="text-right">10,060.00</td>
-                  <td class="text-right">10,060.00</td>
-                </tr>
-                <tr>
-                  <td class="text-center"><a href="/trans/pembelian_detail/2290/"><span class="label label-primary">B2290</span></a></td>
-                  <td class="text-center">A001134</td>
-                  <td class="text-center">2014-05-14</td>
-                  <td class="text-center">2014-05-28</td>
-                  <td class="text-right">3,600.00</td>
-                  <td class="text-right">3,600.00</td>
-                </tr>
-                <tr>
-                  <td class="text-center" rowspan="4">2</td>
-                  <td class="text-center"><a href="/trans/pembelian_detail/2564/"><span class="label label-primary">B2564</span></a></td>
-                  <td class="text-center">A001868</td>
-                  <td class="text-center" rowspan="4">
-                    <a href="#"><span class="label label-info">N32</span></a>Ajeng
-                  </td>
-                  <td class="text-center">2014-06-28</td>
-                  <td class="text-center">2014-07-12</td>
-                  <td class="text-right">11,800.00</td>
-                  <td class="text-right">11,800.00</td>
-                  <td class="text-right" rowspan="4">47,300.00</td>
-                  <td class="text-center" rowspan="4">
-                    <a href="/trans/penarikan_add/129/"> Penarikan <span class="glyphicon glyphicon-tag"></span></a>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="text-center"><a href="/trans/pembelian_detail/2364/"><span class="label label-primary">B2364</span></a></td>
-                  <td class="text-center">A001371</td>
-                  <td class="text-center">2014-05-30</td>
-                  <td class="text-center">2014-06-13</td>
-                  <td class="text-right">15,600.00</td>
-                  <td class="text-right">15,600.00</td>
-                </tr>
-                <tr>
-                  <td class="text-center"><a href="/trans/pembelian_detail/2344/"><span class="label label-primary">B2344</span></a></td>
-                  <td class="text-center">A001285</td>
-                  <td class="text-center">2014-05-24</td>
-                  <td class="text-center">2014-06-07</td>
-                  <td class="text-right">9,500.00</td>
-                  <td class="text-right">9,500.00</td>
-                </tr>
-                <tr>
-                  <td class="text-center"><a href="/trans/pembelian_detail/2204/"><span class="label label-primary">B2204</span></a></td>
-                  <td class="text-center">A001024</td>
-                  <td class="text-center">2014-05-06</td>
-                  <td class="text-center">2014-05-20</td>
-                  <td class="text-right">10,400.00</td>
-                  <td class="text-right">10,400.00</td>
-                </tr>
-              </tbody>
-            </table>
+        <div className="row">
+          <div className="col-xs-12">
+            <div className="box box-info">
+              <div className="box-body">
+                <table data-widget="advanced-table" className="table table-bordered table-hover">
+                  <thead>
+                    <tr>
+                      <th className="text-center">#</th>
+                      <th className="text-center">Kode</th>
+                      <th className="text-center">Nota</th>
+                      <th className="text-center">Nasabah</th>
+                      <th className="text-center">Tanggal</th>
+                      <th className="text-center">Jatuh Tempo</th>
+                      <th className="text-center">Total Transaksi</th>
+                      <th className="text-center">Belum Lunas</th>
+                      <th className="text-center">Total Utang</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {this.getRows()}
+                  </tbody>
+                </table>
+
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
-</div>
+      </section>
+    );
+  }
+});
+module.exports = UnsettledDepositReport;
