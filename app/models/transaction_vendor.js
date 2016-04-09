@@ -25,7 +25,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     },
     tanggal_daftar: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false
     },
     foto: {

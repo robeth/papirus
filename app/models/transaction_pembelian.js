@@ -20,7 +20,7 @@ module.exports = function(sequelize, DataTypes) {
       }
     },
     tanggal: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
       get: function(){
         var pembelianDate = this.getDataValue('tanggal');

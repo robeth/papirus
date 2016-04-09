@@ -15,76 +15,75 @@ if(_.isEmpty(config)){
   config = window.env;
 }
 
-function Migration(){
-  var databaseParams = config.database;
-  console.log(databaseParams);
-  var sequelize = new Sequelize(
-    databaseParams.name,
-    databaseParams.username,
-    databaseParams.password,
-    {
-      host: databaseParams.host,
-      diaclect: 'mysql',
-      define: {
-        timestamps: false
-      },
-      logging : !databaseParams
-    }
-  );
-  var umzug = new Umzug({
-    storage: 'sequelize',
-    storageOptions: {
-      sequelize: sequelize,
+var databaseParams = config.database;
+console.log(databaseParams);
+var sequelize = new Sequelize(
+  databaseParams.name,
+  databaseParams.username,
+  databaseParams.password,
+  {
+    host: databaseParams.host,
+    diaclect: 'mysql',
+    define: {
+      timestamps: false
     },
-    migrations: {
-      params: [sequelize.getQueryInterface(), Sequelize],
-      path: __dirname + '/migrations/production'
-    }
-  });
+    logging : !databaseParams
+  }
+);
+var umzug = new Umzug({
+  storage: 'sequelize',
+  storageOptions: {
+    sequelize: sequelize,
+  },
+  migrations: {
+    params: [sequelize.getQueryInterface(), Sequelize],
+    path: __dirname + '/migrations/production'
+  }
+});
 
-  var dummyUmzug = new Umzug({
-    storage: 'sequelize',
-    storageOptions: {
-      sequelize: sequelize,
-      modelName: 'DummyMigration'
-    },
-    migrations: {
-      params: [sequelize.getQueryInterface(), Sequelize],
-      path: __dirname + '/migrations/dummy'
-    }
-  });
+var dummyUmzug = new Umzug({
+  storage: 'sequelize',
+  storageOptions: {
+    sequelize: sequelize,
+    modelName: 'DummyMigration'
+  },
+  migrations: {
+    params: [sequelize.getQueryInterface(), Sequelize],
+    path: __dirname + '/migrations/dummy'
+  }
+});
 
-  this.sequelize = sequelize;
-  this.umzug = umzug;
-  this.dummyUmzug = dummyUmzug;
-}
-
-Migration.prototype.up = function(){
-  return this.umzug.execute({
+function up(){
+  return umzug.execute({
     migrations: migrationFiles.slice().sort(),
     method: 'up'
   })
 }
 
-Migration.prototype.down = function(){
-  return this.umzug.execute({
+function down(){
+  return umzug.execute({
     migrations: migrationFiles.slice().sort().reverse(),
     method: 'down'
   });
 }
 
-Migration.prototype.upDummy = function(){
-  return this.dummyUmzug.execute({
+function upDummy(){
+  return dummyUmzug.execute({
     migrations: dummyMigrationFiles.slice(),
     method: 'up'
   });
 }
 
-Migration.prototype.downDummy = function(){
-  return this.dummyUmzug.execute({
+function downDummy(){
+  return dummyUmzug.execute({
     migrations: dummyMigrationFiles.slice().sort().reverse(),
     method: 'down'
   });
 }
 
-module.exports = new Migration();
+module.exports = {
+  up: up,
+  down: down,
+  upDummy: upDummy,
+  downDummy: downDummy
+};

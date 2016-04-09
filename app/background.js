@@ -37,7 +37,7 @@ app.on('ready', function () {
         mainWindow.maximize();
     }
 
-    mainWindow.loadUrl('file://' + __dirname + '/bina-mandiri.html');
+    mainWindow.loadURL('file://' + __dirname + '/bina-mandiri.html');
 
     if (env.name !== 'production') {
         // devHelper.setDevMenu();

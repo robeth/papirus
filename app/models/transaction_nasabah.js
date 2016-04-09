@@ -29,7 +29,7 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: true
     },
     tanggal_lahir: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: true,
       get: function(){
         var bornDate = this.getDataValue('tanggal_lahir');
@@ -37,7 +37,7 @@ module.exports = function(sequelize, DataTypes) {
       }
     },
     tanggal_daftar: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false
     },
     foto: {

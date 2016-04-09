@@ -19,7 +19,7 @@ module.exports = {
         }
       },
       tanggal: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: false
       },
       nota: {

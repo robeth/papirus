@@ -31,11 +31,11 @@ module.exports = {
         allowNull: true
       },
       tanggal_lahir: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: true
       },
       tanggal_daftar: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: false
       },
       foto: {

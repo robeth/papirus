@@ -11,7 +11,7 @@ module.exports = function(sequelize, DataTypes) {
       autoIncrement: true
     },
     tanggal: {
-      type: DataTypes.DATE,
+      type: DataTypes.DATEONLY,
       allowNull: false,
       get: function(){
         var pembelianDate = this.getDataValue('tanggal');

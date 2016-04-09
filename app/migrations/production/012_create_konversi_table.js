@@ -11,7 +11,7 @@ module.exports = {
         autoIncrement: true
       },
       tanggal: {
-        type: DataTypes.DATE,
+        type: DataTypes.DATEONLY,
         allowNull: false
       },
       kode: {
