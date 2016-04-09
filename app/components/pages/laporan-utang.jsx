@@ -4,13 +4,15 @@ var DateRangeField = require('../forms/fields/date-range-field');
 var moment = require('moment');
 var RawQueries = window.Models.RawQueries;
 var LinkHelper = require('../helpers/link-helper');
+var classNames = require('classnames');
 
 var UnsettledDepositReport = React.createClass({
   getInitialState: function(){
     return {
       summary: [],
       startDate: moment(new Date('1900-01-01')),
-      endDate: moment().endOf('month')
+      endDate: moment().endOf('month'),
+      accountType: 'kolektif'
     };
   },
 
@@ -20,7 +22,8 @@ var UnsettledDepositReport = React.createClass({
 
   componentDidUpdate: function(previousProps, previousState){
     if(previousState.startDate === this.state.startDate &&
-      previousState.endDate === this.state.endDate){
+      previousState.endDate === this.state.endDate &&
+      previousState.accountType === this.state.accountType){
         return;
       }
     this.refreshReport();
@@ -32,7 +35,7 @@ var UnsettledDepositReport = React.createClass({
     var endDateString = component.state.endDate.format('YYYY-MM-DD');
 
     RawQueries
-      .unsettledDeposit('individu', startDateString, endDateString)
+      .unsettledDeposit(component.state.accountType, startDateString, endDateString)
       .then(function(summary){
         component.setState({
           summary: summary
@@ -48,6 +51,13 @@ var UnsettledDepositReport = React.createClass({
       startDate: eventData.startDate,
       endDate: eventData.endDate
     });
+  },
+
+  getAccountHandler: function(accountType){
+    var component = this;
+    return function(){
+      component.setState({accountType: accountType});
+    };
   },
 
   getRows: function(){
@@ -116,7 +126,7 @@ var UnsettledDepositReport = React.createClass({
       <section className="content">
         <div className="row">
           <div className="col-md-4 col-xs-12">
-            <div className="box">
+            <div className="box box-info">
               <div className="box-header">
                 <h3 className="box-title">Periode</h3>
               </div>
@@ -130,10 +140,35 @@ var UnsettledDepositReport = React.createClass({
               </div>
             </div>
           </div>
+          <div className="col-md-4 col-xs-12">
+            <div className="box box-info">
+              <div className="box-header">
+                <h3 className="box-title">Nasabah</h3>
+              </div>
+              <div className="box-body">
+                <div className="btn-group">
+                  <button className={classNames(
+                      'btn',
+                      'btn-default',
+                      {active: this.state.accountType === 'kolektif'})}
+                      onClick={this.getAccountHandler('kolektif')}>
+                    <i className="fa fa-building"></i> Kolektif
+                  </button>
+                  <button className={classNames(
+                      'btn',
+                      'btn-default',
+                      {active: this.state.accountType === 'individu'})}
+                      onClick={this.getAccountHandler('individu')}>
+                    <i className="fa fa-child"></i> Individu
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div className="row">
           <div className="col-xs-12">
-            <div className="box box-info">
+            <div className="box box-success">
               <div className="box-body">
                 <table data-widget="advanced-table" className="table table-bordered table-hover">
                   <thead>

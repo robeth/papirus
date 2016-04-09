@@ -23,7 +23,7 @@ var PenarikanForm = require('./../pages/form-penarikan');
 var PenarikanData = require('./../pages/data-penarikan');
 var PenarikanDetail = require('./../pages/detail-penarikan');
 var StockFlowReport = require('./../pages/laporan-arus-barang');
-var UnsettledDepositReport = require('./../pages/laporan-utang-individu');
+var UnsettledDepositReport = require('./../pages/laporan-utang');
 
 module.exports = {
   'dashboard': {
@@ -241,13 +241,13 @@ module.exports = {
       { label: 'Arus Barang', to: 'laporan-arus-barang'}
     ]
   },
-  'laporan-utang-individu': {
+  'laporan-utang': {
     title: 'Laporan Utang',
     element: React.createFactory(UnsettledDepositReport),
     path: [
       { label: 'Home', to: 'dashboard'},
       { label: 'Laporan', to: ''},
-      { label: 'Utang', to: 'laporan-utang-individu'}
+      { label: 'Utang', to: 'laporan-utang'}
     ]
   }
 }
