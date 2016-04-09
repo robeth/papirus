@@ -76,6 +76,16 @@ module.exports = function(sequelize, DataTypes) {
                 return previousValue + currentValue;
               });
           });
+      },
+      calculateValue: function(){
+        return this.PembelianStocks.reduce(function(result, currentItem){
+          return result + currentItem.Stock.jumlah * currentItem.Stock.harga;
+        }, 0);
+      },
+      calculateWeight: function(){
+        return this.PembelianStocks.reduce(function(result, currentItem){
+          return result + currentItem.Stock.jumlah;
+        }, 0);
       }
     },
     classMethods: {
@@ -111,6 +121,41 @@ module.exports = function(sequelize, DataTypes) {
           });
 
           return _.sortBy(unsettledPembelians, 'tanggal');
+        });
+      },
+      getSummary: function(accountType, startDate, endDate){
+        return sequelize.models.Pembelian.findAll({
+          include:[
+            {
+              model: sequelize.models.Nasabah,
+              as: 'Nasabah',
+              where: {
+                jenis: accountType
+              }
+            },
+            {
+              model: sequelize.models.PembelianStock,
+              as: 'PembelianStocks',
+              include: [{
+                model: sequelize.models.Stock,
+                as: 'Stock',
+                include: [{
+                  model: sequelize.models.Kategori,
+                  as: 'Kategori',
+                  include: [{
+                    model: sequelize.models.ReportKategori,
+                    as: 'ReportCategory'
+                  }]
+                }]
+              }]
+            }
+          ],
+          where: {
+            tanggal:{
+              $gte: startDate,
+              $lte: endDate
+            }
+          }
         });
       }
     }

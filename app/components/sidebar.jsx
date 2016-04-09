@@ -84,16 +84,7 @@ var Sidebar = React.createClass({
                 <li><a href="#" data-link="laporan-buku-besar"><i className="fa fa-book"></i> Buku Besar</a></li>
                 <li><a href="#" onClick={this._generateOnItemClick('laporan-arus-barang')}><i className="fa fa-exchange"></i> Arus Barang</a></li>
                 <li><a href="#" onClick={this._generateOnItemClick('laporan-utang')}><i className="fa fa-credit-card"></i> Utang Nasabah</a></li>
-                <li>
-                  <a href="#">
-                    <i className="fa fa-shopping-cart"></i> Tonase Nasabah
-                    <i className="fa fa-angle-left pull-right"></i>
-                  </a>
-                  <ul className="treeview-menu">
-                    <li><a href="#" data-link="laporan-tonase-individu"><i className="fa fa-child"></i> Individu</a></li>
-                    <li><a href="#" data-link="laporan-tonase-kolektif"><i className="fa fa-building"></i> Kolektif</a></li>
-                  </ul>
-                </li>
+                <li><a href="#" onClick={this._generateOnItemClick('laporan-tonase')}><i className="fa fa-shopping-cart"></i> Tonase Nasabah</a></li>
               </ul>
             </li>
 

@@ -6,12 +6,12 @@ var RawQueries = window.Models.RawQueries;
 var LinkHelper = require('../helpers/link-helper');
 var classNames = require('classnames');
 
-var UnsettledDepositReport = React.createClass({
+var DepositReport = React.createClass({
   getInitialState: function(){
     return {
       summary: [],
-      startDate: moment(new Date('1900-01-01')),
-      endDate: moment().endOf('month'),
+      startDate: moment.utc('1900-01-01'),
+      endDate: moment.utc().endOf('month'),
       accountType: 'kolektif'
     };
   },
@@ -35,7 +35,7 @@ var UnsettledDepositReport = React.createClass({
     var endDateString = component.state.endDate.format('YYYY-MM-DD');
 
     RawQueries
-      .unsettledDeposit(component.state.accountType, startDateString, endDateString)
+      .depositSummary(component.state.accountType, startDateString, endDateString)
       .then(function(summary){
         component.setState({
           summary: summary
@@ -70,34 +70,57 @@ var UnsettledDepositReport = React.createClass({
 
       for(var depIdx = 0; depIdx < deposits.length; depIdx++){
         var deposit = deposits[depIdx];
-        var expiryDate = moment(deposit.tanggal).add(14, 'd')
-          .format('YYYY-MM-DD');
         var row = null;
         if(depIdx == 0){
+          var categorySummary = [];
+          var index = 0;
+          for(var reportCategoryId in account.summary){
+            if(account.summary.hasOwnProperty(reportCategoryId)){
+              var content = account.summary[reportCategoryId].name +
+                ' : ' +
+                account.summary[reportCategoryId].totalWeight +
+                ' ' +
+                account.summary[reportCategoryId].unit;
+
+              categorySummary.push(<li key={index}>{content}</li>);
+              index++;
+            }
+          }
           row = (
             <tr key={deposit.id}>
               <td className='text-right' rowSpan={deposits.length}>
                 {accIdx + 1}
               </td>
-              <td className='text-center'>
-                {LinkHelper.depositLink(deposit.id)}
+              <td className='text-center' rowSpan={deposits.length}>
+                {deposit.Nasabah.no_induk}
               </td>
-              <td className='text-center'>{deposit.nota}</td>
               <td className='text-center' rowSpan={deposits.length}>
                 {LinkHelper.accountLink(deposit.Nasabah.id)}
                 {deposit.Nasabah.nama}
               </td>
-              <td className='text-center'>{deposit.tanggal}</td>
-              <td className='text-center'>{expiryDate}</td>
-              <td className='text-right'>{deposit.totalValue}</td>
-              <td className='text-right'>{deposit.remainingValue}</td>
-              <td className='text-right' rowSpan={deposits.length}>
-                {account.totalUnsettled}
+              <td className='text-center' rowSpan={deposits.length}>
+                {deposit.Nasabah.nama_pj}
+              </td>
+              <td className='text-left' rowSpan={deposits.length}>
+                {deposit.Nasabah.alamatj}
               </td>
               <td className='text-center' rowSpan={deposits.length}>
-                <a onClick={LinkHelper.withdrawalHandler(deposit.Nasabah.id)}>
-                  Penarikan <i className='fa fa-tag'></i>
-                </a>
+                {deposit.Nasabah.telepon}
+              </td>
+              <td className='text-center'>
+                {LinkHelper.depositLink(deposit.id)}
+              </td>
+              <td className='text-center'>{deposit.tanggal}</td>
+              <td className='text-center'>{deposit.calculateValue()}</td>
+              <td className='text-right'>{deposit.calculateWeight()}</td>
+              <td className='text-right' rowSpan={deposits.length}>
+                {account.totalValue}
+              </td>
+              <td className='text-right' rowSpan={deposits.length}>
+                {account.totalWeight}
+              </td>
+              <td rowSpan={deposits.length}>
+                <ul>{categorySummary}</ul>
               </td>
             </tr>
           );
@@ -107,11 +130,9 @@ var UnsettledDepositReport = React.createClass({
               <td className='text-center'>
                 {LinkHelper.depositLink(deposit.id)}
               </td>
-              <td className='text-center'>{deposit.nota}</td>
               <td className='text-center'>{deposit.tanggal}</td>
-              <td className='text-center'>{expiryDate}</td>
-              <td className='text-right'>{deposit.totalValue}</td>
-              <td className='text-right'>{deposit.remainingValue}</td>
+              <td className='text-center'>{deposit.calculateValue()}</td>
+              <td className='text-right'>{deposit.calculateWeight()}</td>
             </tr>
           );
         }
@@ -176,15 +197,18 @@ var UnsettledDepositReport = React.createClass({
                   <thead>
                     <tr>
                       <th className="text-center">#</th>
-                      <th className="text-center">Kode</th>
-                      <th className="text-center">Nota</th>
+                      <th className="text-center">No Induk</th>
                       <th className="text-center">Nasabah</th>
+                      <th className="text-center">PJ</th>
+                      <th className="text-center">Alamat</th>
+                      <th className="text-center">Telepon</th>
+                      <th className="text-center">Pembelian</th>
                       <th className="text-center">Tanggal</th>
-                      <th className="text-center">Jatuh Tempo</th>
-                      <th className="text-center">Total Transaksi</th>
-                      <th className="text-center">Belum Lunas</th>
-                      <th className="text-center">Total Utang</th>
-                      <th className="text-center">Action</th>
+                      <th className="text-center">Nilai</th>
+                      <th className="text-center">Tonase</th>
+                      <th className="text-center">Total Nilai</th>
+                      <th className="text-center">Total Tonase</th>
+                      <th className="text-center">Rangkuman</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -200,4 +224,4 @@ var UnsettledDepositReport = React.createClass({
     );
   }
 });
-module.exports = UnsettledDepositReport;
+module.exports = DepositReport;

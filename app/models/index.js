@@ -110,6 +110,16 @@ models.ReportKategori.hasMany(models.Kategori, {
   foreignKey: 'report_kategori_id'
 });
 
+models.Stock.belongsTo(models.Kategori, {
+  as: 'Kategori',
+  foreignKey: 'kategori_id'
+});
+
+models.Kategori.hasMany(models.Stock, {
+  as: 'Stocks',
+  foreignKey: 'kategori_id'
+});
+
 models.Konversi.hasMany(models.KonversiInStock, {
   as: 'KonversiInStocks',
   foreignKey: 'konversi_id'

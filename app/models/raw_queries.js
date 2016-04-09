@@ -138,6 +138,46 @@ var RawQueries = function(sequelize){
 
         return unsettledDepositResult;
       });
+    },
+    depositSummary: function(accountType, startDate, endDate){
+      var Pembelian = sequelize.models.Pembelian;
+      return Pembelian.getSummary(accountType, startDate, endDate)
+      .then(function(deposits){
+        var result = [];
+        var accounts = {};
+
+        deposits.forEach(function(deposit){
+          var nasabah_id = deposit.Nasabah.id;
+
+          accounts[nasabah_id] = accounts[nasabah_id] ||
+            {deposits: [], totalValue: 0, totalWeight: 0, summary: {}};
+
+          accounts[nasabah_id].deposits.push(deposit);
+          accounts[nasabah_id].totalValue += deposit.calculateValue();
+          accounts[nasabah_id].totalWeight += deposit.calculateWeight();
+
+          deposit.PembelianStocks.forEach(function(depositStock){
+            var stock = depositStock.Stock;
+            var reportCategory = stock.Kategori.ReportCategory;
+            var summary = accounts[nasabah_id].summary;
+
+            summary[reportCategory.id] = summary[reportCategory.id] || {
+                name: reportCategory.nama,
+                unit: reportCategory.satuan,
+                totalWeight: 0
+              };
+            summary[reportCategory.id].totalWeight += stock.jumlah;
+          });
+        });
+
+        for(var accountId in accounts){
+          if(accounts.hasOwnProperty(accountId)){
+            result.push(accounts[accountId]);
+          }
+        }
+
+        return result;
+      });
     }
 
   }

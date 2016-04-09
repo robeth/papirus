@@ -24,6 +24,7 @@ var PenarikanData = require('./../pages/data-penarikan');
 var PenarikanDetail = require('./../pages/detail-penarikan');
 var StockFlowReport = require('./../pages/laporan-arus-barang');
 var UnsettledDepositReport = require('./../pages/laporan-utang');
+var DepositReport = require('./../pages/laporan-tonase');
 
 module.exports = {
   'dashboard': {
@@ -248,6 +249,15 @@ module.exports = {
       { label: 'Home', to: 'dashboard'},
       { label: 'Laporan', to: ''},
       { label: 'Utang', to: 'laporan-utang'}
+    ]
+  },
+  'laporan-tonase': {
+    title: 'Laporan Tonase',
+    element: React.createFactory(DepositReport),
+    path: [
+      { label: 'Home', to: 'dashboard'},
+      { label: 'Laporan', to: ''},
+      { label: 'Tonase', to: 'laporan-tonase'}
     ]
   }
 }
