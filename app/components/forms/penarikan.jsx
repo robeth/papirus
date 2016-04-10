@@ -12,7 +12,7 @@ var FormMixin = require('../mixins/form-mixin');
 var Promise = require('bluebird');
 var _ = require('lodash');
 var sequelize = window.Models.Kategori.sequelize;
-var Helper = require('../helper');
+var HiddenLink = require('../helpers/link-helper').Hidden;
 
 var PenarikanForm = React.createClass({
   mixins: [FormMixin],
@@ -196,6 +196,7 @@ var PenarikanForm = React.createClass({
   },
 
   onDelete: function(){
+    var component = this;
     var penarikanInstance = this.state.instance;
 
     penarikanInstance.setPembelians([])
@@ -205,7 +206,7 @@ var PenarikanForm = React.createClass({
       })
       .then(function(){
         console.log('Success deleting penarikan');
-        Helper.call('changePage', ['data-penarikan']);
+        component.refs['hidden-link'].goTo();
       })
       .catch(function(error){
         console.log('Error deleting penarikan');
@@ -265,6 +266,9 @@ var PenarikanForm = React.createClass({
 
     return (
       <form role="form" className="form-horizontal" onSubmit={doNothingHandler}>
+        <HiddenLink
+          ref='hidden-link'
+          to='data-penarikan'/>
         <div className="row">
           <div className="col-xs-12">
             <Alert

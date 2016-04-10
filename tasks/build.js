@@ -223,7 +223,7 @@ gulp.task('bundle-react-watch', bundleReact);
 
 gulp.task('watch', function () {
     gulp.watch('app/**/*.js', ['bundle-watch']);
-    gulp.watch('app/**/*.jsx', ['bundle-react-watch']);
+    gulp.watch(['app/**/*.jsx', 'app/components/**/*.js'], ['bundle-react-watch']);
     gulp.watch(paths.copyFromAppDir, { cwd: 'app' }, ['copy-watch']);
     gulp.watch('app/**/*.less', ['less-watch']);
 });

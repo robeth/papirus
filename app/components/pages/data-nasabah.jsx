@@ -1,6 +1,6 @@
 var React = require('react');
 var Nasabah = window.Models.Nasabah;
-var Helper = require('../helper');
+var LinkHelper = require('../helpers/link-helper');
 
 var DataNasabahIndividu = React.createClass({
   propTypes: {
@@ -27,19 +27,15 @@ var DataNasabahIndividu = React.createClass({
       });
   },
 
-  generateOnItemClick: function(nasabahId){
-    return function(){
-      Helper.call('changePage',['detail-nasabah', {nasabahId: nasabahId}]);
-    };
-  },
-
   render: function(){
     var component = this;
     var rows = this.state.accounts.map(function(account, index){
       return (
         <tr key={index}>
           <td className="text-center">{index}</td>
-          <td className="text-center"><a onClick={this.generateOnItemClick(account.id).bind(component)}><span className="label label-info">{account.id}</span></a></td>
+          <td className="text-center">
+            <LinkHelper.Customer customerId={account.id}/>
+          </td>
           <td className="text-center">I01234</td>
           <td>{account.nama} </td>
           <td>{account.alamat}</td>

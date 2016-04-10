@@ -1,6 +1,6 @@
 var React = require('react');
-var Helper = require('../helper');
 var Konversi = window.Models.Konversi;
+var LinkHelper = require('../helpers/link-helper');
 
 var KonversiRow = React.createClass({
   propTypes:{
@@ -50,20 +50,12 @@ var KonversiRow = React.createClass({
       });
   },
 
-  generateOnItemClick: function(instanceId){
-    return function(){
-      Helper.call('changePage',['detail-konversi', {instanceId: instanceId}]);
-    };
-  },
-
   render: function(){
     return (
       <tr>
         <td className="text-center">{this.props.index}</td>
         <td className="text-center">
-          <a onClick={this.generateOnItemClick(this.state.id)}>
-            <span className="label label-warning">{ 'K' + this.state.id}</span>
-          </a>
+          <LinkHelper.Convertion convertionId={this.state.id} />
         </td>
         <td className="text-center">{this.state.nota}</td>
         <td className="text-center">{this.state.tanggal.toString()}</td>

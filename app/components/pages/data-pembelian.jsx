@@ -1,6 +1,6 @@
 var React = require('react');
-var Helper = require('../helper');
 var Pembelian = window.Models.Pembelian;
+var LinkHelper = require('../helpers/link-helper');
 
 var PembelianRow = React.createClass({
   propTypes:{
@@ -48,24 +48,16 @@ var PembelianRow = React.createClass({
       });
   },
 
-  generateOnItemClick: function(pembelianId){
-    return function(){
-      Helper.call('changePage',['detail-pembelian', {pembelianId: pembelianId}]);
-    };
-  },
-
   render: function(){
     return (
       <tr>
         <td className="text-center">{this.props.index}</td>
         <td className="text-center">
-          <a onClick={this.generateOnItemClick(this.state.id)}>
-            <span className="label label-primary">{ 'B' + this.state.id}</span>
-          </a>
+          <LinkHelper.Deposit depositId={this.state.id}/>
         </td>
         <td className="text-center">{this.state.nota}</td>
         <td>
-          <span className="label label-info">N{this.state.nasabah.id}</span>
+          <LinkHelper.Customer customerId={this.state.nasabah.id}/>
           {this.state.nasabah.nama}
         </td>
         <td className="text-center">{this.state.tanggal.toString()}</td>
@@ -93,11 +85,6 @@ var DataPembelian = React.createClass({
         console.log('Retrieving pembelians failed...');
         console.log(error);
       });
-  },
-
-  _generateOnItemClick: function(argument, pembelianId){
-    var component = this;
-    return function(){return component.props.changePage(argument, {pembelianId: pembelianId})};
   },
 
   render: function(){

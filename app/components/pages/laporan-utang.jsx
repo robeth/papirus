@@ -60,6 +60,13 @@ var UnsettledDepositReport = React.createClass({
     };
   },
 
+  goTo: function(depositId){
+    var component = this;
+    return function(){
+      component.refs['withdrawal-link-' + depositId].goTo();
+    };
+  },
+
   getRows: function(){
     var summary = this.state.summary;
     var rows = [];
@@ -80,11 +87,11 @@ var UnsettledDepositReport = React.createClass({
                 {accIdx + 1}
               </td>
               <td className='text-center'>
-                {LinkHelper.depositLink(deposit.id)}
+                <LinkHelper.Deposit depositId={deposit.id} />
               </td>
               <td className='text-center'>{deposit.nota}</td>
               <td className='text-center' rowSpan={deposits.length}>
-                {LinkHelper.accountLink(deposit.Nasabah.id)}
+                <LinkHelper.Customer customerId={deposit.Nasabah.id} />
                 {deposit.Nasabah.nama}
               </td>
               <td className='text-center'>{deposit.tanggal}</td>
@@ -95,7 +102,11 @@ var UnsettledDepositReport = React.createClass({
                 {account.totalUnsettled}
               </td>
               <td className='text-center' rowSpan={deposits.length}>
-                <a onClick={LinkHelper.withdrawalHandler(deposit.Nasabah.id)}>
+                <LinkHelper.Hidden
+                  ref={'withdrawal-link-' + deposit.id}
+                  to='form-penarikan'
+                  properties={{initialNasabahId: deposit.Nasabah.id}}/>
+                <a onClick={this.goTo(deposit.id)}>
                   Penarikan <i className='fa fa-tag'></i>
                 </a>
               </td>
@@ -105,7 +116,7 @@ var UnsettledDepositReport = React.createClass({
           row = (
             <tr key={deposit.id}>
               <td className='text-center'>
-                {LinkHelper.depositLink(deposit.id)}
+                <LinkHelper.Deposit depositId={deposit.id} />
               </td>
               <td className='text-center'>{deposit.nota}</td>
               <td className='text-center'>{deposit.tanggal}</td>

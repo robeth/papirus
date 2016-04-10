@@ -1,6 +1,6 @@
 var React = require('react');
 var Kategori = window.Models.Kategori;
-var Helper = require('../helper');
+var LinkHelper = require('../helpers/link-helper');
 
 var CategoryRow = React.createClass({
   propTypes: {
@@ -30,21 +30,15 @@ var CategoryRow = React.createClass({
       });
   },
 
-  generateOnItemClick: function(categoryId){
-    return function(){
-      Helper.call('changePage',['detail-barang', {instanceId: categoryId}]);
-    };
-  },
-
-
   render: function(){
     return (
       <tr>
         <td className="text-center">{this.props.index + 1}</td>
         <td className="text-center">
-          <a onClick={this.generateOnItemClick(this.props.instance.id)}>
-            <code>{this.props.instance.kode}</code>
-          </a>
+          <LinkHelper.Category
+            categoryId={this.props.instance.id}
+            categoryCode={this.props.instance.kode}
+            />
         </td>
         <td>{this.props.instance.nama} </td>
         <td>{this.state.reportCategory.nama}</td>

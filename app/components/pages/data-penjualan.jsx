@@ -1,6 +1,6 @@
 var React = require('react');
-var Helper = require('../helper');
 var Penjualan = window.Models.Penjualan;
+var LinkHelper = require('../helpers/link-helper');
 
 var PenjualanRow = React.createClass({
   propTypes:{
@@ -48,24 +48,16 @@ var PenjualanRow = React.createClass({
       });
   },
 
-  generateOnItemClick: function(penjualanId){
-    return function(){
-      Helper.call('changePage',['detail-penjualan', {instanceId: penjualanId}]);
-    };
-  },
-
   render: function(){
     return (
       <tr>
         <td className="text-center">{this.props.index}</td>
         <td className="text-center">
-          <a onClick={this.generateOnItemClick(this.state.id)}>
-            <span className="label label-success">J{this.state.id}</span>
-          </a>
+          <LinkHelper.Sale saleId={this.state.id}/>
         </td>
         <td className="text-center">{this.state.nota}</td>
         <td>
-          <span className="label label-warning">V{this.state.vendor.id}</span>
+          <LinkHelper.Vendor vendorId={this.state.vendor.id}/>
           {this.state.vendor.nama}
         </td>
         <td className="text-center">{this.state.tanggal.toString()}</td>

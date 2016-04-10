@@ -1,8 +1,8 @@
 var React = require('react');
-var Helper = require('../helper');
 var Penarikan = window.Models.Penarikan;
 var Pembelian = window.Models.Pembelian;
 var Nasabah = window.Models.Nasabah;
+var LinkHelper = require('../helpers/link-helper');
 
 var DataPenarikan = React.createClass({
   getInitialState: function(){
@@ -28,13 +28,6 @@ var DataPenarikan = React.createClass({
       });
   },
 
-  generateOnItemClick: function(penarikanId){
-    var component = this;
-    return function(){
-      return Helper.call('changePage', ['detail-penarikan', {instanceId: penarikanId}])
-    };
-  },
-
   render: function(){
     var component = this;
     var rows = this.state.penarikanInstances.map(function(penarikan, index){
@@ -42,13 +35,11 @@ var DataPenarikan = React.createClass({
         <tr key={index}>
           <td className="text-center">{index + 1}</td>
           <td className="text-center">
-            <a onClick={component.generateOnItemClick(penarikan.id)}>
-              <span className="label label-primary">{ 'T' + penarikan.id}</span>
-            </a>
+            <LinkHelper.Withdrawal withdrawalId={penarikan.id}/>
           </td>
           <td className="text-center">{penarikan.nota}</td>
           <td>
-            <span className="label label-info">N{penarikan.Nasabah.id}</span>
+            <LinkHelper.Customer customerId={penarikan.Nasabah.id}/>
             {penarikan.Nasabah.nama}
           </td>
           <td className="text-center">{penarikan.tanggal.toString()}</td>

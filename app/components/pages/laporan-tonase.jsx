@@ -95,7 +95,7 @@ var DepositReport = React.createClass({
                 {deposit.Nasabah.no_induk}
               </td>
               <td className='text-center' rowSpan={deposits.length}>
-                {LinkHelper.accountLink(deposit.Nasabah.id)}
+                <LinkHelper.Customer customerId={deposit.Nasabah.id} />
                 {deposit.Nasabah.nama}
               </td>
               <td className='text-center' rowSpan={deposits.length}>
@@ -108,7 +108,7 @@ var DepositReport = React.createClass({
                 {deposit.Nasabah.telepon}
               </td>
               <td className='text-center'>
-                {LinkHelper.depositLink(deposit.id)}
+                <LinkHelper.Deposit depositId={deposit.id} />
               </td>
               <td className='text-center'>{deposit.tanggal}</td>
               <td className='text-center'>{deposit.calculateValue()}</td>
@@ -128,7 +128,7 @@ var DepositReport = React.createClass({
           row = (
             <tr key={deposit.id}>
               <td className='text-center'>
-                {LinkHelper.depositLink(deposit.id)}
+                <LinkHelper.Deposit depositId={deposit.id} />
               </td>
               <td className='text-center'>{deposit.tanggal}</td>
               <td className='text-center'>{deposit.calculateValue()}</td>
