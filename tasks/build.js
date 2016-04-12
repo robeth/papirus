@@ -32,8 +32,8 @@ var paths = {
         './helpers/**'
     ],
     react: {
-      entry: './app/components/bina-mandiri.jsx',
-      destFilename: 'bina-mandiri.js',
+      entry: './app/components/papirus.jsx',
+      destFilename: 'papirus.js',
       destDir: './build/'
     }
 }
@@ -222,8 +222,8 @@ gulp.task('bundle-react', ['clean'], bundleReact);
 gulp.task('bundle-react-watch', bundleReact);
 
 gulp.task('watch', function () {
-    gulp.watch('app/**/*.js', ['bundle-watch']);
-    gulp.watch(['app/**/*.jsx', 'app/components/**/*.js'], ['bundle-react-watch']);
+    gulp.watch(['app/**/*.js', '!app/node_modules/**/*'], ['bundle-watch']);
+    gulp.watch(['app/components/**/*.jsx', 'app/components/**/*.js'], ['bundle-react-watch']);
     gulp.watch(paths.copyFromAppDir, { cwd: 'app' }, ['copy-watch']);
     gulp.watch('app/**/*.less', ['less-watch']);
 });
