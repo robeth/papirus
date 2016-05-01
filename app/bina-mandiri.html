@@ -287,7 +287,30 @@
     // var transactionVolumeChart = new Chart(transactionVolumeCanvas).Line(transactionVolumeChartData, transactionVolumeChartOptions);
     </script>
     <script type="text/javascript">
-    window.Models = require('./models');
+    (function(){
+      var Sequelize = require('sequelize');
+      var sequelize = null;
+
+      window.dbConnect = function(username, password){
+        sequelize = new Sequelize(
+          'papirus',
+          username,
+          password,
+          {
+            host: 'localhost',
+            dialect: 'mysql',
+            define:{
+              timestamps: false
+            }
+          }
+        );
+        sequelize.query('select * from transaction_pembelian').then(function(result){
+          console.log(result);
+        });
+      }
+    })();
+    window.originalRequire = require;
+    // window.Models = require('./models');
     </script>
     <script src="papirus.js"></script>
   </body>

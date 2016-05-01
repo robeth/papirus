@@ -1,5 +1,6 @@
 var React = require('react');
 var PageLink = require('./page-link');
+var SectionLink = require('./section-link');
 
 var Sidebar = React.createClass({
   render: function(){
@@ -106,6 +107,12 @@ var Sidebar = React.createClass({
                 <li><a href="#"><i className="fa fa-users"></i> User</a></li>
                 <li><a href="#"><i className="fa fa-eyedropper"></i> Tema</a></li>
               </ul>
+            </li>
+
+            <li className="treeview">
+              <SectionLink to='login'>
+                <i className="fa fa-power-off"></i> <span>Logout</span>
+              </SectionLink>
             </li>
           </ul>
         </section>

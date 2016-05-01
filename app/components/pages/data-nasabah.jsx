@@ -1,5 +1,5 @@
 var React = require('react');
-var Nasabah = window.Models.Nasabah;
+var Nasabah = window.originalRequire('./models').Nasabah;
 var LinkHelper = require('../helpers/link-helper');
 
 var DataNasabahIndividu = React.createClass({

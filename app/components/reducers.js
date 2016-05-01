@@ -2,7 +2,7 @@ var Action = require('./actions');
 var _ = require('lodash');
 
 var initialState = {
-  section: 'LOGIN',
+  section: 'login',
   page: {
     name: 'dashboard',
     properties: undefined

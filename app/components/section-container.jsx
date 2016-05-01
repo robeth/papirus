@@ -2,12 +2,11 @@ var React = require('react');
 var ReactRedux = require('react-redux');
 var ReactDom = require('react-dom');
 
-var Login = require('./login');
-var Main = require('./main');
+var SectionDictionary = require('./constants/section-dictionary');
 
 var Section = React.createClass({
   render: function(){
-    return this.props.section == 'LOGIN' ? <Login/> : <Main/>;
+    return SectionDictionary[this.props.section] || <span/>;
   }
 });
 
