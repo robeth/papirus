@@ -1,9 +1,7 @@
 var React = require('react');
 var Field = require('./fields/field');
 var ReactSelectField = require('./fields/react-select-field');
-var Kategori = window.Models.Kategori;
-var Stock = window.Models.Stock;
-var KonversiOutStock = window.Models.KonversiOutStock;
+var ModelProxy = require('../../models/proxy');
 var FormMixin = require('../mixins/form-mixin');
 
 var Header = React.createClass({
@@ -26,7 +24,7 @@ var Element = React.createClass({
       return instance
         .destroy()
         .then(function(){
-          return Stock.destroy({
+          return ModelProxy.get('Stock').destroy({
             where: {
               id: stockId
             }
@@ -63,7 +61,7 @@ var Element = React.createClass({
     var component = this;
 
     // Initialize kategori for detail konversi forms
-    Kategori
+    ModelProxy.get('Kategori')
       .findAll()
       .then(function onFound(kategoriInstances){
         if(component.isMounted()){
@@ -113,7 +111,7 @@ var Element = React.createClass({
     stockPayload.harga = args.price;
     var component = this;
 
-    var newKonversiOutStockPromise = Stock
+    var newKonversiOutStockPromise = ModelProxy.get('Stock')
       .create(stockPayload, {
         transaction: args.transaction
       })
@@ -125,7 +123,7 @@ var Element = React.createClass({
           konversi_id: args.konversi.id
         };
 
-        return KonversiOutStock.create(konversiInStockPayload,{
+        return ModelProxy.get('KonversiOutStock').create(konversiInStockPayload,{
           transaction: args.transaction
         });
       });

@@ -1,5 +1,5 @@
 var React = require('react');
-var Kategori = window.Models.Kategori;
+var ModelProxy = require('../../models/proxy');
 var LinkHelper = require('../helpers/link-helper');
 
 var CategoryRow = React.createClass({
@@ -56,7 +56,7 @@ var DataKategori = React.createClass({
   },
   componentDidMount: function(){
     var instance = this;
-    Kategori
+    ModelProxy.get('Kategori')
       .findAll()
       .then(function onKategoriRetrieveSuccess(categories){
         console.log('Retrieve all categories data success!');

@@ -1,9 +1,6 @@
 var React = require('react');
 var Field = require('./fields/field');
 var ReactSelectField = require('./fields/react-select-field');
-var Kategori = window.Models.Kategori;
-var Stock = window.Models.Stock;
-var PenjualanStock = window.Models.PenjualanStock;
 var FormMixin = require('../mixins/form-mixin');
 
 var Header = React.createClass({

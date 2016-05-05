@@ -2,8 +2,7 @@ var React = require('react');
 var Alert = require('../../alert');
 var classNames = require('classnames');
 var InputMixin = require('../../mixins/field-mixin');
-var Pembelian = window.Models.Pembelian;
-var Penarikan = window.Models.Penarikan;
+var ModelProxy = require('../../../models/proxy');
 
 var ERROR_MESSAGE = 'Jumlah lebih besar dari Pembelian Nasabah';
 
@@ -88,7 +87,7 @@ var PenarikanDetailTable = React.createClass({
   refreshCandidates: function(nasabahId){
     var component = this;
 
-    return Pembelian
+    return ModelProxy.get('Pembelian')
       .getPenarikanCandidates(nasabahId)
       .then(function(pembelianCandidates){
         console.log('Penarikan-Detail-Table CWP success');

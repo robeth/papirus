@@ -2,7 +2,7 @@ var React = require('react');
 var Field = require('./fields/field');
 var Alert = require('../alert');
 var FormMixin = require('../mixins/form-mixin');
-var Vendor = window.Models.Vendor;
+var ModelProxy = require('../../models/proxy');
 
 var VendorForm = React.createClass({
   mixins: [FormMixin],
@@ -31,7 +31,7 @@ var VendorForm = React.createClass({
 
     var component = this;
     console.log('instanceId: ' + this.props.instanceId);
-    Vendor
+    ModelProxy.get('Vendor')
     .findById(this.props.instanceId)
     .then(function onFound(vendor){
       console.log('vendor found');
@@ -58,7 +58,7 @@ var VendorForm = React.createClass({
     var vendorPayload = this.collectPayload();
     vendorPayload['tanggal_daftar'] = new Date();
 
-    Vendor
+    ModelProxy.get('Vendor')
       .create(vendorPayload)
       .then(function onVendorCreationSuccess(vendor){
         console.log("success creating new vendor!");

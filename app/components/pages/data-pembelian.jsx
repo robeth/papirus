@@ -1,5 +1,5 @@
 var React = require('react');
-var Pembelian = window.Models.Pembelian;
+var ModelProxy = require('../../models/proxy');
 var LinkHelper = require('../helpers/link-helper');
 
 var PembelianRow = React.createClass({
@@ -74,7 +74,7 @@ var DataPembelian = React.createClass({
   },
   componentDidMount: function(){
     var instance = this;
-    Pembelian
+    ModelProxy.get('Pembelian')
       .findAll()
       .then(function onPembeliansRetrieveSuccess(pembelians){
         console.log('Retrieve all pembelians data success!');

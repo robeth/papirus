@@ -1,7 +1,5 @@
 var React = require('react');
-var Penarikan = window.Models.Penarikan;
-var Pembelian = window.Models.Pembelian;
-var Nasabah = window.Models.Nasabah;
+var ModelProxy = require('../../models/proxy');
 var LinkHelper = require('../helpers/link-helper');
 
 var DataPenarikan = React.createClass({
@@ -10,11 +8,11 @@ var DataPenarikan = React.createClass({
   },
   componentDidMount: function(){
     var instance = this;
-    Penarikan
+    ModelProxy.get('Penarikan')
       .findAll({
         include: [
-          {model: Pembelian, as: 'Pembelians'},
-          {model: Nasabah, as: 'Nasabah'}
+          {model: ModelProxy.get('Pembelian'), as: 'Pembelians'},
+          {model: ModelProxy.get('Nasabah'), as: 'Nasabah'}
         ]
       })
       .then(function(penarikans){

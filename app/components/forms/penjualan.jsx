@@ -6,14 +6,11 @@ var ReactSelectField = require('./fields/react-select-field');
 var PenjualanDetails = require('./penjualan-details');
 var DynamicForm = require('./dynamic-form');
 var Alert = require('../alert');
-var Vendor = window.Models.Vendor;
-var Penjualan = window.Models.Penjualan;
-var PenjualanStock = window.Models.PenjualanStock;
-var Kategori = window.Models.Kategori;
+var ModelProxy = require('../../models/proxy');
+
 var FormMixin = require('../mixins/form-mixin');
 var Promise = require('bluebird');
 var _ = require('lodash');
-var sequelize = window.Models.Kategori.sequelize;
 
 var PenjualanForm = React.createClass({
   mixins: [FormMixin],
@@ -44,13 +41,13 @@ var PenjualanForm = React.createClass({
     var categoryAvailabilityResult = null;
 
     // Initialize vendor selection
-    Vendor
+    ModelProxy.get('Vendor')
     .findAll()
     .then(function onVendorFound(vendorInstances){
       console.log('All vendor found');
       console.log(vendorInstances);
       vendorInstancesResult = vendorInstances;
-      return Kategori.getAvailability();
+      return ModelProxy.get('Kategori').getAvailability();
     })
     .then(function onAvailibityFound(availabilityInstances){
       console.log('Availability calculated');
@@ -69,7 +66,7 @@ var PenjualanForm = React.createClass({
     console.log(this.props)
     // Edit mode: Fetch penjualan instance
     if(this.props.mode === 'edit'){
-      Penjualan
+      ModelProxy.get('Penjualan')
         .findById(this.props.instanceId)
         .then(function onPenjualanFound(penjualan){
           console.log('penjualan found');
@@ -114,7 +111,7 @@ var PenjualanForm = React.createClass({
     preparationPromise
       .then(function(){
         var penjualanPayload = component.collectPayload();
-        return Penjualan.create(penjualanPayload);
+        return ModelProxy.get('Penjualan').create(penjualanPayload);
       })
       .then(function onPenjualanCreationSuccess(penjualan){
         console.log("success creating new penjualan!");
@@ -135,7 +132,7 @@ var PenjualanForm = React.createClass({
         component.refs['add-success-alert'].show();
         component.resetFields();
         component.resetChildrenForms();
-        return Kategori.getAvailability();
+        return ModelProxy.get('Kategori').getAvailability();
       })
       .then(function onAvailibityFound(availabilityInstances){
         console.log('Availability calculated');
@@ -167,6 +164,7 @@ var PenjualanForm = React.createClass({
       throw new Error('Invalid!');
     }
     var component = this;
+    var sequelize = ModelProxy.get('Kategori').sequelize;
 
     sequelize.transaction({
       isolationLevel: sequelize.Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED
@@ -234,7 +232,7 @@ var PenjualanForm = React.createClass({
             penjualanStockInstances: newPenjualanStocks
           });
 
-          return Kategori.getAvailability();
+          return ModelProxy.get('Kategori').getAvailability();
         })
         .then(function onAvailibityFound(availabilityInstances){
           console.log('Availability calculated');
@@ -371,7 +369,7 @@ var PenjualanForm = React.createClass({
   getAvailability: function(categoryIds, transaction){
     var queryPromises = [];
     categoryIds.map(function(categoryId){
-      var queryPromise = Kategori.getRemainingStocks(categoryId, transaction)
+      var queryPromise = ModelProxy.get('Kategori').getRemainingStocks(categoryId, transaction)
         .then(function(availabilities){
           return {categoryId: categoryId, data: availabilities};
         });

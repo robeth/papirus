@@ -5,13 +5,10 @@ var DateField = require('./fields/date-field');
 var ReactSelectField = require('./fields/react-select-field');
 var PenarikanDetailTable = require('./others/penarikan-detail-table');
 var Alert = require('../alert');
-var Nasabah = window.Models.Nasabah;
-var Pembelian = window.Models.Pembelian;
-var Penarikan = window.Models.Penarikan;
+var ModelProxy = require('../../models/proxy');
 var FormMixin = require('../mixins/form-mixin');
 var Promise = require('bluebird');
 var _ = require('lodash');
-var sequelize = window.Models.Kategori.sequelize;
 var HiddenLink = require('../helpers/link-helper').Hidden;
 
 var PenarikanForm = React.createClass({
@@ -42,7 +39,7 @@ var PenarikanForm = React.createClass({
     var component = this;
 
     // Initialize nasabah selection
-    Nasabah
+    ModelProxy.get('Nasabah')
       .findAll()
       .then(function onFound(nasabahInstances){
         console.log('All nasabah found');
@@ -52,9 +49,9 @@ var PenarikanForm = React.createClass({
 
         if(component.props.instanceId){
           // Instance provided: edit mode
-          Penarikan
+          ModelProxy.get('Penarikan')
             .findAll({
-              include: [ {model: Pembelian, as: 'Pembelians'}],
+              include: [ {model: ModelProxy.get('Pembelian'), as: 'Pembelians'}],
               where: {
                 id: component.props.instanceId
               }
@@ -115,11 +112,11 @@ var PenarikanForm = React.createClass({
     penarikanPayload.total = 0;
 
     var component = this;
-
+    var sequelize = ModelProxy.get('Kategori').sequelize;
     sequelize.transaction({
       isolationLevel: sequelize.Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED
     },function(t){
-      return Penarikan
+      return ModelProxy.get('Penarikan')
         .create(penarikanPayload, {
           transaction: t
         })

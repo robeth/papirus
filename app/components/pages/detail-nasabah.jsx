@@ -1,7 +1,6 @@
 var React = require('react');
 var NasabahForm = require('../forms/nasabah');
 var Box = require('../box.jsx');
-var Nasabah = window.Models.Nasabah;
 
 var DetailNasabah = React.createClass({
 

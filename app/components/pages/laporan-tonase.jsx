@@ -2,7 +2,7 @@ var React = require('react');
 var DateRangeField = require('../forms/fields/date-range-field');
 
 var moment = require('moment');
-var RawQueries = window.Models.RawQueries;
+var ModelProxy = require('../../models/proxy');
 var LinkHelper = require('../helpers/link-helper');
 var classNames = require('classnames');
 
@@ -34,7 +34,7 @@ var DepositReport = React.createClass({
     var startDateString = component.state.startDate.format('YYYY-MM-DD');
     var endDateString = component.state.endDate.format('YYYY-MM-DD');
 
-    RawQueries
+    ModelProxy.get('RawQueries')
       .depositSummary(component.state.accountType, startDateString, endDateString)
       .then(function(summary){
         component.setState({

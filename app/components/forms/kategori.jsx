@@ -3,8 +3,7 @@ var Box = require('../box');
 var Field = require('./fields/field');
 var ReactSelectField = require('./fields/react-select-field');
 var Alert = require('../alert');
-var Kategori = window.Models.Kategori;
-var ReportKategori = window.Models.ReportKategori;
+var ModelProxy = require('../../models/proxy');
 var FormMixin = require('../mixins/form-mixin');
 
 var CategoryForm = React.createClass({
@@ -35,7 +34,7 @@ var CategoryForm = React.createClass({
     var component = this;
 
     // Initialize report catgory selection
-    ReportKategori
+    ModelProxy.get('ReportKategori')
     .findAll()
     .then(function onFound(reportCategoryInstances){
       console.log('All report categories found');
@@ -50,7 +49,7 @@ var CategoryForm = React.createClass({
 
     // Edit mode: Fetch category instance
     if(this.props.mode === 'edit'){
-      Kategori
+      ModelProxy.get('Kategori')
         .findById(this.props.instanceId)
         .then(function onCategoryFound(category){
           console.log('category found');
@@ -78,7 +77,7 @@ var CategoryForm = React.createClass({
 
     var payload = this.collectPayload();
     var component = this;
-    Kategori
+    ModelProxy.get('Kategori')
       .create(payload)
       .then(function onCategoryCreationSuccess(category){
         console.log("success creating new category!");

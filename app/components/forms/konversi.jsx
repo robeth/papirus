@@ -7,14 +7,11 @@ var KonversiInForm = require('./konversi-in-form');
 var KonversiOutForm = require('./konversi-out-form');
 var DynamicForm = require('./dynamic-form');
 var Alert = require('../alert');
-var Konversi = window.Models.Konversi;
-var KonversiInStock = window.Models.KonversiInStock;
-var KonversiOutStock = window.Models.KonversiOutStock;
-var Kategori = window.Models.Kategori;
+var ModelProxy = require('../../models/proxy');
+
 var FormMixin = require('../mixins/form-mixin');
 var Promise = require('bluebird');
 var _ = require('lodash');
-var sequelize = window.Models.Kategori.sequelize;
 
 var KonversiForm = React.createClass({
   mixins: [FormMixin],
@@ -41,7 +38,7 @@ var KonversiForm = React.createClass({
   componentDidMount: function(){
     var component = this;
 
-    Kategori
+    ModelProxy.get('Kategori')
     .getAvailability()
     .then(function onAvailibityFound(availabilityInstances){
       console.log('Availability calculated');
@@ -61,7 +58,7 @@ var KonversiForm = React.createClass({
     // Edit mode: Fetch konversi instance
     if(this.props.mode === 'edit'){
       var konversiInstance = null;
-      Konversi
+      ModelProxy.get('Konversi')
         .findById(this.props.instanceId)
         .then(function onKonversiFound(konversi){
           console.log('konversi found');
@@ -114,7 +111,7 @@ var KonversiForm = React.createClass({
 
     var konversiInFormGroup = component.refs['konversi_in_form_group'];
     var konversiOutFormGroup = component.refs['konversi_out_form_group'];
-
+    var sequelize = ModelProxy.get('Kategori').sequelize;
     sequelize.transaction({
       isolationLevel: sequelize.Transaction.ISOLATION_LEVELS.READ_UNCOMMITTED
     },function(t){
@@ -163,7 +160,7 @@ var KonversiForm = React.createClass({
           component.refs['add-success-alert'].show();
           component.resetFields();
           component.resetChildrenForms();
-          return Kategori.getAvailability();
+          return ModelProxy('Kategori').getAvailability();
         })
         .then(function onAvailibityFound(availabilityInstances){
           console.log('Availability calculated');
@@ -300,7 +297,7 @@ var KonversiForm = React.createClass({
             konversiOutStockInstances: newKonversiOutStocks
           });
 
-          return Kategori.getAvailability();
+          return ModelProxy('Kategori').getAvailability();
         })
         .then(function onAvailibityFound(availabilityInstances){
           console.log('Availability calculated');
@@ -390,7 +387,7 @@ var KonversiForm = React.createClass({
   getAvailability: function(categoryIds, transaction){
     var queryPromises = [];
     categoryIds.map(function(categoryId){
-      var queryPromise = Kategori.getRemainingStocks(categoryId, transaction)
+      var queryPromise = ModelProxy.get('Kategori').getRemainingStocks(categoryId, transaction)
         .then(function(availabilities){
           return {categoryId: categoryId, data: availabilities};
         });

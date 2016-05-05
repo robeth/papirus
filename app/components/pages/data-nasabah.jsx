@@ -1,5 +1,5 @@
 var React = require('react');
-var Nasabah = window.originalRequire('./models').Nasabah;
+var ModelProxy = require('../../models/proxy');
 var LinkHelper = require('../helpers/link-helper');
 
 var DataNasabahIndividu = React.createClass({
@@ -12,7 +12,7 @@ var DataNasabahIndividu = React.createClass({
   },
   componentDidMount: function(){
     var instance = this;
-    Nasabah
+    ModelProxy.get('Nasabah')
       .findAll({
         where: {jenis: this.props.type }
       })

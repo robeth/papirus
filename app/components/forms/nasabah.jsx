@@ -4,7 +4,7 @@ var DateField = require('./fields/date-field');
 var ReactSelectField = require('./fields/react-select-field');
 var Alert = require('../alert');
 var FormMixin = require('../mixins/form-mixin');
-var Nasabah = window.Models.Nasabah;
+var ModelProxy = require('../../models/proxy');
 
 var FormNasabah = React.createClass({
   mixins: [FormMixin],
@@ -38,7 +38,7 @@ var FormNasabah = React.createClass({
 
     var component = this;
     console.log('nasabahId: ' + this.props.nasabahId);
-    Nasabah
+    ModelProxy.get('Nasabah')
     .findById(this.props.nasabahId)
     .then(function onFound(nasabah){
       console.log('nasabah found');
@@ -65,7 +65,7 @@ var FormNasabah = React.createClass({
     var nasabahPayload = this.collectPayload();
     nasabahPayload['tanggal_daftar'] = new Date();
 
-    Nasabah
+    ModelProxy.get('Nasabah')
       .create(nasabahPayload)
       .then(function onNasabahCreationSuccess(nasabah){
         console.log("success creating new nasabah!");

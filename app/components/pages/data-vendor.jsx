@@ -1,5 +1,5 @@
 var React = require('react');
-var Vendor = window.Models.Vendor;
+var ModelProxy = require('../../models/proxy');
 var LinkHelper = require('../helpers/link-helper');
 
 var DataVendor = React.createClass({
@@ -8,7 +8,7 @@ var DataVendor = React.createClass({
   },
   componentDidMount: function(){
     var instance = this;
-    Vendor
+    ModelProxy.get('Vendor')
       .findAll()
       .then(function onVendorRetrieveSuccess(vendors){
         console.log('Retrieve all vendors data success!');

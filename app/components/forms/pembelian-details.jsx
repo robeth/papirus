@@ -1,9 +1,7 @@
 var React = require('react');
 var Field = require('./fields/field');
 var ReactSelectField = require('./fields/react-select-field');
-var Kategori = window.Models.Kategori;
-var Stock = window.Models.Stock;
-var PembelianStock = window.Models.PembelianStock;
+var ModelProxy = require('../../models/proxy');
 var FormMixin = require('../mixins/form-mixin');
 
 var Header = React.createClass({
@@ -27,7 +25,7 @@ var Element = React.createClass({
       return instance
         .destroy()
         .then(function(){
-          return Stock.destroy({
+          return ModelProxy.get('Stock').destroy({
             where: {
               id: stockId
             }
@@ -65,7 +63,7 @@ var Element = React.createClass({
     var component = this;
 
     // Initialize kategori for detail pembelian forms
-    Kategori
+    ModelProxy.get('Kategori')
       .findAll()
       .then(function onFound(kategoriInstances){
         if(component.isMounted()){
@@ -114,7 +112,7 @@ var Element = React.createClass({
     stokPayload.tanggal = args.tanggal;
     var component = this;
 
-    var newPembelianStockPromise = Stock
+    var newPembelianStockPromise = ModelProxy.get('Stock')
       .create(stokPayload)
       .then(function(stok){
         console.log('success. new stok');
@@ -124,7 +122,7 @@ var Element = React.createClass({
           pembelian_id: args.id
         };
 
-        return PembelianStock.create(stokPembelianPayload);
+        return ModelProxy.get('PembelianStock').create(stokPembelianPayload);
       });
 
     newPembelianStockPromise

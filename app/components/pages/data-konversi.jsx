@@ -1,5 +1,5 @@
 var React = require('react');
-var Konversi = window.Models.Konversi;
+var ModelProxy = require('../../models/proxy');
 var LinkHelper = require('../helpers/link-helper');
 
 var KonversiRow = React.createClass({
@@ -73,7 +73,7 @@ var DataKonversi = React.createClass({
   },
   componentDidMount: function(){
     var instance = this;
-    Konversi
+    ModelProxy.get('Konversi')
       .findAll()
       .then(function onKonversisRetrieveSuccess(konversis){
         console.log('Retrieve all konversis data success!');

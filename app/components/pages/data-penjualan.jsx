@@ -1,5 +1,5 @@
 var React = require('react');
-var Penjualan = window.Models.Penjualan;
+var ModelProxy = require('../../models/proxy');
 var LinkHelper = require('../helpers/link-helper');
 
 var PenjualanRow = React.createClass({
@@ -74,7 +74,7 @@ var DataPenjualan = React.createClass({
   },
   componentDidMount: function(){
     var instance = this;
-    Penjualan
+    ModelProxy.get('Penjualan')
       .findAll()
       .then(function onPenjualansRetrieveSuccess(penjualans){
         console.log('Retrieve all penjualans data success!');

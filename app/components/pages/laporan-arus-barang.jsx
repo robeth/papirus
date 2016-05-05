@@ -5,7 +5,7 @@ var BootstrapTable = ReactBsTable.BootstrapTable;
 var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
 
 var moment = require('moment');
-var RawQueries = window.Models.RawQueries;
+var ModelProxy = require('../../models/proxy');
 
 var StockFlowReport = React.createClass({
   getInitialState: function(){
@@ -33,7 +33,7 @@ var StockFlowReport = React.createClass({
     var startDateString = component.state.startDate.format('YYYY-MM-DD');
     var endDateString = component.state.endDate.format('YYYY-MM-DD');
 
-    RawQueries
+    ModelProxy.get('RawQueries')
       .stockFlow(startDateString, endDateString)
       .then(function(stockSummary){
         component.setState({

@@ -6,9 +6,7 @@ var ReactSelectField = require('./fields/react-select-field');
 var PembelianDetails = require('./pembelian-details');
 var DynamicForm = require('./dynamic-form');
 var Alert = require('../alert');
-var Nasabah = window.Models.Nasabah;
-var Pembelian = window.Models.Pembelian;
-var PembelianStock = window.Models.PembelianStock;
+var ModelProxy = require('../../models/proxy');
 var FormMixin = require('../mixins/form-mixin');
 var Promise = require('bluebird');
 var _ = require('lodash');
@@ -38,7 +36,7 @@ var PembelianForm = React.createClass({
     var component = this;
 
     // Initialize nasabah selection
-    Nasabah
+    ModelProxy.get('Nasabah')
     .findAll()
     .then(function onFound(nasabahInstances){
       console.log('All nasabah found');
@@ -52,7 +50,7 @@ var PembelianForm = React.createClass({
     console.log(this.props)
     // Edit mode: Fetch pembelian instance
     if(this.props.mode === 'edit'){
-      Pembelian
+      ModelProxy.get('Pembelian')
         .findById(this.props.pembelianId)
         .then(function onPembelianFound(pembelian){
           console.log('pembelian found');
@@ -85,7 +83,7 @@ var PembelianForm = React.createClass({
     }
     var pembelianPayload = this.collectPayload();
     var component = this;
-    Pembelian
+    ModelProxy.get('Pembelian')
       .create(pembelianPayload)
       .then(function onPembelianCreationSuccess(pembelian){
         console.log("success creating new pembelian!");

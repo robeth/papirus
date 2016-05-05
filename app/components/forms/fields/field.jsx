@@ -6,6 +6,7 @@ var InputMixin = require('../../mixins/field-mixin');
 var Field = React.createClass({
   mixins: [InputMixin],
   propTypes: {
+    type: React.PropTypes.string,
     inputColumn: React.PropTypes.number,
     htmlId: React.PropTypes.string,
     label: React.PropTypes.string,
@@ -115,7 +116,7 @@ var Field = React.createClass({
         )}
         <input
           ref='input'
-          type="text"
+          type={this.props.type || 'text'}
           id={this.props.htmlId}
           className='form-control'
           onChange={this.handleValueChange}
@@ -131,7 +132,7 @@ var Field = React.createClass({
     var inputFieldWithoutAddon = (
       <input
         ref='input'
-        type='text'
+        type={this.props.type || 'text'}
         id={this.props.htmlId}
         className='form-control'
         onChange={this.handleValueChange}
