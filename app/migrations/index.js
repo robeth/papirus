@@ -1,15 +1,14 @@
 var Sequelize = require('sequelize');
 var Umzug = require('umzug');
 var jetpack = require('fs-jetpack');
-var config = require('./vendor/electron_boilerplate/env_config');
+var config = require('../vendor/electron_boilerplate/env_config');
 var _ = require('lodash');
 
 var modelsDir = jetpack.cwd(__dirname);
-var migrationFiles = modelsDir.list('migrations/production');
+var migrationFiles = modelsDir.list('./production');
 migrationFiles = migrationFiles.sort();
-var dummyMigrationFiles = modelsDir.list('migrations/dummy');
+var dummyMigrationFiles = modelsDir.list('./dummy');
 dummyMigrationFiles = dummyMigrationFiles.sort();
-
 
 if(_.isEmpty(config)){
   config = window.env;

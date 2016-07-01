@@ -26,6 +26,8 @@ To start development:
 ```
 git clone https://github.com/robeth/papirus.git
 cd papirus
+npm install -g bower
+bower install
 npm install
 npm start
 ```

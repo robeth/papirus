@@ -14,7 +14,6 @@ var uglify = require('gulp-uglify');
 var source = require('vinyl-source-stream');
 
 var utils = require('./utils');
-var generateSpecsImportFile = require('./generate_specs_import');
 
 var projectDir = jetpack;
 var srcDir = projectDir.cwd('./app');
@@ -26,8 +25,7 @@ var paths = {
     copyFromAppDir: [
         './node_modules/**',
         './vendor/**',
-        './**/*.html',
-        './models/**',
+        './*.html',
         './migrations/**',
         './helpers/**'
     ],
@@ -38,36 +36,36 @@ var paths = {
     }
 }
 
-var bowerPaths = {
-  plugins: {
+var bowerPaths = [
+  {
     src: './bower_components/admin-lte/plugins',
     dest: './build/plugins'
   },
-  js: {
+  {
     src: './bower_components/admin-lte/dist/js',
     dest: './build/js'
   },
-  css: {
+  {
     src: './bower_components/admin-lte/dist/css',
     dest: './build/css'
   },
-  img: {
+  {
     src: './bower_components/admin-lte/dist/img',
     dest: './build/img'
   },
-  bootstrap: {
+  {
     src: './bower_components/admin-lte/bootstrap',
     dest: './build/plugins/bootstrap'
   },
-  fa: {
+  {
     src: './vendor/font-awesome/',
     dest: './build/plugins/font-awesome'
   },
-  daterangepicker: {
+  {
     src: './bower_components/bootstrap-daterangepicker',
     dest: './build/plugins/bootstrap-daterangepicker'
   }
-}
+]
 
 // -------------------------------------
 // Tasks
@@ -77,52 +75,27 @@ gulp.task('clean', function(callback) {
     return destDir.dirAsync('.', { empty: true });
 });
 
-var copyAdminPluginTask = function(){
-  return projectDir.cwd(bowerPaths.plugins.src).copyAsync('.',projectDir.cwd(bowerPaths.plugins.dest).path(), {overwrite: true});
-};
+gulp.task('copy', ['clean'], function(){
 
-var copyAdminJsTask = function(){
-  return projectDir.cwd(bowerPaths.js.src).copyAsync('.',projectDir.cwd(bowerPaths.js.dest).path(), {overwrite: true});
-};
+  var copyVendorPromises = bowerPaths.map(function(folder){
+    return projectDir.cwd(folder.src).copyAsync('.',
+      projectDir.cwd(folder.dest).path(),
+      { overwrite: true }
+    );
+  });
 
-var copyAdminCssTask = function(){
-  return projectDir.cwd(bowerPaths.css.src).copyAsync('.',projectDir.cwd(bowerPaths.css.dest).path(), {overwrite: true});
-};
+  var copyEssentialPromise = projectDir.copyAsync('app', destDir.path(),{
+    overwrite: true,
+    matching: paths.copyFromAppDir
+  });
 
-var copyAdminImgTask = function(){
-  return projectDir.cwd(bowerPaths.img.src).copyAsync('.',projectDir.cwd(bowerPaths.img.dest).path(), {overwrite: true});
-};
+  copyVendorPromises.push(copyEssentialPromise);
+  return Q.all(copyVendorPromises);
+});
 
-var copyAdminBootstrapTask = function(){
-  return projectDir.cwd(bowerPaths.bootstrap.src).copyAsync('.',projectDir.cwd(bowerPaths.bootstrap.dest).path(), {overwrite: true});
-};
-
-var copyAdminFaTask = function(){
-  return projectDir.cwd(bowerPaths.fa.src).copyAsync('.',projectDir.cwd(bowerPaths.fa.dest).path(), {overwrite: true});
-};
-
-var copyDaterangepickerTask = function(){
-  return projectDir.cwd(bowerPaths.daterangepicker.src).copyAsync('.',projectDir.cwd(bowerPaths.daterangepicker.dest).path(), {overwrite: true});
-};
-
-var copyTask = function () {
-    return projectDir.copyAsync('app', destDir.path(), {
-        overwrite: true,
-        matching: paths.copyFromAppDir
-    });
-};
-
-gulp.task('copy-admin-plugin', ['clean'], copyAdminPluginTask);
-gulp.task('copy-admin-bootstrap', ['copy-admin-plugin'],copyAdminBootstrapTask);
-gulp.task('copy-admin-fa', ['copy-admin-bootstrap'],copyAdminFaTask);
-gulp.task('copy-admin-js', ['copy-admin-fa'],copyAdminJsTask);
-gulp.task('copy-admin-css', ['copy-admin-js'], copyAdminCssTask);
-gulp.task('copy-admin-img', ['copy-admin-css'], copyAdminImgTask);
-gulp.task('copy-daterangepicker', ['copy-admin-img'], copyDaterangepickerTask);
-gulp.task('copy-admin', ['copy-daterangepicker']);
-
-gulp.task('copy', ['copy-admin'], copyTask);
-gulp.task('copy-watch', copyTask);
+// var copyAdminPluginTask = function(){
+//   return projectDir.cwd(bowerPaths.plugins.src).copyAsync('.',projectDir.cwd(bowerPaths.plugins.dest).path(), {overwrite: true});
+// };
 
 var bundle = function (src, dest) {
     var deferred = Q.defer();
@@ -151,25 +124,11 @@ var bundle = function (src, dest) {
 
 var bundleApplication = function () {
     return Q.all([
-        bundle(srcDir.path('background.js'), destDir.path('background.js')),
-        bundle(srcDir.path('app.js'), destDir.path('app.js')),
-        bundle(srcDir.path('migration.js'), destDir.path('migration.js')),
+        bundle(srcDir.path('background.js'), destDir.path('background.js'))
     ]);
 };
 
-var bundleSpecs = function () {
-    generateSpecsImportFile().then(function (specEntryPointPath) {
-        return Q.all([
-            bundle(srcDir.path('background.js'), destDir.path('background.js')),
-            bundle(specEntryPointPath, destDir.path('spec.js')),
-        ]);
-    });
-};
-
 var bundleTask = function () {
-    if (utils.getEnvName() === 'test') {
-        return bundleSpecs();
-    }
     return bundleApplication();
 };
 gulp.task('bundle', ['clean'], bundleTask);
@@ -222,9 +181,8 @@ gulp.task('bundle-react', ['clean'], bundleReact);
 gulp.task('bundle-react-watch', bundleReact);
 
 gulp.task('watch', function () {
-    gulp.watch(['app/**/*.js', '!app/node_modules/**/*'], ['bundle-watch']);
+    gulp.watch(['app/*.js', 'app/electron_boilerplate/*.js'], ['bundle-watch']);
     gulp.watch(['app/components/**/*.jsx', 'app/components/**/*.js'], ['bundle-react-watch']);
-    gulp.watch(paths.copyFromAppDir, { cwd: 'app' }, ['copy-watch']);
     gulp.watch('app/**/*.less', ['less-watch']);
 });
 
