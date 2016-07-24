@@ -36,7 +36,7 @@ function test(params){
 
   return sequelize.authenticate();
 }
-
+// TODO instantiate sequelize if it is not defined yet
 function setup(){
   console.log('setup');
   models = {}
@@ -193,6 +193,7 @@ function connect(params){
 
 function get(modelName){
   console.log(models);
+  debugger;
   return models[modelName];
 }
 

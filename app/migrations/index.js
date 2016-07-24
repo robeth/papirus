@@ -1,7 +1,7 @@
 var Sequelize = require('sequelize');
 var Umzug = require('umzug');
 var jetpack = require('fs-jetpack');
-var config = require('../vendor/electron_boilerplate/env_config');
+var config = require('../vendor/electron_boilerplate/db_config');
 var _ = require('lodash');
 
 var modelsDir = jetpack.cwd(__dirname);
@@ -13,8 +13,7 @@ dummyMigrationFiles = dummyMigrationFiles.sort();
 if(_.isEmpty(config)){
   config = window.env;
 }
-
-var databaseParams = config.database;
+var databaseParams = config.load();
 console.log(databaseParams);
 var sequelize = new Sequelize(
   databaseParams.name,
@@ -36,7 +35,7 @@ var umzug = new Umzug({
   },
   migrations: {
     params: [sequelize.getQueryInterface(), Sequelize],
-    path: __dirname + '/migrations/production'
+    path: __dirname + '/production'
   }
 });
 
@@ -48,7 +47,7 @@ var dummyUmzug = new Umzug({
   },
   migrations: {
     params: [sequelize.getQueryInterface(), Sequelize],
-    path: __dirname + '/migrations/dummy'
+    path: __dirname + '/dummy'
   }
 });
 
