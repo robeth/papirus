@@ -5,7 +5,7 @@ var Tab = require('./tab');
 var Sequelize = require('sequelize');
 var Field = require('./forms/fields/field');
 var ModelProxy = require('../models/proxy');
-var DbConfig = require('../vendor/electron_boilerplate/db_config');
+var DbConfig = require('../../electron_boilerplate/db_config');
 
 var config = DbConfig.load();
 
@@ -19,7 +19,7 @@ var DbForm = React.createClass({
             label='Db User'
             inputColumn={6}
             htmlId='db-user'
-            placeholder='DB User'
+            placeholder='DB Users'
             initialValue={config.username}/>
           <Field
             ref='db-password'

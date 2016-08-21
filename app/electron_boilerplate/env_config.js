@@ -7,9 +7,11 @@
     var jetpack = require('fs-jetpack');
     if (typeof window === 'object') {
         // Web browser context, __dirname points to folder where app.html file is.
-        window.env = jetpack.read(__dirname + '/../../env_config.json', 'json');
+        window.env = jetpack.read(__dirname + '/../env_config.json', 'json');
+        console.log("browser context", __dirname);
     } else {
         // Node context
-        module.exports = jetpack.read(__dirname + '/../../env_config.json', 'json');
+        console.log("node context", __dirname);
+        module.exports = jetpack.read(__dirname + '/../env_config.json', 'json');
     }
 }());

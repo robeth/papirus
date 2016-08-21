@@ -2,22 +2,22 @@ var Sequelize = window.originalRequire('sequelize');
 var sequelize = null;
 var models = null;
 
-var MODEL_DICTIONARY = {
-  'Sequelize': 'sequelize-meta',
-  'Nasabah': 'transaction_nasabah',
-  'Vendor': 'transaction_vendor',
-  'ReportKategori': 'transaction_reportkategori',
-  'Kategori': 'transaction_kategori',
-  'Stock': 'transaction_stok',
-  'Penarikan': 'transaction_penarikan',
-  'Pembelian': 'transaction_pembelian',
-  'PembelianStock': 'transaction_pembelian_stocks',
-  'PenarikanDetail': 'transaction_detailpenarikan',
-  'Penjualan': 'transaction_penjualan',
-  'PenjualanStock': 'transaction_detailpenjualan',
-  'Konversi': 'transaction_konversi',
-  'KonversiInStock': 'transaction_detailin',
-  'KonversiOutStock': 'transaction_konversi_outs'
+var MODEL_DEFINITIONS = {
+  'Sequelize': require('./sequelize-meta'),
+  'Nasabah': require('./transaction_nasabah'),
+  'Vendor': require('./transaction_vendor'),
+  'ReportKategori': require('./transaction_reportkategori'),
+  'Kategori': require('./transaction_kategori'),
+  'Stock': require('./transaction_stok'),
+  'Penarikan': require('./transaction_penarikan'),
+  'Pembelian': require('./transaction_pembelian'),
+  'PembelianStock': require('./transaction_pembelian_stocks'),
+  'PenarikanDetail': require('./transaction_detailpenarikan'),
+  'Penjualan': require('./transaction_penjualan'),
+  'PenjualanStock': require('./transaction_detailpenjualan'),
+  'Konversi': require('./transaction_konversi'),
+  'KonversiInStock': require('./transaction_detailin'),
+  'KonversiOutStock': require('./transaction_konversi_outs')
 }
 
 function test(params){
@@ -42,13 +42,11 @@ function setup(){
   models = {}
 
   // Register All Models
-  for(var modelName in MODEL_DICTIONARY){
+  for(var modelName in MODEL_DEFINITIONS){
     // Make sure prototype/built-in attribute doesn't pass
-    if(MODEL_DICTIONARY.hasOwnProperty(modelName)){
-      var tableName = MODEL_DICTIONARY[modelName];
-      var model = window.originalRequire('./models/' + tableName);
-      console.log(model);
-      models[modelName] = sequelize.import(tableName, model);
+    if(MODEL_DEFINITIONS.hasOwnProperty(modelName)){
+      var tableDefinition = MODEL_DEFINITIONS[modelName];
+      models[modelName] = sequelize.import(modelName, tableDefinition);
     }
   }
 
@@ -193,7 +191,6 @@ function connect(params){
 
 function get(modelName){
   console.log(models);
-  debugger;
   return models[modelName];
 }
 

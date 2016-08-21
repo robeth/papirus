@@ -22,50 +22,54 @@ var bowerSrcDir = projectDir.cwd('./bower_components');
 var bowerDestDir = projectDir.cwd('./build/vendor/');
 
 var paths = {
-    copyFromAppDir: [
-        './node_modules/**',
-        './vendor/**',
-        './*.html',
-        './migrations/**',
-        './helpers/**'
-    ],
-    react: {
-      entry: './app/components/papirus.jsx',
-      destFilename: 'papirus.js',
-      destDir: './build/'
+  static: [
+    './node_modules/**',
+    './views/**',
+    './electron_boilerplate/**',
+    './background.js',
+    './bina-mandiri.html'
+  ],
+  react: {
+    entry: './app/js/components/papirus.jsx',
+    destFilename: 'papirus.js',
+    destDir: './build/'
+  },
+  bower: [
+    {
+      src: './bower_components/admin-lte/plugins',
+      dest: './build/plugins'
+    },
+    {
+      src: './bower_components/admin-lte/dist/js',
+      dest: './build/js'
+    },
+    {
+      src: './bower_components/admin-lte/dist/css',
+      dest: './build/css'
+    },
+    {
+      src: './bower_components/admin-lte/dist/img',
+      dest: './build/img'
+    },
+    {
+      src: './bower_components/admin-lte/bootstrap',
+      dest: './build/plugins/bootstrap'
+    },
+    {
+      src: './vendor/font-awesome/',
+      dest: './build/plugins/font-awesome'
+    },
+    {
+      src: './bower_components/bootstrap-daterangepicker',
+      dest: './build/plugins/bootstrap-daterangepicker'
+    },
+    {
+      src: './app/node_modules/react-bootstrap-table/css',
+      dest: './build/plugins/react-bootstrap-table/css'
     }
+  ]
 }
 
-var bowerPaths = [
-  {
-    src: './bower_components/admin-lte/plugins',
-    dest: './build/plugins'
-  },
-  {
-    src: './bower_components/admin-lte/dist/js',
-    dest: './build/js'
-  },
-  {
-    src: './bower_components/admin-lte/dist/css',
-    dest: './build/css'
-  },
-  {
-    src: './bower_components/admin-lte/dist/img',
-    dest: './build/img'
-  },
-  {
-    src: './bower_components/admin-lte/bootstrap',
-    dest: './build/plugins/bootstrap'
-  },
-  {
-    src: './vendor/font-awesome/',
-    dest: './build/plugins/font-awesome'
-  },
-  {
-    src: './bower_components/bootstrap-daterangepicker',
-    dest: './build/plugins/bootstrap-daterangepicker'
-  }
-]
 
 // -------------------------------------
 // Tasks
@@ -76,64 +80,20 @@ gulp.task('clean', function(callback) {
 });
 
 gulp.task('copy', ['clean'], function(){
-
-  var copyVendorPromises = bowerPaths.map(function(folder){
+  var copyBowerPromise = paths.bower.map(function(folder){
     return projectDir.cwd(folder.src).copyAsync('.',
       projectDir.cwd(folder.dest).path(),
       { overwrite: true }
     );
   });
 
-  var copyEssentialPromise = projectDir.copyAsync('app', destDir.path(),{
+  var copyStaticPromise = projectDir.copyAsync('app', destDir.path(),{
     overwrite: true,
-    matching: paths.copyFromAppDir
+    matching: paths.static
   });
 
-  copyVendorPromises.push(copyEssentialPromise);
-  return Q.all(copyVendorPromises);
+  return Q.all([copyBowerPromise, copyStaticPromise]);
 });
-
-// var copyAdminPluginTask = function(){
-//   return projectDir.cwd(bowerPaths.plugins.src).copyAsync('.',projectDir.cwd(bowerPaths.plugins.dest).path(), {overwrite: true});
-// };
-
-var bundle = function (src, dest) {
-    var deferred = Q.defer();
-
-    rollup.rollup({
-        entry: src
-    }).then(function (bundle) {
-        var jsFile = pathUtil.basename(dest);
-        var result = bundle.generate({
-            format: 'iife',
-            sourceMap: true,
-            sourceMapFile: jsFile,
-        });
-        return Q.all([
-            destDir.writeAsync(dest, result.code + '\n//# sourceMappingURL=' + jsFile + '.map'),
-            destDir.writeAsync(dest + '.map', result.map.toString()),
-        ]);
-    }).then(function () {
-        deferred.resolve();
-    }).catch(function (err) {
-        console.error(err);
-    });
-
-    return deferred.promise;
-};
-
-var bundleApplication = function () {
-    return Q.all([
-        bundle(srcDir.path('background.js'), destDir.path('background.js'))
-    ]);
-};
-
-var bundleTask = function () {
-    return bundleApplication();
-};
-gulp.task('bundle', ['clean'], bundleTask);
-gulp.task('bundle-watch', bundleTask);
-
 
 var lessTask = function () {
     return gulp.src('app/stylesheets/main.less')
@@ -181,10 +141,9 @@ gulp.task('bundle-react', ['clean'], bundleReact);
 gulp.task('bundle-react-watch', bundleReact);
 
 gulp.task('watch', function () {
-    gulp.watch(['app/*.js', 'app/electron_boilerplate/*.js'], ['bundle-watch']);
-    gulp.watch(['app/components/**/*.jsx', 'app/components/**/*.js'], ['bundle-react-watch']);
+    // gulp.watch(['app/electron/**/*'], ['bundle-electron-watch']);
+    gulp.watch(['app/js/**/*'], ['bundle-react-watch']);
     gulp.watch('app/**/*.less', ['less-watch']);
 });
 
-
-gulp.task('build', ['bundle', 'bundle-react' ,'less', 'copy','finalize']);
+gulp.task('build', ['bundle-react' ,'less', 'copy','finalize']);
