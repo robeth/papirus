@@ -1,4 +1,4 @@
-CREATE VIEW `transaction_penjualan_total` AS
+CREATE OR REPLACE VIEW `transaction_penjualan_total` AS
 SELECT `p`.`id` AS `id`,
        `p`.`tanggal` AS `tanggal`,
        sum((`dp`.`jumlah` * `dp`.`harga`)) AS `total`

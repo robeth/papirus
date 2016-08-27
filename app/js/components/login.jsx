@@ -6,6 +6,7 @@ var Sequelize = require('sequelize');
 var Field = require('./forms/fields/field');
 var ModelProxy = require('../models/proxy');
 var DbConfig = require('../../electron_boilerplate/db_config');
+var Migration = window.originalRequire('./migrations');
 
 var config = DbConfig.load();
 
@@ -114,7 +115,7 @@ var Login = React.createClass({
         component.props.onLoginSuccess();
       })
       .catch(function(error){
-        console.log('error');
+        console.log(error);
       });
   },
   render: function(){
@@ -147,7 +148,10 @@ var Login = React.createClass({
 function mapDispatchToProps(dispatch, ownProps){
   return {
     onLoginSuccess: function(){
-      dispatch(Action.changeSectionTo('main'));
+      Migration.setup(DbConfig.load());
+      Migration.up().then(function(){
+        dispatch(Action.changeSectionTo('main'));
+      });
     }
   };
 }

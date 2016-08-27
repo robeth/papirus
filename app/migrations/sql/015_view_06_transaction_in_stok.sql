@@ -1,4 +1,4 @@
-CREATE VIEW `transaction_in_stok` AS
+CREATE OR REPLACE VIEW `transaction_in_stok` AS
 SELECT
       `sd`.`id` AS `id`,
       `sd`.`kode` AS `kode`,

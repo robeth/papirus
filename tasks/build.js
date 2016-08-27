@@ -26,6 +26,7 @@ var paths = {
     './node_modules/**',
     './views/**',
     './electron_boilerplate/**',
+    './migrations/**',
     './background.js',
     './bina-mandiri.html'
   ],

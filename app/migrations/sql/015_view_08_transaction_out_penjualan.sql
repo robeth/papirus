@@ -1,4 +1,4 @@
-CREATE VIEW `transaction_out_penjualan` AS
+CREATE OR REPLACE VIEW `transaction_out_penjualan` AS
 SELECT
       `sd`.`id` AS `id`,
       `sd`.`kode` AS `kode`,

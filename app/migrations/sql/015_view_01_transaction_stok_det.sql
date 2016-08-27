@@ -1,4 +1,4 @@
-CREATE VIEW `transaction_stok_det` AS
+CREATE OR REPLACE VIEW `transaction_stok_det` AS
 SELECT `s`.`id` AS `id`,
        `k`.`id` AS `kategori_id`,
        `k`.`kode` AS `kode`,

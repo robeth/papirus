@@ -1,4 +1,4 @@
-CREATE VIEW `transaction_pembelian_recap` AS
+CREATE OR REPLACE VIEW `transaction_pembelian_recap` AS
 SELECT extract(YEAR FROM `transaction_pembelian_total`.`tanggal`) AS `year`,
        extract(MONTH FROM `transaction_pembelian_total`.`tanggal`) AS `month`,
        sum(`transaction_pembelian_total`.`total`) AS `total`

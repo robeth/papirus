@@ -1,4 +1,4 @@
-CREATE VIEW `stok_remain` AS
+CREATE OR REPLACE VIEW `stok_remain` AS
 SELECT
       `k`.`id` AS `id`,
       `k`.`kode` AS `kode`,
