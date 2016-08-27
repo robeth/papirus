@@ -27,7 +27,7 @@
     "postinstall": "node ./tasks/app_npm_install",
     "app-install": "node ./tasks/app_npm_install",
     "build": "gulp build",
-    "release": "gulp release --env=production",
+    "release": "gulp release --env=development",
     "start": "node ./tasks/start",
     "test": "cp ./config/env_test.json ./build/env_config.json && ./node_modules/mocha/bin/mocha"
   }

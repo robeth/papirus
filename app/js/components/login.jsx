@@ -4,6 +4,7 @@ var Action = require('./actions');
 var Tab = require('./tab');
 var Sequelize = require('sequelize');
 var Field = require('./forms/fields/field');
+var LoadingButton = require('./loading-button');
 var ModelProxy = require('../models/proxy');
 var DbConfig = require('../../electron_boilerplate/db_config');
 var Migration = window.originalRequire('./migrations');
@@ -18,7 +19,7 @@ var DbForm = React.createClass({
           <Field
             ref='db-user'
             label='Db User'
-            inputColumn={6}
+            inputColumn={9}
             htmlId='db-user'
             placeholder='DB Users'
             initialValue={config.username}/>
@@ -26,21 +27,21 @@ var DbForm = React.createClass({
             ref='db-password'
             type='password'
             label='DB Password'
-            inputColumn={6}
+            inputColumn={9}
             htmlId='db-password'
             placeholder='DB Password'
             initialValue={config.password}/>
           <Field
             ref='db-name'
             label='DB Name'
-            inputColumn={6}
+            inputColumn={9}
             htmlId='db-name'
             placeholder='DB Name'
             initialValue={config.name}/>
           <Field
             ref='db-host'
             label='DB Host'
-            inputColumn={6}
+            inputColumn={9}
             htmlId='db-host'
             placeholder='DB Host'
             initialValue={config.host}/>
@@ -58,45 +59,12 @@ var DbForm = React.createClass({
   }
 });
 
-var UserForm = React.createClass({
-  render: function(){
-    return (
-      <div className="row">
-        <form className="form-horizontal">
-          <Field
-            ref='username'
-            label="User"
-            inputColumn={6}
-            htmlId='username'
-            placeholder='Username'
-            initialValue='Robeth'/>
-          <Field
-            ref='password'
-            label="Password"
-            type='password'
-            inputColumn={6}
-            htmlId='password'
-            placeholder='Password'
-            initialValue='cihui'/>
-        </form>
-      </div>
-    );
-  },
-  value: function(){
-    return {
-      username: this.refs['username'].value(),
-      password: this.refs['password'].value()
-    };
-  }
-});
-
 var containerStyle = {
-  marginTop: "20px",
-  marginRight: "20px"
+  marginTop: "20px"
 };
 
 var Login = React.createClass({
-  checkDatabase: function(){
+  checkDatabase: function(finishCallback){
     console.log("Database clicked!");
     var component = this;
     var dbValue = this.refs['db-form'].value();
@@ -111,36 +79,34 @@ var Login = React.createClass({
 
     promise
       .then(function(){
-        console.log('Success');
+        Migration.setup(DbConfig.load());
+        return Migration.up();
+      })
+      .then(function(){
+        finishCallback();
         component.props.onLoginSuccess();
       })
       .catch(function(error){
+        finishCallback();
         console.log(error);
       });
   },
   render: function(){
     return (
       <div className="row" style={containerStyle}>
-        <div className="col-md-6 col-xs-12 well pull-right">
-          <div className="row">
-            <div className="col-md-6 col-xs-12">
-              <h2>User</h2>
-              <UserForm ref="user-form"/>
-            </div>
-            <div className="col-md-6 col-xs-12">
-              <h2>Database</h2>
-              <DbForm ref="db-form"/>
-            </div>
-          </div>
-          <div className="row" style={{marginTop: "20px"}}>
-            <button
-              className="btn btn-block btn-primary pull-right"
-              onClick={this.checkDatabase}>
-              Login
-            </button>
-          </div>
+        <div className="col-md-offset-3 col-md-6 col-xs-12">
+          <h2>Welcome</h2>
+          <DbForm ref="db-form"/>
+          <LoadingButton
+            className="btn btn-block btn-primary pull-right"
+            label="Login"
+            loadingLabel="Please wait..."
+            type="primary"
+            isBlock={true}
+            onLoading={this.checkDatabase}/>
         </div>
       </div>
+
     );
   }
 });
@@ -148,10 +114,7 @@ var Login = React.createClass({
 function mapDispatchToProps(dispatch, ownProps){
   return {
     onLoginSuccess: function(){
-      Migration.setup(DbConfig.load());
-      Migration.up().then(function(){
-        dispatch(Action.changeSectionTo('main'));
-      });
+      dispatch(Action.changeSectionTo('main'));
     }
   };
 }

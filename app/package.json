@@ -1,10 +1,10 @@
 {
-  "name": "electron-boilerplate",
-  "productName": "Electron Boilerplate",
-  "identifier": "com.example.electron-boilerplate",
-  "description": "Starter for your Electron application. Out of the box ready for serious stuff.",
+  "name": "Papirus",
+  "productName": "Papirus",
+  "identifier": "com.github.sleepy-panda.papirus",
+  "description": "Asset management apps for Bank Sampah",
   "version": "0.1.0",
-  "author": "Mr Gumby <gumby@sillywalks.com>",
+  "author": "Robeth Rahmatullah",
   "main": "background.js",
   "config": {
     "target": "development"
