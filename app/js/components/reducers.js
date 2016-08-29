@@ -5,7 +5,8 @@ var initialState = {
   section: 'login',
   page: {
     name: 'dashboard',
-    properties: undefined
+    properties: undefined,
+    isSidebarCollapse: false
   }
 };
 
@@ -16,6 +17,9 @@ function papirusApp(state, action){
       return _.merge({}, state, {page: action.page});
     case Action.CHANGE_SECTION:
       return _.merge({}, state, {section: action.section});
+    case Action.DASHBOARD_SIDEBAR_TOGGLE:
+      var nextCollapseState = !state.page.isSidebarCollapse;
+      return _.merge({}, state, {page: {isSidebarCollapse: nextCollapseState}});
     default:
       return state;
   }

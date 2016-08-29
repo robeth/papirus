@@ -20,7 +20,7 @@ var Dashboard = React.createClass({
           <div className="col-lg-3 col-xs-6">
             <div className="small-box bg-green">
               <div className="inner">
-                <h3>53<sup style={{'font-size': '20px'}}>%</sup></h3>
+                <h3>53<sup style={{'fontSize': '20px'}}>%</sup></h3>
                 <p>HPP</p>
               </div>
               <div className="icon">

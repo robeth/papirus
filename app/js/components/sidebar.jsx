@@ -52,24 +52,6 @@ var Sidebar = React.createClass({
             </li>
 
             <li className="treeview">
-              <a href="#" id="menu-form">
-                <i className="fa fa-edit"></i> <span>Form</span>
-                <i className="fa fa-angle-left pull-right"></i>
-              </a>
-              <ul className="treeview-menu">
-                <li><PageLink to='form-pembelian'><i className="fa fa-arrow-right"></i> Pembelian</PageLink></li>
-                <li><PageLink to='form-penjualan'><i className="fa fa-arrow-left"></i> Penjualan</PageLink></li>
-                <li><PageLink to='form-konversi'><i className="fa fa-recycle"></i> Konversi</PageLink></li>
-                <li><PageLink to='form-penarikan'><i className="fa fa-hand-lizard-o"></i> Penarikan</PageLink></li>
-                <li><a href="#"><i className="fa fa-file"></i> Transaksi</a></li>
-                <li><PageLink to='form-nasabah'><i className="fa fa-users"></i> Nasabah</PageLink></li>
-                <li><PageLink to='form-vendor'><i className="fa fa-truck"></i> Vendor</PageLink></li>
-                <li><PageLink to='form-barang'><i className="fa fa-rocket"></i> Barang</PageLink></li>
-                <li><a href="#"><i className="fa fa-list-ol"></i> Kategori Transaksi</a></li>
-              </ul>
-            </li>
-
-            <li className="treeview">
               <a href="#">
                 <i className="fa fa-files-o"></i>
                 <span>Laporan</span>
@@ -109,11 +91,6 @@ var Sidebar = React.createClass({
               </ul>
             </li>
 
-            <li className="treeview">
-              <SectionLink to='login'>
-                <i className="fa fa-power-off"></i> <span>Logout</span>
-              </SectionLink>
-            </li>
           </ul>
         </section>
       </aside>
