@@ -6,6 +6,11 @@ var Header = require('./header');
 var PageContainer = require('./page-container');
 var classnames = require('classnames');
 
+var DbConfig = require('../../electron_boilerplate/db_config');
+var ModelProxy = require('../models/proxy');
+
+ModelProxy.connect(DbConfig.load());
+
 var BinaMandiri = React.createClass({
   render: function(){
     return (

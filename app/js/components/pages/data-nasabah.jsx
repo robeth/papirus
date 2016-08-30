@@ -1,25 +1,37 @@
 var React = require('react');
 var ModelProxy = require('../../models/proxy');
 var LinkHelper = require('../helpers/link-helper');
+var ReactBsTable = require('react-bootstrap-table');
+var BootstrapTable = ReactBsTable.BootstrapTable;
+var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
+var classnames = require('classnames');
 
-var DataNasabahIndividu = React.createClass({
-  propTypes: {
-    type: React.PropTypes.oneOf(['individu', 'kolektif']).isRequired
-  },
-
+var DataNasabah = React.createClass({
   getInitialState: function(){
-    return {accounts: []};
+    return {accountType: 'kolektif', accounts: []};
   },
+
   componentDidMount: function(){
-    var instance = this;
+    this.refreshAccountTable();
+  },
+
+  componentDidUpdate: function(prevProps, prevState){
+    if(prevState.accountType == this.state.accountType){
+      return;
+    }
+    this.refreshAccountTable();
+  },
+
+  refreshAccountTable: function(){
+    var component = this;
     ModelProxy.get('Nasabah')
       .findAll({
-        where: {jenis: this.props.type }
+        where: {jenis: this.state.accountType }
       })
       .then(function onAccountRetrieveSuccess(accounts){
         console.log('Retrieve all accounts data success!');
         console.log(accounts);
-        instance.setState({accounts: accounts});
+        component.setState({accounts: accounts});
       })
       .catch(function onAccountRetrieveFailed(error){
         console.log('Retrieving accounts failed...');
@@ -27,37 +39,90 @@ var DataNasabahIndividu = React.createClass({
       });
   },
 
+  getAccountHandler: function(accountType){
+    var component = this;
+    return function(){
+      component.setState({accountType: accountType});
+    };
+  },
+
+  getCsvFilename: function(){
+    var today = moment().format('YYYY-MM-DD');
+    return 'nasabah-' + this.state.accountType + '-' + today + '.csv';
+  },
+
+  accountFormatter: function(cell, row){
+    return <LinkHelper.Customer customerId={cell}/>;
+  },
+
   render: function(){
     var component = this;
-    var rows = this.state.accounts.map(function(account, index){
-      return (
-        <tr key={index}>
-          <td className="text-center">{index}</td>
-          <td className="text-center">
-            <LinkHelper.Customer customerId={account.id}/>
-          </td>
-          <td className="text-center">I01234</td>
-          <td>{account.nama} </td>
-          <td>{account.alamat}</td>
-          <td>-</td>
-          <td className="text-right">-</td>
-        </tr>
-      );
-    }.bind(component));
+    var table = (
+      <BootstrapTable
+        data={this.state.accounts}
+        condensed={true}
+        hover={true}
+        pagination={true}
+        exportCSV={true}
+        csvFileName={this.getCsvFilename()}
+        options={{sizePerPage: 25}}>
+        <TableHeaderColumn
+          isKey={true}
+          dataField='id'
+          dataSort={true}
+          filter={{type: 'TextFilter'}}
+          dataFormat={this.accountFormatter}
+          dataAlign="center"
+          >
+          Kode
+        </TableHeaderColumn>
+        <TableHeaderColumn
+          dataField='no_induk'
+          dataSort={true}
+          filter={{type: 'TextFilter'}}
+          >
+          No Induk
+        </TableHeaderColumn>
+        <TableHeaderColumn
+          dataField='nama'
+          dataSort={true}
+          filter={{type: 'TextFilter'}}
+          >
+          Nama
+        </TableHeaderColumn>
+        <TableHeaderColumn dataField='alamat' filter={{type: 'TextFilter'}}>
+          Alamat
+        </TableHeaderColumn>
+        <TableHeaderColumn dataField='telepon' filter={{type: 'TextFilter'}}>
+          Telepon
+        </TableHeaderColumn>
+      </BootstrapTable>
+    );
+
     return (
       <section className="content">
         <div className="row">
-          <div className="col-md-6">
-            <div className="box">
+          <div className="col-md-4 col-xs-12">
+            <div className="box box-info">
               <div className="box-header">
-                <h3 className="box-title">Periode</h3>
+                <h3 className="box-title">Jenis</h3>
               </div>
               <div className="box-body">
-                <div className="form-group">
-                  <div className="input-group">
-                    <div className="input-group-addon"><i className="fa fa-calendar"></i></div>
-                    <input data-widget="calendar-range" className="form-control pull-right"></input>
-                  </div>
+                <div className="btn-group">
+                  <button className={classnames(
+                      'btn',
+                      'btn-default',
+                      {active: this.state.accountType === 'kolektif'})}
+                      onClick={this.getAccountHandler('kolektif')}>
+                    <i className="fa fa-building"></i> Kolektif
+                  </button>
+                  <button className={classnames(
+                      'btn',
+                      'btn-default',
+                      {active: this.state.accountType === 'individu'})}
+                      onClick={this.getAccountHandler('individu')}>
+                    <i className="fa fa-child"></i> Individu
+                  </button>
                 </div>
               </div>
             </div>
@@ -67,22 +132,7 @@ var DataNasabahIndividu = React.createClass({
           <div className="col-xs-12">
             <div className="box box-info">
               <div className="box-body">
-                <table data-widget="advanced-table" className="table table-bordered table-striped">
-                  <thead>
-                    <tr>
-                      <th className="text-center">#</th>
-                      <th className="text-center">Kode</th>
-                      <th className="text-center">No Induk</th>
-                      <th className="text-center">Nama</th>
-                      <th className="text-center">Alamat</th>
-                      <th className="text-center">Telepon</th>
-                      <th className="text-center">Saldo</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows}
-                  </tbody>
-                </table>
+                {table}
               </div>
             </div>
           </div>
@@ -92,4 +142,4 @@ var DataNasabahIndividu = React.createClass({
   }
 });
 
-module.exports = DataNasabahIndividu;
+module.exports = DataNasabah;
