@@ -32,6 +32,51 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     tableName: 'transaction_penjualan',
     freezeTableName: true,
+    classMethods: {
+      findAllEager: function(startDate, endDate){
+        return sequelize.models.Penjualan.findAll({
+          include: [
+            {
+              model: sequelize.models.Vendor,
+              as: 'Vendor'
+            },
+            {
+              model: sequelize.models.PenjualanStock,
+              as: 'PenjualanStocks',
+              include: [
+                {
+                  model: sequelize.models.Stock,
+                  as: 'Stock'
+                }
+              ]
+            }
+          ],
+          where: {
+            tanggal: {
+              $gte: startDate,
+              $lte: endDate
+            }
+          }
+        })
+        .then(function(penjualans){
+          penjualans.forEach(function(penjualan){
+
+            var value = penjualan.PenjualanStocks.reduce(function(result, currentItem){
+              return result + currentItem.jumlah * currentItem.harga;
+            }, 0);
+
+            var weight = penjualan.PenjualanStocks.reduce(function(result, currentItem){
+              return result + currentItem.jumlah
+            }, 0);
+
+            penjualan.value = value;
+            penjualan.weight = weight;
+          });
+
+          return penjualans;
+        });
+      }
+    },
     instanceMethods: {
       getValue: function(){
         return this.getPenjualanStocks()

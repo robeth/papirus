@@ -60,7 +60,7 @@ var DataPembelian = React.createClass({
   getCsvFilename: function(){
     var start = this.state.startDate.format('YYYY-MM-DD');
     var end = this.state.endDate.format('YYYY-MM-DD');
-    return 'Pembelian from ' + start + ' to ' + end + '.csv'
+    return 'Pembelian from ' + start + ' to ' + end + '.csv';
   },
 
   pembelianLinkFormatter: function(cell, row){
@@ -85,8 +85,6 @@ var DataPembelian = React.createClass({
   },
 
   render: function(){
-    var component = this;
-
     var table = (
       <BootstrapTable
         data={this.state.instances}
