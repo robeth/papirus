@@ -129,9 +129,9 @@ module.exports = function(sequelize, DataTypes) {
             {
               model: sequelize.models.Nasabah,
               as: 'Nasabah',
-              where: {
+              where: accountType ? {
                 jenis: accountType
-              }
+              } : {}
             },
             {
               model: sequelize.models.PembelianStock,
@@ -156,6 +156,23 @@ module.exports = function(sequelize, DataTypes) {
               $lte: endDate
             }
           }
+        })
+        .then(function(pembelians){
+          pembelians.forEach(function(pembelian){
+
+            var value = pembelian.PembelianStocks.reduce(function(result, currentItem){
+                return result + currentItem.Stock.jumlah * currentItem.Stock.harga;
+              }, 0);
+
+            var weight = pembelian.PembelianStocks.reduce(function(result, currentItem){
+                return result + currentItem.Stock.jumlah;
+              }, 0);
+
+            pembelian.value = value;
+            pembelian.weight = weight;
+          });
+
+          return pembelians;
         });
       }
     }

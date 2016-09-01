@@ -59,6 +59,7 @@ module.exports = function(sequelize, DataTypes) {
           }
         );
       },
+
       isValidState: function(){
         return sequelize.models.Kategori.getRemainingStock()
           .then(function(remainingStocks){
@@ -72,6 +73,7 @@ module.exports = function(sequelize, DataTypes) {
             return isValid;
           });
       },
+
       getRemainingStocks: function(categoryId, t){
         console.log('TransactionKategori-getRemainingStocks');
         console.log('categoriId:' + categoryId);
@@ -86,7 +88,19 @@ module.exports = function(sequelize, DataTypes) {
             }
           }
         );
+      },
+
+      findAllWithReportCategory: function(){
+        return sequelize.models.Kategori.findAll({
+          include: [
+            {
+              model: sequelize.models.ReportKategori,
+              as: 'ReportCategory'
+            }
+          ]
+        });
       }
+
     }
   });
 };

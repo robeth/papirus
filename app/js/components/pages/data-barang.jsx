@@ -1,67 +1,28 @@
 var React = require('react');
 var ModelProxy = require('../../models/proxy');
 var LinkHelper = require('../helpers/link-helper');
-
-var CategoryRow = React.createClass({
-  propTypes: {
-    index: React.PropTypes.number.isRequired,
-    instance: React.PropTypes.object.isRequired
-  },
-
-  getInitialState: function(){
-    return {
-      reportCategory: {
-        nama: null
-      }
-    };
-  },
-
-  componentDidMount: function(){
-    var component = this;
-    component.props.instance.getReportCategory()
-      .then(function onReportCategoryFound(reportCategory){
-        component.setState({
-          reportCategory: reportCategory
-        });
-      })
-      .catch(function(error){
-        console.log('DataBarang-Row-Error retrieving report category');
-        console.log(error);
-      });
-  },
-
-  render: function(){
-    return (
-      <tr>
-        <td className="text-center">{this.props.index + 1}</td>
-        <td className="text-center">
-          <LinkHelper.Category
-            categoryId={this.props.instance.id}
-            categoryCode={this.props.instance.kode}
-            />
-        </td>
-        <td>{this.props.instance.nama} </td>
-        <td>{this.state.reportCategory.nama}</td>
-        <td className="text-center">{this.props.instance.stabil}</td>
-        <td className="text-center">{this.props.instance.fluktuatif}</td>
-        <td className="text-center">{this.props.instance.satuan}</td>
-      </tr>
-    );
-  }
-});
+var ReactBsTable = require('react-bootstrap-table');
+var BootstrapTable = ReactBsTable.BootstrapTable;
+var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
+var moment = require('moment');
 
 var DataKategori = React.createClass({
   getInitialState: function(){
     return {instances: []};
   },
+
   componentDidMount: function(){
-    var instance = this;
+    this.fetchCategory();
+  },
+
+  fetchCategory: function(){
+    var component = this;
     ModelProxy.get('Kategori')
-      .findAll()
+      .findAllWithReportCategory()
       .then(function onKategoriRetrieveSuccess(categories){
         console.log('Retrieve all categories data success!');
         console.log(categories);
-        instance.setState({instances: categories});
+        component.setState({instances: categories});
       })
       .catch(function onKategoriRetrieveFailed(error){
         console.log('Retrieving category failed...');
@@ -69,33 +30,86 @@ var DataKategori = React.createClass({
       });
   },
 
+  getCsvFilename: function(){
+    var today = moment().format('YYYY-MM-DD');
+    return 'category-' + today + '.csv';
+  },
+
+  categoryFormatter: function(cell, row, formatExtraData, rowIdx){
+    return <LinkHelper.Category categoryId={row.id} categoryCode={row.kode}/>;
+  },
+
+  reportCategoryFormatter: function(cell, row){
+    return cell.nama;
+  },
+
   render: function(){
     var component = this;
-    var rows = this.state.instances.map(function(category, index){
-      return <CategoryRow key={category.id} instance={category} index={index}/>;
-    });
+
+    var table = (
+      <BootstrapTable
+        data={this.state.instances}
+        condensed={true}
+        hover={true}
+        pagination={true}
+        exportCSV={true}
+        csvFileName={this.getCsvFilename()}
+        options={{sizePerPage: 25}}>
+        <TableHeaderColumn
+          isKey={true}
+          dataField='kode'
+          dataSort={true}
+          filter={{type: 'TextFilter'}}
+          dataFormat={this.categoryFormatter}
+          dataAlign="center"
+          >
+          Kode
+        </TableHeaderColumn>
+        <TableHeaderColumn
+          dataField='nama'
+          dataSort={true}
+          filter={{type: 'TextFilter'}}
+          >
+          Nama
+        </TableHeaderColumn>
+        <TableHeaderColumn
+          dataField='ReportCategory'
+          dataSort={true}
+          filter={{type: 'TextFilter'}}
+          filterValue={this.reportCategoryFormatter}
+          dataFormat={this.reportCategoryFormatter}
+          >
+          Jenis
+        </TableHeaderColumn>
+        <TableHeaderColumn
+          dataField='stabil'
+          dataSort={true}
+          filter={{type: 'NumberFilter'}}
+          >
+          Stabil
+        </TableHeaderColumn>
+        <TableHeaderColumn
+          dataField='fluktuatif'
+          dataSort={true}
+          filter={{type: 'NumberFilter'}}
+          >
+          Fluktuatif
+        </TableHeaderColumn>
+        <TableHeaderColumn
+          dataField='satuan'
+          filter={{type: 'TextFilter'}}
+          >
+          Satuan
+        </TableHeaderColumn>
+      </BootstrapTable>
+    );
     return (
       <section className="content">
         <div className="row">
           <div className="col-xs-12">
             <div className="box box-info">
               <div className="box-body">
-                <table data-widget="advanced-table" className="table table-bordered table-striped">
-                  <thead>
-                    <tr>
-                      <th className="text-center">#</th>
-                      <th className="text-center">Kode</th>
-                      <th className="text-center">Nama</th>
-                      <th className="text-center">Jenis</th>
-                      <th className="text-center">Harga Normal</th>
-                      <th className="text-center">Harga Fluktuatif</th>
-                      <th className="text-center">Satuan</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows}
-                  </tbody>
-                </table>
+                {table}
               </div>
             </div>
           </div>

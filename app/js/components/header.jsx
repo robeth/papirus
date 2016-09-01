@@ -24,7 +24,7 @@ var Header = React.createClass({
                 </a>
                 <ul className="dropdown-menu">
                   <li>
-                    <ul className="menu" style={{maxHeight: 300}}>
+                    <ul className="menu" style={{height: 300}}>
                       <li>
                         <PageLink to='form-pembelian'>
                           <i className="fa fa-arrow-right"></i> Pembelian
