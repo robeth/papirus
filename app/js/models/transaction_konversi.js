@@ -69,6 +69,67 @@ module.exports = function(sequelize, DataTypes) {
               }, 0);
           });
       }
+    },
+    classMethods: {
+      findAllEager: function(startDate, endDate){
+        return sequelize.models.Konversi.findAll({
+          include: [
+            {
+              model: sequelize.models.KonversiInStock,
+              as: 'KonversiInStocks',
+              include: [
+                {
+                  model: sequelize.models.Stock,
+                  as: 'Stock'
+                }
+              ]
+            },
+            {
+              model: sequelize.models.KonversiOutStock,
+              as: 'KonversiOutStocks',
+              include: [
+                {
+                  model: sequelize.models.Stock,
+                  as: 'Stock'
+                }
+              ]
+            }
+          ],
+          where: {
+            tanggal: {
+              $gte: startDate,
+              $lte: endDate
+            }
+          }
+        })
+        .then(function(konversis){
+          konversis.forEach(function(konversi){
+
+            var inputValue = konversi.KonversiInStocks.reduce(function(result, inStock){
+              return result + inStock.jumlah * inStock.Stock.harga;
+            }, 0);
+
+            var inputWeight = konversi.KonversiInStocks.reduce(function(result, inStock){
+              return result + inStock.jumlah;
+            }, 0);
+
+            var outputValue = konversi.KonversiOutStocks.reduce(function(result, outStock){
+              return result + outStock.Stock.jumlah * outStock.Stock.harga;
+            }, 0);
+
+            var outputWeight = konversi.KonversiOutStocks.reduce(function(result, outStock){
+              return result + outStock.Stock.jumlah;
+            }, 0);
+
+            konversi.inputValue = inputValue;
+            konversi.inputWeight = inputWeight;
+            konversi.outputValue = outputValue;
+            konversi.outputWeight = outputWeight;
+        });
+
+          return konversis;
+        });
+      }
     }
   });
 };

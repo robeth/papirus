@@ -1,84 +1,48 @@
 var React = require('react');
 var ModelProxy = require('../../models/proxy');
 var LinkHelper = require('../helpers/link-helper');
-
-var KonversiRow = React.createClass({
-  propTypes:{
-    index: React.PropTypes.number.isRequired,
-    konversi: React.PropTypes.object.isRequired
-  },
-
-  getInitialState: function(){
-    return {
-      id: this.props.konversi.id,
-      tanggal: this.props.konversi.tanggal,
-      nota: this.props.konversi.nota,
-      value: null,
-      inputWeight: null,
-      outputWeight: null
-    };
-  },
-
-  componentDidMount: function() {
-    var component = this;
-
-    component.props.konversi.getValue()
-      .then(function(value){
-        console.log('Konversi (' + component.props.konversi.id + ') value : ' + value);
-        component.setState({value: value});
-      })
-      .catch(function(error){
-        console.log('Error fetching value of Konversi (' + component.props.konversi.id + ')');
-      });
-
-    component.props.konversi.getInputWeight()
-      .then(function(inputWeight){
-        console.log('Konversi (' + component.props.konversi.id + ') input weight : ' + inputWeight);
-        component.setState({inputWeight: inputWeight});
-      })
-      .catch(function(error){
-        console.log('Error fetching input weight of Konversi (' + component.props.konversi.id + ')');
-      });
-
-    component.props.konversi.getOutputWeight()
-      .then(function(outputWeight){
-        console.log('Konversi (' + component.props.konversi.id + ') output weight : ' + outputWeight);
-        component.setState({outputWeight: outputWeight});
-      })
-      .catch(function(error){
-        console.log('Error fetching output weight of Konversi (' + component.props.konversi.id + ')');
-      });
-  },
-
-  render: function(){
-    return (
-      <tr>
-        <td className="text-center">{this.props.index}</td>
-        <td className="text-center">
-          <LinkHelper.Convertion convertionId={this.state.id} />
-        </td>
-        <td className="text-center">{this.state.nota}</td>
-        <td className="text-center">{this.state.tanggal.toString()}</td>
-        <td className="text-right">{this.state.value}</td>
-        <td className="text-right">{this.state.inputWeight}</td>
-        <td className="text-right">{this.state.outputWeight}</td>
-      </tr>
-    );
-  }
-});
+var DateRangeField = require('../forms/fields/date-range-field');
+var ReactBsTable = require('react-bootstrap-table');
+var BootstrapTable = ReactBsTable.BootstrapTable;
+var TableHeaderColumn = ReactBsTable.TableHeaderColumn;
+var moment = require('moment');
 
 var DataKonversi = React.createClass({
   getInitialState: function(){
-    return {konversiInstances: []};
+    var today = moment();
+    var lastMonth = moment().subtract(30, 'days');
+
+    return {
+      startDate: lastMonth,
+      endDate: today,
+      instances: []
+    };
   },
+
   componentDidMount: function(){
-    var instance = this;
+    this.fetchKonversi();
+  },
+
+  componentDidUpdate: function(prevProps, prevState){
+    if(prevState.startDate === this.state.startDate &&
+      prevState.endDate === this.state.endDate){
+        return;
+      }
+
+    this.fetchKonversi();
+  },
+
+  fetchKonversi: function(){
+    var component = this;
+    var startDateString = component.state.startDate.format('YYYY-MM-DD');
+    var endDateString = component.state.endDate.format('YYYY-MM-DD');
+
     ModelProxy.get('Konversi')
-      .findAll()
+      .findAllEager(startDateString, endDateString)
       .then(function onKonversisRetrieveSuccess(konversis){
         console.log('Retrieve all konversis data success!');
         console.log(konversis);
-        instance.setState({konversiInstances: konversis});
+        component.setState({instances: konversis});
       })
       .catch(function onKonversisRetrieveFailed(error){
         console.log('Retrieving konversis failed...');
@@ -86,11 +50,83 @@ var DataKonversi = React.createClass({
       });
   },
 
-  render: function(){
-    var component = this;
-    var rows = this.state.konversiInstances.map(function(konversi, index){
-      return <KonversiRow key={konversi.id} index={index} konversi={konversi}/>;
+  handleDateChange: function(eventData){
+    this.setState({
+      startDate: eventData.startDate,
+      endDate: eventData.endDate
     });
+  },
+
+  getCsvFilename: function(){
+    var start = this.state.startDate.format('YYYY-MM-DD');
+    var end = this.state.endDate.format('YYYY-MM-DD');
+    return 'Konversi from ' + start + ' to ' + end + '.csv';
+  },
+
+  konversiLinkFormatter: function(cell, row){
+    return <LinkHelper.Convertion convertionId={cell} />;
+  },
+
+  dateFormatter: function(cell, row){
+    return cell.toString();
+  },
+
+  render: function(){
+    var table = (
+      <BootstrapTable
+        data={this.state.instances}
+        condensed={true}
+        hover={true}
+        pagination={true}
+        exportCSV={true}
+        csvFileName={this.getCsvFilename()}
+        options={{sizePerPage: 25}}>
+        <TableHeaderColumn
+          isKey={true}
+          dataField='id'
+          dataSort={true}
+          dataAlign="center"
+          filter={{type: "TextFilter"}}
+          dataFormat={this.konversiLinkFormatter}>
+          Kode
+        </TableHeaderColumn>
+        <TableHeaderColumn
+          dataField='nota'
+          dataSort={true}
+          filter={{type: "TextFilter"}}>
+          Nota
+        </TableHeaderColumn>
+        <TableHeaderColumn
+          dataField='tanggal'
+          filter={{type: "TextFilter"}}
+          dataSort={true}
+          dataAlign="center"
+          dataFormat={this.dateFormatter}>
+          Tanggal
+        </TableHeaderColumn>
+        <TableHeaderColumn
+          dataField='inputValue'
+          dataAlign='right'
+          filter={{type: "NumberFilter"}}
+          dataSort={true}>
+          Nilai
+        </TableHeaderColumn>
+        <TableHeaderColumn
+          dataField='inputWeight'
+          dataAlign='right'
+          filter={{type: "NumberFilter"}}
+          dataSort={true}>
+          Tonase Input
+        </TableHeaderColumn>
+        <TableHeaderColumn
+          dataField='outputWeight'
+          dataAlign='right'
+          filter={{type: "NumberFilter"}}
+          dataSort={true}>
+          Tonase Output
+        </TableHeaderColumn>
+      </BootstrapTable>
+    );
 
     return (
       <section className="content">
@@ -101,12 +137,12 @@ var DataKonversi = React.createClass({
                 <h3 className="box-title">Periode</h3>
               </div>
               <div className="box-body">
-                <div className="form-group">
-                  <div className="input-group">
-                    <div className="input-group-addon"><i className="fa fa-calendar"></i></div>
-                    <input data-widget="calendar-range" className="form-control pull-right"></input>
-                  </div>
-                </div>
+                <DateRangeField
+                  ref='date-picker'
+                  initialStartDate={this.state.startDate}
+                  initialEndDate={this.state.endDate}
+                  onEvent={this.handleDateChange}
+                />
               </div>
             </div>
           </div>
@@ -115,22 +151,7 @@ var DataKonversi = React.createClass({
           <div className="col-xs-12">
             <div className="box box-info">
               <div className="box-body">
-                <table data-widget="advanced-table" className="table table-bordered table-striped">
-                  <thead>
-                    <tr>
-                      <th className="text-center">#</th>
-                      <th className="text-center">Kode</th>
-                      <th className="text-center">Nota</th>
-                      <th className="text-center">Tanggal</th>
-                      <th className="text-center">Nilai</th>
-                      <th className="text-center">Tonase In</th>
-                      <th className="text-center">Tonase Out</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {rows}
-                  </tbody>
-                </table>
+                {table}
               </div>
             </div>
           </div>

@@ -133,7 +133,7 @@ var DataPenjualan = React.createClass({
         </TableHeaderColumn>
         <TableHeaderColumn
           dataField='tanggal'
-          filter={{type: "DateFilter"}}
+          filter={{type: "TextFilter"}}
           dataSort={true}
           dataAlign="center"
           dataFormat={this.dateFormatter}>
