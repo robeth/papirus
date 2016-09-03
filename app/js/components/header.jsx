@@ -65,11 +65,6 @@ var Header = React.createClass({
                           <i className="fa fa-rocket"></i> Barang
                         </PageLink>
                       </li>
-                      <li>
-                        <a href="#">
-                          <i className="fa fa-list-ol"></i> Kategori Barang
-                        </a>
-                      </li>
                     </ul>
                   </li>
                 </ul>

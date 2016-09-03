@@ -1,5 +1,6 @@
 var Action = require('./actions');
 var _ = require('lodash');
+var PageDictionary = require('./constants/page-dictionary');
 
 var initialState = {
   section: 'main',
@@ -10,19 +11,30 @@ var initialState = {
   }
 };
 
+function isValidState(state){
+  return state.page.name ? true : false;
+}
+
 function papirusApp(state, action){
-  state = state || initialState;
+  var oldState = state || initialState;
+  var newState = null;
+
   switch(action.type){
     case Action.CHANGE_PAGE:
-      return _.merge({}, state, {page: action.page});
+      newState = _.merge({}, oldState, {page: action.page});
+      break;
     case Action.CHANGE_SECTION:
-      return _.merge({}, state, {section: action.section});
+      newState = _.merge({}, oldState, {section: action.section});
+      break;
     case Action.DASHBOARD_SIDEBAR_TOGGLE:
-      var nextCollapseState = !state.page.isSidebarCollapse;
-      return _.merge({}, state, {page: {isSidebarCollapse: nextCollapseState}});
+      var nextCollapseState = !oldState.page.isSidebarCollapse;
+      newState = _.merge({}, oldState, {page: {isSidebarCollapse: nextCollapseState}});
+      break;
     default:
-      return state;
+      newState = oldState;
+      break;
   }
+  return isValidState(newState) ? newState : oldState;
 }
 
 module.exports = papirusApp;
