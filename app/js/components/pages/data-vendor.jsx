@@ -16,6 +16,7 @@ var DataVendor = React.createClass({
   },
 
   fetchVendor: function(){
+    // TODO show loading icon instead of empty table until query is finished
     var instance = this;
     ModelProxy.get('Vendor')
       .findAll()

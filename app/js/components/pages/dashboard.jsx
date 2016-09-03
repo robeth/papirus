@@ -1,6 +1,14 @@
 var React = require('react');
 
 var Dashboard = React.createClass({
+  // TODO show total amount of indiv or colective accounts
+  // TODO find sensible start and end date
+  // TODO show total amount of deposit, sale
+  // TODO show total amount of nett profit, bruto profit, total unsettledDeposit
+  // TODO disable date selector until all queries are finished
+  // TODO show loading container until query is finished
+  // TODO show bank activity (sale, deposit, withdrawal) using line chart
+  // TODO show remaining stock table with its potential value
   render: function(){
     return (
       <section className="content">

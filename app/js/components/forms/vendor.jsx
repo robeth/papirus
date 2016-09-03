@@ -45,6 +45,7 @@ var VendorForm = React.createClass({
   },
 
   onNewFormSubmit: function(event){
+    // TODO use LoadingButton until query is finished
     event.preventDefault();
     this.resetAlert();
     var component = this;
@@ -120,6 +121,7 @@ var VendorForm = React.createClass({
   },
 
   render: function(){
+    // TODO enable DELETE vendor if it has no sale
     var formHandler = function(event){
       event.preventDefault();
     };

@@ -201,10 +201,12 @@ var PembelianForm = React.createClass({
   },
 
   formHandler: function(event){
+    // TODO use LoadingButton until query is finished
     event.preventDefault();
   },
 
   render: function(){
+    // TODO enable DELETE deposit if its not related to any Sale or Convertion
     var nasabahOptions = this.state.nasabahInstances.map(
       function(nasabahInstance, index, arr){
         return {

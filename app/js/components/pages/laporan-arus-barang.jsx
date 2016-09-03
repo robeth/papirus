@@ -9,6 +9,7 @@ var ModelProxy = require('../../models/proxy');
 
 var StockFlowReport = React.createClass({
   getInitialState: function(){
+    // TODO Sensible startDate to avoid initial empty table
     return {
       stockSummary: [],
       startDate: moment(new Date('1900-01-01')),
@@ -29,6 +30,8 @@ var StockFlowReport = React.createClass({
   },
 
   refreshReport: function(){
+    // TODO show loading icon instead of empty table until query is finished
+    // TODO disable date selector until query is finished
     var component = this;
     var startDateString = component.state.startDate.format('YYYY-MM-DD');
     var endDateString = component.state.endDate.format('YYYY-MM-DD');

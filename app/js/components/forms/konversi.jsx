@@ -471,10 +471,12 @@ var KonversiForm = React.createClass({
   },
 
   formHandler: function(event){
+    // TODO use LoadingButton until query is finished
     event.preventDefault();
   },
 
   render: function(){
+    // TODO enable DELETE convertion if it has no related sale or other convertion
     var buttons = null;
 
     if(this.props.mode === 'add'){

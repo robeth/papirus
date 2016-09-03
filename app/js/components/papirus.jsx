@@ -5,6 +5,7 @@ var ReactDom = require('react-dom');
 var SectionContainer = require('./section-container');
 var Store = require('./store');
 
+// TODO change application logo
 var Papirus = React.createClass({
   render: function(){
     return (

@@ -216,6 +216,7 @@ module.exports = {
     ]
   },
   // TODO Add ReportCategory List, Add, Edit, Show functionality
+  // TODO Add ProfitLoss report
   'laporan-arus-barang': {
     title: 'Laporan Arus Barang',
     element: React.createFactory(StockFlowReport),

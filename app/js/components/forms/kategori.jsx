@@ -150,6 +150,7 @@ var CategoryForm = React.createClass({
   },
 
   formHandler: function(event){
+    // TODO use LoadingButton until query is finished
     event.preventDefault();
   },
 

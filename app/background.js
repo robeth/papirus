@@ -32,6 +32,7 @@ app.on('ready', function () {
 
     mainWindow.loadURL('file://' + __dirname + '/bina-mandiri.html');
 
+    // TODO Disable menu but let application debuggable
     if (env.name !== 'production') {
         // devHelper.setDevMenu();
         // mainWindow.openDevTools();

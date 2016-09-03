@@ -16,6 +16,7 @@ var DataKategori = React.createClass({
   },
 
   fetchCategory: function(){
+    // TODO show loading icon instead of empty table until query is finished
     var component = this;
     ModelProxy.get('Kategori')
       .findAllWithReportCategory()

@@ -97,6 +97,7 @@ var PenarikanForm = React.createClass({
   },
 
   save: function(){
+    // TODO use LoadingButton until query is finished
     event.preventDefault();
     this.resetAlert();
     var formErrors = this.validate();
@@ -193,6 +194,7 @@ var PenarikanForm = React.createClass({
   },
 
   onDelete: function(){
+    // TODO use LoadingButton until query is finished
     var component = this;
     var penarikanInstance = this.state.instance;
 

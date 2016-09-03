@@ -52,6 +52,7 @@ var FormNasabah = React.createClass({
   },
 
   onNewFormSubmit: function(event){
+    // TODO use LoadingButton until query is finished
     event.preventDefault();
     this.resetAlert();
     var component = this;
@@ -127,6 +128,7 @@ var FormNasabah = React.createClass({
   },
 
   render: function(){
+    // TODO enable DELETE account if it has no deposit & withdrawal
     var formHandler = this.props.mode === 'add'
       ? this.onNewFormSubmit
       : this.onEditFormSubmit;

@@ -7,6 +7,10 @@ var VendorDetailPage = React.createClass({
     instanceId: React.PropTypes.number.isRequired
   },
   render: function(){
+    /**
+    * TODO Add Sale history for a vendor
+    * TODO Add Sale deposit summary for a vendor
+    */
     return (
       <section className="content">
         <Box.Container className="box-info">

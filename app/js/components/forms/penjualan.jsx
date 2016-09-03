@@ -421,10 +421,12 @@ var PenjualanForm = React.createClass({
   },
 
   formHandler: function(event){
+    // TODO use LoadingButton until query is finished
     event.preventDefault();
   },
 
   render: function(){
+    // TODO enable DELETE sale
     var vendorOptions = this.state.vendorInstances.map(
       function(vendorInstance, index, arr){
         return {

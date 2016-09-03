@@ -9,6 +9,7 @@ var moment = require('moment');
 
 var DataPembelian = React.createClass({
   getInitialState: function(){
+    // TODO Sensible startDate to avoid initial empty table
     var today = moment();
     var lastMonth = moment().subtract(30, 'days');
 
@@ -33,6 +34,8 @@ var DataPembelian = React.createClass({
   },
 
   fetchPembelian: function(){
+    // TODO show loading icon instead of empty table until query is finished
+    // TODO disable date selector until query is finished
     var component = this;
     var startDateString = component.state.startDate.format('YYYY-MM-DD');
     var endDateString = component.state.endDate.format('YYYY-MM-DD');
